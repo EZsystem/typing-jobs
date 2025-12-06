@@ -329,11 +329,15 @@
         inputArea.value = "";
         updateProgress();
 
+        // ここで音声再生関数を呼び出し
         speak(current.en, 'en-US');
     }
 
+    // ★修正箇所：読み上げ関数
     function speak(text, lang) {
+        // 1. まず前の発話をキャンセルしてリセット
         speechSynthesis.cancel();
+
         const uttr = new SpeechSynthesisUtterance(text);
         uttr.lang = lang;
         uttr.rate = parseFloat(speedSelect.value);
@@ -342,7 +346,10 @@
              statusDisplay.innerText = "Type it!";
         };
         
-        speechSynthesis.speak(uttr);
+        // 2. 0.2秒待ってから再生（これにより冒頭切れを防ぐ）
+        setTimeout(() => {
+            speechSynthesis.speak(uttr);
+        }, 200);
     }
 
     function updateProgress() {
