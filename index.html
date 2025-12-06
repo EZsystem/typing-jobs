@@ -277,6 +277,10 @@
 
     let currentQueue = [];
     let currentIndex = 0;
+    
+    // ★ 修正点1: グローバル変数で音声オブジェクトを保持する（ガベージコレクション対策）
+    let currentUttr = null;
+
     const jaDisplay = document.getElementById('japanese');
     const enDisplay = document.getElementById('english-display');
     const inputArea = document.getElementById('input-area');
@@ -329,27 +333,43 @@
         inputArea.value = "";
         updateProgress();
 
-        // ここで音声再生関数を呼び出し
         speak(current.en, 'en-US');
     }
 
-    // ★修正箇所：読み上げ関数
+    // ★ 修正点2: 強力な冒頭切れ・音飛び対策を施したspeak関数
     function speak(text, lang) {
-        // 1. まず前の発話をキャンセルしてリセット
+        // 前の読み上げがあればキャンセル
         speechSynthesis.cancel();
 
-        const uttr = new SpeechSynthesisUtterance(text);
-        uttr.lang = lang;
-        uttr.rate = parseFloat(speedSelect.value);
-
-        uttr.onend = () => {
-             statusDisplay.innerText = "Type it!";
-        };
-        
-        // 2. 1.2秒待ってから再生（これにより冒頭切れを防ぐ）
+        // 少しだけ間を置く（連続呼び出し時のブラウザの混乱を防ぐ）
         setTimeout(() => {
+            // 1. ダミーの無音Utteranceを作成
+            // 冒頭が切れる現象は、この「捨て石」が引き受けてくれます
+            const dummy = new SpeechSynthesisUtterance("");
+            dummy.volume = 0; // 無音
+
+            // 2. 本番の音声Utteranceを作成
+            const uttr = new SpeechSynthesisUtterance(text);
+            uttr.lang = lang;
+            uttr.rate = parseFloat(speedSelect.value);
+            uttr.pitch = 1.0;
+            
+            uttr.onend = () => {
+                 statusDisplay.innerText = "Type it!";
+            };
+            
+            uttr.onerror = (e) => {
+                console.error('Speech synthesis error:', e);
+            };
+
+            // 3. グローバル変数に代入して、メモリから消されないように保護する
+            currentUttr = uttr;
+
+            // 4. ダミー → 本番 の順でキューに入れる
+            speechSynthesis.speak(dummy);
             speechSynthesis.speak(uttr);
-        }, 1200);
+
+        }, 50);
     }
 
     function updateProgress() {
@@ -392,5 +412,3 @@
 
 </body>
 </html>
-
-
