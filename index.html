@@ -346,10 +346,10 @@
              statusDisplay.innerText = "Type it!";
         };
         
-        // 2. 0.2秒待ってから再生（これにより冒頭切れを防ぐ）
+        // 2. 0.6秒待ってから再生（これにより冒頭切れを防ぐ）
         setTimeout(() => {
             speechSynthesis.speak(uttr);
-        }, 200);
+        }, 600);
     }
 
     function updateProgress() {
@@ -392,3 +392,4 @@
 
 </body>
 </html>
+
