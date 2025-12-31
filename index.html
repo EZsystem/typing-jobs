@@ -7,49 +7,40 @@
 <style>
     body { font-family: 'Helvetica Neue', Arial, sans-serif; text-align: center; padding: 30px; background-color: #f0f2f5; color: #333; }
     h1 { color: #444; font-size: 1.6em; margin-bottom: 10px; }
-    
+
     #container { background: white; max-width: 800px; margin: 0 auto; padding: 30px; border-radius: 12px; box-shadow: 0 6px 12px rgba(0,0,0,0.1); }
-    
+
     .controls { display: flex; gap: 10px; margin-bottom: 20px; justify-content: center; flex-wrap: wrap; }
     select { padding: 10px; font-size: 1em; border-radius: 5px; border: 1px solid #ccc; background: #fff; }
     #chapter-select { flex: 2; min-width: 250px; }
     #speed-select { flex: 1; min-width: 120px; }
 
-    /* --- レイアウト変更箇所 --- */
-    /* 1. 和訳 */
     #japanese { font-size: 1.1em; color: #333; margin-bottom: 5px; min-height: 1.5em; line-height: 1.6; font-weight: bold; }
-    
-    /* 2. カタカナ */
     #kana-display { font-size: 0.9em; color: #666; margin-bottom: 2px; min-height: 1.2em; }
-
-    /* 3. 発音記号 (新規) */
     #phonetic-display { font-size: 0.9em; color: #007bff; margin-bottom: 15px; font-family: "Lucida Sans Unicode", "Arial Unicode MS", sans-serif; min-height: 1.2em; }
-
-    /* 4. 英文 (判定用装飾) */
-    #english-display { 
-        font-size: 1.6em; 
-        font-weight: bold; 
-        margin-bottom: 25px; 
-        letter-spacing: 0.5px; 
-        min-height: 1.5em; 
-        color: #bbb; /* 未入力部分は薄いグレー */
+    #english-display {
+        font-size: 1.6em;
+        font-weight: bold;
+        margin-bottom: 25px;
+        letter-spacing: 0.5px;
+        min-height: 1.5em;
+        color: #bbb;
         word-wrap: break-word;
     }
 
-    /* 文字単位の判定スタイル */
-    .char-correct { color: #333; } /* 正解した文字は濃い黒 */
-    .char-wrong { color: #dc3545; background-color: #f8d7da; border-radius: 3px; } /* 間違いは赤文字＋背景 */
-    .char-pending { color: #aaa; } /* まだ打っていない文字 */
-    
+    .char-correct { color: #333; }
+    .char-wrong { color: #dc3545; background-color: #f8d7da; border-radius: 3px; }
+    .char-pending { color: #aaa; }
+
     #input-area { width: 90%; padding: 15px; font-size: 1.3em; border: 2px solid #ddd; border-radius: 8px; outline: none; transition: border-color 0.3s; }
     #input-area:focus { border-color: #007bff; }
-    
+
     #status { margin-top: 20px; font-weight: bold; color: #007bff; min-height: 1.5em; }
-    
+
     .btn-group { margin-top: 20px; }
     button { padding: 12px 25px; font-size: 1.1em; background-color: #007bff; color: white; border: none; border-radius: 6px; cursor: pointer; transition: background 0.3s; }
     button:hover { background-color: #0056b3; }
-    
+
     .progress-bar { height: 8px; background: #eee; width: 100%; margin-top: 25px; border-radius: 4px; overflow: hidden; }
     .progress-fill { height: 100%; background: #28a745; width: 0%; transition: width 0.3s; }
 </style>
@@ -58,26 +49,34 @@
 
 <div id="container">
     <h1>Steve Jobs Speech Typing</h1>
-    
+
     <div class="controls">
         <select id="chapter-select">
             <option value="all">★ 全文を通して実行 (Full Story)</option>
-            <option value="0">1. ひとつ目は点と点をつなぐ話</option>
-            <option value="1">2. 私の人生の始まり</option>
-            <option value="2">3. 大学中退を決断した</option>
-            <option value="3">4. 好奇心と直感に従って出合ったもの</option>
-            <option value="4">5. 10年後によみがえった記憶</option>
-            <option value="5">6. 点と点がやがてつながると信じよう</option>
-            <option value="6">7. ふたつ目は愛と失意の話</option>
-            <option value="7">8. 失敗しても自分の仕事を愛していた</option>
-            <option value="8">9. アップル追放は人生最良の出来事だった</option>
-            <option value="9">10. 愛せる仕事を見つけよう</option>
-            <option value="10">11. みっつ目は死に関する話</option>
-            <option value="11">12. がんで死の宣告を受けた</option>
-            <option value="12">13. 死に近づいた経験から言えること</option>
-            <option value="13">14. 自分の心と直感に従う勇気を持て</option>
-            <option value="14">15. 『全地球カタログ』に触れて</option>
-            <option value="15">16. ハングリーであり続けろ、愚か者であり続けろ</option>
+            <option value="0">1. はじめに</option>
+            <option value="1">2. 大学卒業という経験</option>
+            <option value="2">3. ３つのストーリー</option>
+            <option value="3">4. 点と点を繋ぐ話</option>
+            <option value="4">5. 中退の理由</option>
+            <option value="5">6. 養子縁組の裏側</option>
+            <option value="6">7. 両親の約束</option>
+            <option value="7">8. 高くついた大学生活</option>
+            <option value="8">9. 中退という決断</option>
+            <option value="9">10. ロマンチックではなかった現実</option>
+            <option value="10">11. カリグラフィとの出会い</option>
+            <option value="11">12. 人生における実用性</option>
+            <option value="12">13. マッキントッシュへの応用</option>
+            <option value="13">14. 未来を信じること</option>
+            <option value="14">15. 愛と喪失について</option>
+            <option value="15">16. Appleからの解雇</option>
+            <option value="16">17. 人生の再出発</option>
+            <option value="17">18. 解雇がもたらした最高の結果</option>
+            <option value="18">19. NeXTとPixar、そして家族</option>
+            <option value="19">20. 人生という名の良薬</option>
+            <option value="20">21. 死について</option>
+            <option value="21">22. 死の宣告と向き合う</option>
+            <option value="22">23. 死という最高の発明</option>
+            <option value="23">24. Stay Hungry. Stay Foolish.</option>
         </select>
 
         <select id="speed-select">
@@ -92,205 +91,202 @@
 
     <div id="japanese">テーマを選択してスタートしてください</div>
     <div id="kana-display"></div>
-    <div id="phonetic-display"></div> <div id="english-display">Stay Hungry. Stay Foolish.</div>
-    
+    <div id="phonetic-display"></div>
+    <div id="english-display">Stay Hungry. Stay Foolish.</div>
+
     <input type="text" id="input-area" placeholder="Type here..." disabled autocomplete="off">
-    
+
     <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
     <div id="status"></div>
-    
+
     <div class="btn-group">
         <button id="start-btn" onclick="startPractice()">スタート (Start)</button>
     </div>
 </div>
 
 <script>
-    /* データ構成: 発音記号 (phonetic) を追加 */
     const speechData = [
-        // 1. 点と点の話
         [
-            { en: "I am honored to be with you today", ja: "本日は、皆さんとご一緒できて光栄です、", kana: "アイ アム オナード トゥ ビー ウィズ ユー トゥデイ", phonetic: "/aɪ æm ˈɒnərd tuː biː wɪð juː təˈdeɪ/" },
-            { en: "for your commencement from one of the finest universities in the world.", ja: "世界でも有数の大学の卒業式に。", kana: "フォー ユア コメンスメント フロム ワン オブ ザ ファイネスト ユニバーシティーズ イン ザ ワールド", phonetic: "/fɔːr jɔːr kəˈmɛnsmənt frɒm wʌn ɒv ðə ˈfaɪnɪst ˌjuːnɪˈvɜːrsɪtiz ɪn ðə wɜːrld/" },
-            { en: "Truth be told, I never graduated from college.", ja: "実を言うと、私は大学を卒業していません。", kana: "トゥルース ビー トールド、 アイ ネバー グラジュエイティド フロム カレッジ", phonetic: "/truːθ biː toʊld, aɪ ˈnɛvər ˈɡrædʒueɪtɪd frɒm ˈkɒlɪdʒ/" },
-            { en: "And this is the closest I've ever gotten to a college graduation.", ja: "これが私にとって、大学卒業に最も近い経験になります。", kana: "アンド ディス イズ ザ クローセスト アイヴ エバー ガッテン トゥ ア カレッジ グラジュエイション", phonetic: "/ænd ðɪs ɪz ðə ˈkloʊsɪst aɪv ˈɛvər ˈɡɒtn tuː ə ˈkɒlɪdʒ ˌɡrædʒuˈeɪʃən/" },
-            { en: "Today I want to tell you three stories from my life.", ja: "本日は、私の人生から3つの話をさせていただきたいと思います。", kana: "トゥデイ アイ ウォント トゥ テル ユー スリー ストーリーズ フロム マイ ライフ", phonetic: "/təˈdeɪ aɪ wɒnt tuː tɛl juː θriː ˈstɔːriz frɒm maɪ laɪf/" },
-            { en: "That's it. No big deal. Just three stories.", ja: "それだけです。大したことではありません。たった3つの話です。", kana: "ザッツ イット。 ノー ビッグ ディール。 ジャスト スリー ストーリーズ", phonetic: "/ðæts ɪt. noʊ bɪɡ diːl. dʒʌst θriː ˈstɔːriz/" },
-            { en: "The first story is about connecting the dots.", ja: "1つ目は、点と点をつなぐという話です。", kana: "ザ ファースト ストーリー イズ アバウト コネクティング ザ ドッツ", phonetic: "/ðə fɜːrst ˈstɔːri ɪz əˈbaʊt kəˈnɛktɪŋ ðə dɒts/" }
+            { en: "This is a prepared text of the Commencement address delivered by Steve Jobs, CEO of Apple Computer and of Pixar Animation Studios, on June 12, 2005.", ja: "これは、2005年6月12日にアップルコンピュータとピクサー・アニメーション・スタジオのCEOであるスティーブ・ジョブズが行った卒業式の祝辞の準備稿です。", kana: "ディス イズ ア プリペアード テクスト オブ ザ コメンスメント アドレス デリバード バイ スティーブ ジョブズ、 シーイーオー オブ アップル コンピューター アンド オブ ピクサー アニメーション スタジオズ、 オン ジューン トウェルフス、 トゥーサウザンドアンドファイブ。", phonetic: "/ðɪs ɪz ə prɪˈpɛrd tɛkst ʌv ðə kəˈmɛnsmənt əˈdrɛs dɪˈlɪvərd baɪ stiv ʤɑbz, siˌiˈoʊ ʌv ˈæpəl kəmˈpjutər ænd ʌv ˈpɪksɑr ˌænəˈmeɪʃən ˈstudiˌoʊz, ɑn ʤun 12, 2005./" }
         ],
-        // 2. 人生の始まり
         [
-            { en: "I dropped out of Reed College after the first 6 months,", ja: "私はリード大学を最初の半年で退学しました。", kana: "アイ ドロップト アウト オブ リード カレッジ アフター ザ ファースト シックス マンス", phonetic: "/aɪ drɒpt aʊt ɒv riːd ˈkɒlɪdʒ ˈæftər ðə fɜːrst sɪks mʌnθs/" },
-            { en: "but then stayed around as a drop-in for another 18 months", ja: "しかしその後も、もぐりの学生として18ヶ月ほど居座りました、", kana: "バット ゼン ステイド アラウンド アズ ア ドロップイン フォー アナザー エイティーン マンス", phonetic: "/bʌt ðɛn steɪd əˈraʊnd æz ə drɒp-ɪn fɔːr əˈnʌðər eɪˈtiːn mʌnθs/" },
-            { en: "before I really quit. So why did I drop out?", ja: "本当に辞めてしまうまで。ではなぜ、私は中退したのでしょうか？", kana: "ビフォー アイ リアリー クイット。 ソー ホワイ ディド アイ ドロップ アウト？", phonetic: "/bɪˈfɔːr aɪ ˈrɪəli kwɪt. soʊ waɪ dɪd aɪ drɒp aʊt?/" },
-            { en: "It started before I was born.", ja: "話は、私が生まれる前にさかのぼります。", kana: "イット スターティド ビフォー アイ ワズ ボーン", phonetic: "/ɪt ˈstɑːrtɪd bɪˈfɔːr aɪ wɒz bɔːrn/" },
-            { en: "My biological mother was a young, unwed college graduate student,", ja: "私の生みの母は、若き未婚の大学院生でした。", kana: "マイ バイオロジカル マザー ワズ ア ヤング、 アンウェド カレッジ グラジュエイト スチューデント", phonetic: "/maɪ ˌbaɪəˈlɒdʒɪkəl ˈmʌðər wɒz ə jʌŋ, ˌʌnˈwɛd ˈkɒlɪdʒ ˈɡrædʒuət ˈstuːdənt/" },
-            { en: "and she decided to put me up for adoption.", ja: "彼女は私を養子に出すことに決めました。", kana: "アンド シー ディサイディド トゥ プット ミー アップ フォー アダプション", phonetic: "/ænd ʃiː dɪˈsaɪdɪd tuː pʊt miː ʌp fɔːr əˈdɒpʃən/" },
-            { en: "She felt very strongly that I should be adopted by college graduates.", ja: "彼女は、私が大卒の家庭に引き取られるべきだと強く望んでいました。", kana: "シー フェルト ベリー ストロングリー ザット アイ シュッド ビー アダプティド バイ カレッジ グラジュエイツ", phonetic: "/ʃiː fɛlt ˈvɛri ˈstrɒŋli ðæt aɪ ʃʊd biː əˈdɒptɪd baɪ ˈkɒlɪdʒ ˈɡrædʒuəts/" }
+            { en: "I am honored to be with you today at your commencement from one of the finest universities in the world.", ja: "今日、世界で最も優れた大学の一つであるこの大学の卒業式に、皆さんと共にいられることを光栄に思います。", kana: "アイ アム アナード トゥ ビー ウィズ ユー トゥデイ アット ユア コメンスメント フロム ワン オブ ザ ファイネスト ユニバーシティーズ イン ザ ワールド。", phonetic: "/aɪ æm ˈɑnərd tu bi wɪð ju təˈdeɪ æt jʊər kəˈmɛnsmənt frʌm wʌn ʌv ðə ˈfaɪnəst ˌjunəˈvɜrsətiz ɪn ðə wɜrld./" },
+            { en: "I never graduated from college.", ja: "私は大学を卒業しませんでした。", kana: "アイ ネバー グラジュエイテッド フロム カレッジ。", phonetic: "/aɪ ˈnɛvər ˈgræʤuˌeɪtəd frʌm ˈkɑləʤ./" },
+            { en: "Truth be told, this is the closest I've ever gotten to a college graduation.", ja: "実を言うと、これが私が大学の卒業に最も近づいた経験です。", kana: "トゥルース ビー トールド、 ディス イズ ザ クローセスト アイヴ エバー ガッテン トゥ ア カレッジ グラジュエイション。", phonetic: "/truθ bi toʊld, ðɪs ɪz ðə ˈkloʊsəst aɪv ˈɛvər ˈgɑtən tu ə ˈkɑləʤ ˌgræʤuˈeɪʃən./" }
         ],
-        // 3. 中退の決断
         [
-            { en: "Seventeen years later I did go to college.", ja: "17年後、私は本当に大学に行きました。", kana: "セブンティーン イヤーズ レイター アイ ディド ゴー トゥ カレッジ", phonetic: "/ˌsɛvənˈtiːn jɪərz ˈleɪtər aɪ dɪd ɡoʊ tuː ˈkɒlɪdʒ/" },
-            { en: "But I naively chose a college that was almost as expensive as Stanford,", ja: "しかし私は何も考えずに、スタンフォードと同じくらい学費の高い大学を選んでしまいました。", kana: "バット アイ ナイーブリー チョーズ ア カレッジ ザット ワズ オールモスト アズ エクスペンシブ アズ スタンフォード", phonetic: "/bʌt aɪ naˈiːvli tʃoʊz ə ˈkɒlɪdʒ ðæt wɒz ˈɔːlmoʊst æz ɪkˈspɛnsɪv æz ˈstænfərd/" },
-            { en: "and all of my working-class parents' savings were being spent on my college tuition.", ja: "労働者階級の私の両親の蓄えはすべて、大学の学費に消えていきました。", kana: "アンド オール ɒv maɪ ˈwɜːrkɪŋ-klæs ˈpɛərənts ˈseɪvɪŋz wɜːr ˈbiːɪŋ spɛnt ɒn maɪ ˈkɒlɪdʒ tuˈɪʃən", phonetic: "/ænd ɔːl ɒv maɪ ˈwɜːrkɪŋ-klæs ˈpɛərənts ˈseɪvɪŋz wɜːr ˈbiːɪŋ spɛnt ɒn maɪ ˈkɒlɪdʒ tuˈɪʃən/" },
-            { en: "After six months, I couldn't see the value in it.", ja: "半年後、私はそこに価値を見出せなくなりました。", kana: "アフター シックス マンス、 アイ クドゥント シー ザ バリュー イン イット", phonetic: "/ˈæftər sɪks mʌnθs, aɪ ˈkʊdənt siː ðə ˈvæljuː ɪn ɪt/" },
-            { en: "I didn't know what I wanted to do with my life", ja: "人生で何をしたいのか分かりませんでしたし、", kana: "アイ ディドゥント ノウ ホワット アイ ウォンティド トゥ ドゥ ウィズ マイ ライフ", phonetic: "/aɪ ˈdɪdənt noʊ wɒt aɪ ˈwɒntɪd tuː duː wɪð maɪ laɪf/" },
-            { en: "and I didn't know how college was going to help me figure it out.", ja: "大学がどうやってそれを見つける助けになるのかも分かりませんでした。", kana: "アンド アイ ディドゥント ノウ ハウ カレッジ ワズ ゴーイング トゥ ヘルプ ミー フィギュア イット アウト", phonetic: "/ænd aɪ ˈdɪdənt noʊ haʊ ˈkɒlɪdʒ wɒz ˈɡoʊɪŋ tuː hɛlp miː ˈfɪɡjər ɪt aʊt/" },
-            { en: "So I decided to drop out and trust that it would all work out OK.", ja: "そこで私は退学を決意し、すべてうまくいくと信じることにしたのです。", kana: "ソー アイ ディサイディド トゥ ドロップ アウト アンド トラスト ザット イット ウド オール ワーク アウト オーケー", phonetic: "/soʊ aɪ dɪˈsaɪdɪd tuː drɒp aʊt ænd trʌst ðæt ɪt wʊd ɔːl wɜːrk aʊt oʊˈkeɪ/" }
+            { en: "Today I want to tell you three stories from my life.", ja: "今日、私の人生から3つの話をおしたいと思います。", kana: "トゥデイ アイ ウォント トゥ テル ユー スリー ストーリーズ フロム マイ ライフ。", phonetic: "/təˈdeɪ aɪ wɑnt tə tɛl ju θri ˈstɔriz frʌm maɪ laɪf./" },
+            { en: "That's it.", ja: "それだけです。", kana: "ザッツ イット。", phonetic: "/ðæts ɪt./" },
+            { en: "No big deal.", ja: "大したことではありません。", kana: "ノー ビッグ ディール。", phonetic: "/noʊ bɪg dil./" },
+            { en: "Just three stories.", ja: "たった3つの話です。", kana: "ジャスト スリー ストーリーズ。", phonetic: "/ʤəst θri ˈstɔriz./" }
         ],
-        // 4. 好奇心と直感
         [
-            { en: "It was pretty scary at the time,", ja: "当時はとても怖かったのですが、", kana: "イット ワズ プリティ スケアリー アット ザ タイム", phonetic: "/ɪt wɒz ˈprɪti ˈskɛəri æt ðə taɪm/" },
-            { en: "but looking back it was one of the best decisions I ever made.", ja: "振り返ってみれば、それは人生最良の決断のひとつでした。", kana: "バット ルッキング バック イット ワズ ワン オブ ザ ベスト ディシジョンズ アイ エバー メイド", phonetic: "/bʌt ˈlʊkɪŋ bæk ɪt wɒz wʌn ɒv ðə bɛst dɪˈsɪʒənz aɪ ˈɛvər meɪd/" },
-            { en: "The minute I dropped out I could stop taking the required classes that didn't interest me,", ja: "退学した瞬間に、興味のない必修科目の授業に出る必要がなくなり、", kana: "ザ ミニット アイ ドロップト アウト アイ クド ストップ テイキング ザ リクワイアード クラッシーズ ザット ディドゥント インタレスト ミー", phonetic: "/ðə ˈmɪnɪt aɪ drɒpt aʊt aɪ kʊd stɒp ˈteɪkɪŋ ðə rɪˈkwaɪərd ˈklæsɪz ðæt ˈdɪdənt ˈɪntrəst miː/" },
-            { en: "and begin dropping in on the ones that looked interesting.", ja: "面白そうな授業にだけ顔を出せるようになったからです。", kana: "アンド ビギン ドロッピング イン オン ザ ワンズ ザット ルックト インタレスティング", phonetic: "/ænd bɪˈɡɪn ˈdrɒpɪŋ ɪn ɒn ðə wʌnz ðæt lʊkt ˈɪntrəstɪŋ/" },
-            { en: "It wasn't all romantic.", ja: "夢のような生活ばかりではありませんでした。", kana: "イット ワズント オール ロマンティック", phonetic: "/ɪt ˈwɒzənt ɔːl roʊˈmæntɪk/" },
-            { en: "I didn't have a dorm room, so I slept on the floor in friends' rooms,", ja: "寮の部屋がなかったので、友人の部屋の床で寝泊まりしました。", kana: "アイ ディドゥント ハブ ア ドーム ルーム、 ソー アイ スレプト オン ザ フロア イン フレンズ ルームズ", phonetic: "/aɪ ˈdɪdənt hæv ə dɔːrm ruːm, soʊ aɪ slɛpt ɒn ðə flɔːr ɪn frɛndz ruːmz/" },
-            { en: "and I walked the 7 miles across town every Sunday night", ja: "毎週日曜の夜には、町を横切って7マイル歩きました、", kana: "アンド アイ ウォークト ザ セブン マイルズ アクロス タウン エブリ サンデー ナイト", phonetic: "/ænd aɪ wɔːkt ðə ˈsɛvən maɪlz əˈkrɒs taʊn ˈɛvri ˈsʌndeɪ naɪt/" },
-            { en: "to get one good meal a week at the Hare Krishna temple.", ja: "ハーレ・クリシュナ寺院で週に一度のまともな食事にありつくために。", kana: "トゥ ゲット ワン グッド ミール ア ウィーク アット ザ ハーレ クリシュナ テンプル", phonetic: "/tuː ɡɛt wʌn ɡʊd miːl ə wiːk æt ðə ˈhɛəri ˈkrɪʃnə ˈtɛmpəl/" },
-            { en: "I loved it. And much of what I stumbled into by following my curiosity and intuition", ja: "それが最高でした。好奇心と直感に従って出くわしたものの多くは、", kana: "アイ ラブド イット。 アンド マッチ オブ ホワット アイ スタンブルド イントゥ バイ フォロイング マイ キュリオシティ アンド インテュイション", phonetic: "/aɪ lʌvd ɪt. ænd mʌtʃ ɒv wɒt aɪ ˈstʌmbəld ˈɪntuː baɪ ˈfɒloʊɪŋ maɪ ˌkjʊəriˈɒsɪti ænd ˌɪntjuˈɪʃən/" },
-            { en: "turned out to be priceless later on.", ja: "後になって、得難い価値を持つものになったのです。", kana: "ターンド アウト トゥ ビー プライスレス レイター オン", phonetic: "/tɜːrnd aʊt tuː biː ˈpraɪsləs ˈleɪtər ɒn/" }
+            { en: "The first story is about connecting the dots.", ja: "最初の話は、点と点をつなぐことについてです。", kana: "ザ ファースト ストーリー イズ アバウト コネクティング ザ ドッツ。", phonetic: "/ðə fɜrst ˈstɔri ɪz əˈbaʊt kəˈnɛktɪŋ ðə dɑts./" }
         ],
-        // 5. 10年後の記憶
         [
-            { en: "Reed College at that time offered perhaps the best calligraphy instruction in the country.", ja: "当時のリード大学は、おそらく国内最高のカリグラフィの授業を提供していました。", kana: "リード カレッジ アット ザット タイム オファード パハップス ザ ベスト カリグラフィー インストラクション イン ザ カントリー", phonetic: "/riːd ˈkɒlɪdʒ æt ðæt taɪm ˈɒfərd pərˈhæps ðə bɛst kəˈlɪɡrəfi ɪnˈstrʌkʃən ɪn ðə ˈkʌntri/" },
-            { en: "Because I had dropped out and didn't have to take the normal classes,", ja: "私は中退していて普通の授業を取る必要がなかったので、", kana: "ビコーズ アイ ハド ドロップト アウト アンド ディドゥント ハブ トゥ テイク ザ ノーマル クラッシーズ", phonetic: "/bɪˈkɒz aɪ hæd drɒpt aʊt ænd ˈdɪdənt hæv tuː teɪk ðə ˈnɔːrməl ˈklæsɪz/" },
-            { en: "I decided to take a calligraphy class to learn how to do this.", ja: "カリグラフィの授業を受けて、それを学ぶことにしました。", kana: "アイ ディサイディド トゥ テイク ア カリグラフィー クラス トゥ ラーン ハウ トゥ ドゥ ディス", phonetic: "/aɪ dɪˈsaɪdɪd tuː teɪk ə kəˈlɪɡrəfi klæs tuː lɜːrn haʊ tuː duː ðɪs/" },
-            { en: "I learned about serif and sans serif typefaces,", ja: "セリフやサンセリフといった書体について学びました。", kana: "アイ ラーンド アバウト セリフ アンド サンセリフ タイプフェイシーズ", phonetic: "/aɪ lɜːrnd əˈbaʊt ˈsɛrɪf ænd sænz ˈsɛrɪf ˈtaɪpˌfeɪsɪz/" },
-            { en: "It was beautiful, historical, artistically subtle in a way that science can't capture,", ja: "それは美しく、歴史があり、科学では捉えられない繊細な芸術性を持っていて、", kana: "イット ワズ ビューティフル、 ヒストリカル、 アーティスティカリー サトル イン ア ウェイ ザット サイエンス キャント キャプチャー", phonetic: "/ɪt wɒz ˈbjuːtəfəl, hɪˈstɒrɪkəl, ɑːrˈtɪstɪkli ˈsʌtəl ɪn ə weɪ ðæt ˈsaɪəns kænt ˈkæptʃər/" },
-            { en: "and I found it fascinating.", ja: "私はそれに魅了されました。", kana: "アンド アイ ファウンド イット ファッシネイティング", phonetic: "/ænd aɪ faʊnd ɪt ˈfæsɪneɪtɪŋ/" },
-            { en: "None of this had even a hope of any practical application in my life.", ja: "これらが私の人生で何の役に立つかなど、期待すらしていませんでした。", kana: "ナン オブ ディス ハド イーブン ア ホープ オブ エニー プラクティカル アプリケーション イン マイ ライフ", phonetic: "/nʌn ɒv ðɪs hæd ˈiːvən ə hoʊp ɒv ˈɛni ˈpræktɪkəl ˌæplɪˈkeɪʃən ɪn maɪ laɪf/" },
-            { en: "But ten years later, when we were designing the first Macintosh computer, it all came back to me.", ja: "しかし10年後、最初のマッキントッシュを設計していたとき、その記憶がすべて蘇ったのです。", kana: "バット テン イヤーズ レイター、 ホエン ウィー ワー デザイニング ザ ファースト マッキントッシュ コンピュータ、 イット オール ケイム バック トゥ ミー", phonetic: "/bʌt tɛn jɪərz ˈleɪtər, wɛn wiː wɜːr dɪˈzaɪnɪŋ ðə fɜːrst ˈmækɪnˌtɒʃ kəmˈpjuːtər, ɪt ɔːl keɪm bæk tuː miː/" },
-            { en: "And we designed it all into the Mac.", ja: "そして私たちは、そのすべてをMacに組み込みました。", kana: "アンド ウィー デザインド イット オール イントゥ ザ マック", phonetic: "/ænd wiː dɪˈzaɪnd ɪt ɔːl ˈɪntuː ðə mæk/" }
+            { en: "I dropped out of Reed College after the first 6 months, but then stayed around as a drop-in for another 18 months or so before I really quit.", ja: "私はリード大学を最初の6ヶ月で退学しましたが、本当に辞めるまでの18ヶ月ほどはもぐりの学生として大学にいました。", kana: "アイ ドロップト アウト オブ リード カレッジ アフター ザ ファースト シックス マンス、 バット ゼン ステイド アラウンド アズ ア ドロップイン フォー アナザー エイティーン マンス オア ソー ビフォー アイ リアリー クイット。", phonetic: "/aɪ drɑpt aʊt ʌv rid ˈkɑlɪʤ ˈæftər ðə fɜrst 6 mʌnθs, bʌt ðɛn steɪd əˈraʊnd æz ə drɑp-ɪn fɔr əˈnʌðər 18 mʌnθs ɔr soʊ bɪˈfɔr aɪ ˈrili kwɪt./" },
+            { en: "So why did I drop out?", ja: "では、なぜ私は退学したのでしょうか？", kana: "ソー ホワイ ディド アイ ドロップ アウト？", phonetic: "/soʊ waɪ dɪd aɪ drɑp aʊt?/" }
         ],
-        // 6. 点と点をつなぐ
         [
-            { en: "If I had never dropped in on that single course in college,", ja: "もし私が大学であの授業に潜り込んでいなければ、", kana: "イフ アイ ハド ネバー ドロップト イン オン ザット シングル コース イン カレッジ", phonetic: "/ɪf aɪ hæd ˈnɛvər drɒpt ɪn ɒn ðæt ˈsɪŋɡəl kɔːrs ɪn ˈkɒlɪdʒ/" },
-            { en: "the Mac would have never had multiple typefaces or proportionally spaced fonts.", ja: "Macが複数の書体やプロポーショナルフォントを持つことはなかったでしょう。", kana: "ザ マック ウド ハブ ネバー ハド マルチプル タイプフェイシーズ オア プロポーショナリー スペースド フォンツ", phonetic: "/ðə mæk wʊd hæv ˈnɛvər hæd ˈmʌltɪpəl ˈtaɪpˌfeɪsɪz ɔːr prəˈpɔːrʃənəli speɪst fɒnts/" },
-            { en: "Again, you can't connect the dots looking forward;", ja: "繰り返しになりますが、未来を見て点と点をつなぐことはできません。", kana: "アゲイン、 ユー キャント コネクト ザ ドッツ ルッキング フォワード", phonetic: "/əˈɡɛn, juː kænt kəˈnɛkt ðə dɒts ˈlʊkɪŋ ˈfɔːrwərd/" },
-            { en: "you can only connect them looking backwards.", ja: "過去を振り返って初めて、点をつなぐことができるのです。", kana: "ユー キャン オンリー コネクト ゼム ルッキング バックワーズ", phonetic: "/juː kæn ˈoʊnli kəˈnɛkt ðɛm ˈlʊkɪŋ ˈbækwərdz/" },
-            { en: "So you have to trust that the dots will somehow connect in your future.", ja: "だから、点と点が将来いつかつながると信じなければなりません。", kana: "ソー ユー ハブ トゥ トラスト ザット ザ ドッツ ウィル サムハウ コネクト イン ユア フューチャー", phonetic: "/soʊ juː hæv tuː trʌst ðæt ðə dɒts wɪl ˈsʌmhaʊ kəˈnɛkt ɪn jɔːr ˈfjuːtʃər/" },
-            { en: "You have to trust in something - your gut, destiny, life, karma, whatever.", ja: "何かを信じなければなりません。自分の直感、運命、人生、カルマ、何でもいい。", kana: "ユー ハブ トゥ トラスト イン サムシング - ユア ガット、 デスティニー、 ライフ、 カルマ、 ホワットエバー", phonetic: "/juː hæv tuː trʌst ɪn ˈsʌmθɪŋ - jɔːr ɡʌt, ˈdɛstɪni, laɪf, ˈkɑːrmə, wɒtˈɛvər/" },
-            { en: "This approach has never let me down,", ja: "このやり方で、私は裏切られたことがありませんし、", kana: "ディス アプローチ ハズ ネバー レット ミー ダウン", phonetic: "/ðɪs əˈproʊtʃ hæz ˈnɛvər lɛt miː daʊn/" },
-            { en: "and it has made all the difference in my life.", ja: "それが私の人生に大きな違いをもたらしたのです。", kana: "アンド イット ハズ メイド オール ザ ディファレンス イン マイ ライフ", phonetic: "/ænd ɪt hæz meɪd ɔːl ðə ˈdɪfərəns ɪn maɪ laɪf/" }
+            { en: "It started before I was born.", ja: "それは私が生まれる前から始まりました。", kana: "イット スターテッド ビフォー アイ ワズ ボーン。", phonetic: "/ɪt ˈstɑrtəd bɪˈfɔr aɪ wʌz bɔrn./" },
+            { en: "My biological mother was a young, unwed college graduate student, and she decided to put me up for adoption.", ja: "私の生みの母は若く、未婚の大学院生で、私を養子に出すことを決心しました。", kana: "マイ バイオロジカル マザー ワズ ア ヤング、 アンウェッド カレッジ グラジュエート スチューデント、 アンド シー ディサイデッド トゥ プット ミー アップ フォー アドプション。", phonetic: "/maɪ ˌbaɪəˈlɑʤɪkəl ˈmʌðər wʌz ə jʌŋ, ənˈwɛd ˈkɑlɪʤ ˈgræʤuət ˈstudənt, ænd ʃi dɪˈsaɪdəd tə pʊt mi ʌp fər əˈdɑpʃən./" },
+            { en: "She felt very strongly that I should be adopted by college graduates, so everything was all set for me to be adopted at birth by a lawyer and his wife.", ja: "彼女は私が大卒の両親に引き取られるべきだと強く感じていたので、私が生まれると同時に弁護士夫妻の養子になるよう、すべてが整えられていました。", kana: "シー フェルト ベリー ストロングリー ザット アイ シュッド ビー アダプテッド バイ カレッジ グラジュエーツ、 ソー エブリシング ワズ オール セット フォー ミー トゥ ビー アダプテッド アット バース バイ ア ロイヤー アンド ヒズ ワイフ。", phonetic: "/ʃi fɛlt ˈvɛri ˈstrɔŋli ðæt aɪ ʃʊd bi əˈdɑptəd baɪ ˈkɑlɪʤ ˈgræʤuəts, soʊ ˈɛvriˌθɪŋ wʌz ɔl sɛt fɔr mi tə bi əˈdɑptəd æt bɜrθ baɪ ə ˈlɔjər ænd hɪz waɪf./" },
+            { en: "Except that when I popped out they decided at the last minute that they really wanted a girl.", ja: "ところが、私が生まれてくると、彼らは土壇場で女の子が欲しいと心変わりしました。", kana: "イクセプト ザット ウェン アイ ポップト アウト ゼイ ディサイデッド アット ザ ラスト ミニット ザット ゼイ リアリー ウォンテッド ア ガール。", phonetic: "/ɪkˈsɛpt ðæt wɛn aɪ pɑpt aʊt ðeɪ dɪˈsaɪdəd æt ðə læst ˈmɪnət ðæt ðeɪ ˈrɪli ˈwɑntəd ə gɜrl./" },
+            { en: "So my parents, who were on a waiting list, got a call in the middle of the night asking: \"We have an unexpected baby boy; do you want him?\"", ja: "そこで、待機リストに載っていた私の両親は、真夜中に電話を受けました。「予定外の男の子が生まれました。引き取りませんか？」", kana: "ソー マイ ペアレンツ、 フー ワー オン ア ウェイティング リスト、 ガット ア コール イン ザ ミドル オブ ザ ナイト アスキング： ウィー ハブ アン アンエクスペクテッド ベイビー ボーイ、 ドゥー ユー ウォント ヒム？", phonetic: "/soʊ maɪ ˈpɛrənts, hu wɜr ɑn ə ˈweɪtɪŋ lɪst, gɑt ə kɔl ɪn ðə ˈmɪdəl ʌv ðə naɪt ˈæskɪŋ: \"wi hæv ən ənɪkˈspɛktɪd ˈbeɪbi bɔɪ; du ju wɑnt hɪm?\"/" },
+            { en: "They said: \"Of course.\"", ja: "彼らは言いました。「もちろんです。」", kana: "ゼイ セッド： オブ コース。", phonetic: "/ðeɪ sɛd: \"ʌv kɔrs.\""/ }
         ],
-        // 7. 愛と失意の話
         [
-            { en: "My second story is about love and loss.", ja: "2つ目は、愛と失意に関する話です。", kana: "マイ セカンド ストーリー イズ アバウト ラブ アンド ロス", phonetic: "/maɪ ˈsɛkənd ˈstɔːri ɪz əˈbaʊt lʌv ænd lɒs/" },
-            { en: "I was lucky. I found what I loved to do early in life.", ja: "私は幸運でした。人生の早い段階で、自分が愛することを見つけたからです。", kana: "アイ ワズ ラッキー。 アイ ファウンド ホワット アイ ラブド トゥ ドゥ アーリー イン ライフ", phonetic: "/aɪ wɒz ˈlʌki. aɪ faʊnd wɒt aɪ lʌvd tuː duː ˈɜːrli ɪn laɪf/" },
-            { en: "Woz and I started Apple in my parents' garage when I was 20.", ja: "私とウォズは、私が20歳の時に実家のガレージでアップルを創業しました。", kana: "ウォズ アンド アイ スターティド アップル イン マイ ペアレンツ ガレージ ホエン アイ ワズ トゥエンティ", phonetic: "/wɒz ænd aɪ ˈstɑːrtɪd ˈæpəl ɪn maɪ ˈpɛərənts ˈɡærɑːʒ wɛn aɪ wɒz ˈtwɛnti/" },
-            { en: "We worked hard, and in 10 years Apple had grown from just the two of us in a garage", ja: "我々は懸命に働き、10年でアップルはガレージの2人きりの会社から、", kana: "ウィー ワークト ハード、 アンド イン テン イヤーズ アップル ハド グロウン フロム ジャスト ザ トゥー オブ アス イン ア ガレージ", phonetic: "/wiː wɜːrkt hɑːrd, ænd ɪn tɛn jɪərz ˈæpəl hæd ɡroʊn frɒm dʒʌst ðə tuː ɒv ʌs ɪn ə ˈɡærɑːʒ/" },
-            { en: "into a $2 billion company with over 4000 employees.", ja: "4000人以上の従業員を抱える20億ドル企業に成長しました。", kana: "イントゥ ア トゥー ビリオン ダラー カンパニー ウィズ オーバー フォーサウザンド エンプロイイーズ", phonetic: "/ˈɪntuː ə tuː ˈbɪljən ˈdɒlər ˈkʌmpəni wɪð ˈoʊvər ˈfɔːrˈθaʊzənd ɪmˈplɔɪiːz/" }
+            { en: "My biological mother later found out that my mother had never graduated from college and that my father had never graduated from high school.", ja: "私の生みの母は後で、私の母が大学を卒業しておらず、父は高校さえ卒業していないことを知りました。", kana: "マイ バイオロジカル マザー レイター ファウンド アウト ザット マイ マザー ハッド ネバー グラジュエイテッド フロム カレッジ アンド ザット マイ ファーザー ハッド ネバー グラジュエイテッド フロム ハイ スクール。", phonetic: "/maɪ ˌbaɪəˈlɑʤɪkəl ˈmʌðər ˈleɪtər faʊnd aʊt ðæt maɪ ˈmʌðər hæd ˈnɛvər ˈgræʤuˌeɪtəd frʌm ˈkɑləʤ ænd ðæt maɪ ˈfɑðər hæd ˈnɛvər ˈgræʤuˌeɪtəd frʌm haɪ skul./" },
+            { en: "She refused to sign the final adoption papers.", ja: "彼女は最終的な養子縁組の書類に署名することを拒否しました。", kana: "シー リフューズド トゥ サイン ザ ファイナル アドプション ペーパーズ。", phonetic: "/ʃi rɪˈfjuzd tə saɪn ðə ˈfaɪnəl əˈdɑpʃən ˈpeɪpərz./" },
+            { en: "She only relented a few months later when my parents promised that I would someday go to college.", ja: "彼女が態度を和らげたのは、私の両親が、私がいつか大学に行くことを約束した数ヶ月後のことでした。", kana: "シー オンリー リレンテッド ア フュー マンス レイター ウェン マイ ペアレンツ プロミスド ザット アイ ウッド サムデイ ゴー トゥ カレッジ。", phonetic: "/ʃi ˈoʊnli rɪˈlɛntəd ə fju mʌnθs ˈleɪtər wɛn maɪ ˈpɛrənts ˈprɑməst ðæt aɪ wʊd ˈsʌmˌdeɪ goʊ tə ˈkɑləʤ./" }
         ],
-        // 8. 失敗しても仕事を愛していた
         [
-            { en: "We had just released our finest creation - the Macintosh - a year earlier,", ja: "私たちは最高の作品、マッキントッシュをその1年前に発表したばかりで、", kana: "ウィー ハド ジャスト リリースド アワー ファイネスト クリエイション - ザ マッキントッシュ - ア イヤー アーリーアー", phonetic: "/wiː hæd dʒʌst rɪˈliːst ˈaʊər ˈfaɪnɪst kriˈeɪʃən - ðə ˈmækɪnˌtɒʃ - ə jɪər ˈɜːrliər/" },
-            { en: "and I had just turned 30. And then I got fired.", ja: "私は30歳になったばかりでした。そして私はクビになりました。", kana: "アンド アイ ハド ジャスト ターンド サーティ。 アンド ゼン アイ ガット ファイアード", phonetic: "/ænd aɪ hæd dʒʌst tɜːrnd ˈθɜːrti. ænd ðɛn aɪ ɡɒt ˈfaɪərd/" },
-            { en: "How can you get fired from a company you started?", ja: "自分が創業した会社を、どうやったらクビになるのか？", kana: "ハウ キャン ユー ゲット ファイアード フロム ア カンパニー ユー スターティド？", phonetic: "/haʊ kæn juː ɡɛt ˈfaɪərd frɒm ə ˈkʌmpəni juː ˈstɑːrtɪd?/" },
-            { en: "What had been the focus of my entire adult life was gone,", ja: "私の大人の人生のすべてを賭けてきたものが消え去り、", kana: "ホワット ハド ビーン ザ フォーカス オブ マイ エンタイア アダルト ライフ ワズ ゴーン", phonetic: "/wɒt hæd biːn ðə ˈfoʊkəs ɒv maɪ ɪnˈtaɪər əˈdʌlt laɪf wɒz ɡɒn/" },
-            { en: "and it was devastating.", ja: "私は打ちのめされました。", kana: "アンド イット ワズ デバステイティング", phonetic: "/ænd ɪt wɒz ˈdɛvəsteɪtɪŋ/" },
-            { en: "I really didn't know what to do for a few months.", ja: "数ヶ月間、本当に何をすべきか分かりませんでした。", kana: "アイ リアリー ディドゥント ノウ ホワット トゥ ドゥ フォー ア フュー マンス", phonetic: "/aɪ ˈrɪəli ˈdɪdənt noʊ wɒt tuː duː fɔːr ə fjuː mʌnθs/" },
-            { en: "But something slowly began to dawn on me.", ja: "しかし、何かがゆっくりと私の中で明らかになってきました。", kana: "バット サムシング スローリー ビガン トゥ ドーン オン ミー", phonetic: "/bʌt ˈsʌmθɪŋ ˈsloʊli bɪˈɡæn tuː dɔːn ɒn miː/" },
-            { en: "I still loved what I did.", ja: "私はまだ、自分の仕事を愛していたのです。", kana: "アイ スティル ラブド ホワット アイ ディド", phonetic: "/aɪ stɪl lʌvd wɒt aɪ dɪd/" },
-            { en: "The turn of events at Apple had not changed that one bit.", ja: "アップルでの出来事は、そのことを少しも変えませんでした。", kana: "ザ ターン オブ イベンツ アット アップル ハド ノット チェンジド ザット ワン ビット", phonetic: "/ðə tɜːrn ɒv ɪˈvɛnts æt ˈæpəl hæd nɒt tʃeɪndʒd ðæt wʌn bɪt/" },
-            { en: "I had been rejected, but I was still in love.", ja: "私は拒絶されましたが、まだ愛していたのです。", kana: "アイ ハド ビーン リジェクティド、 バット アイ ワズ スティル イン ラブ", phonetic: "/aɪ hæd biːn rɪˈdʒɛktɪd, bʌt aɪ wɒz stɪl ɪn lʌv/" },
-            { en: "And so I decided to start over.", ja: "だから私は、もう一度やり直すことに決めました。", kana: "アンド ソー アイ ディサイディド トゥ スタート オーバー", phonetic: "/ænd soʊ aɪ dɪˈsaɪdɪd tuː stɑːrt ˈoʊvər/" }
+            { en: "And 17 years later I did go to college.", ja: "そして17年後、私は大学に行きました。", kana: "アンド セブンティーン イヤーズ レイター アイ ディド ゴー トゥ カレッジ。", phonetic: "/ænd 17 jɪrz ˈleɪtər aɪ dɪd goʊ tə ˈkɑləʤ./" },
+            { en: "But I naively chose a college that was almost as expensive as Stanford, and all of my working-class parents' savings were being spent on my college tuition.", ja: "しかし、私は無邪気にもスタンフォード大学とほぼ同じくらい学費の高い大学を選んでしまい、労働者階級の両親の貯蓄はすべて私の大学の授業料に費やされました。", kana: "バット アイ ナイーブリー チョーズ ア カレッジ ザット ワズ オールモスト アズ エクスペンシブ アズ スタンフォード、 アンド オール オブ マイ ワーキングクラス ペアレンツ セービングス ワー ビーイング スペント オン マイ カレッジ テュイション。", phonetic: "/bʌt aɪ naɪˈivli ʧoʊz ə ˈkɑlɪʤ ðæt wʌz ˈɔlˌmoʊst æz ɪkˈspɛnsɪv æz ˈstænfərd, ænd ɔl ʌv maɪ ˈwɜrkɪŋ-klæs ˈpɛrənts ˈseɪvɪŋz wɜr ˈbiɪŋ spɛnt ɑn maɪ ˈkɑlɪʤ tuˈɪʃən./" },
+            { en: "After six months, I couldn't see the value in it.", ja: "6ヶ月後、私はそこに価値を見いだせなくなりました。", kana: "アフター シックス マンス、 アイ クドゥント シー ザ バリュー イン イット。", phonetic: "/ˈæftər sɪks mʌnθs, aɪ ˈkʊdənt si ðə ˈvælju ɪn ɪt./" },
+            { en: "I had no idea what I wanted to do with my life and no idea how college was going to help me figure it out.", ja: "私は人生で何をしたいのか、そして大学がそれを見つけるのにどう役立つのか、全く分かりませんでした。", kana: "アイ ハッド ノー アイデア ホワット アイ ウォンテッド トゥ ドゥー ウィズ マイ ライフ アンド ノー アイデア ハウ カレッジ ワズ ゴーイング トゥ ヘルプ ミー フィギュア イット アウト。", phonetic: "/aɪ hæd noʊ aɪˈdiə wʌt aɪ ˈwɑntəd tə du wɪð maɪ laɪf ænd noʊ aɪˈdiə haʊ ˈkɑlɪʤ wʌz ˈgoʊɪŋ tə hɛlp mi ˈfɪgjər ɪt aʊt./" },
+            { en: "And here I was spending all of the money my parents had saved their entire life.", ja: "そして、私は両親が一生をかけて貯めたすべてのお金を使っていました。", kana: "アンド ヒア アイ ワズ スペンディング オール オブ ザ マネー マイ ペアレンツ ハッド セーブド ゼア エンタイア ライフ。", phonetic: "/ænd hir aɪ wʌz ˈspɛndɪŋ ɔl ʌv ðə ˈmʌni maɪ ˈpɛrənts hæd seɪvd ðɛr ɪnˈtaɪər laɪf./" }
         ],
-        // 9. アップル追放は最良の出来事
         [
-            { en: "I didn't see it then,", ja: "その時は分かりませんでしたが、", kana: "アイ ディドゥント シー イット ゼン", phonetic: "/aɪ ˈdɪdənt siː ɪt ðɛn/" },
-            { en: "but it turned out that getting fired from Apple", ja: "アップルをクビになったことは、", kana: "バット イット ターンド アウト ザット ゲッティング ファイアード フロム アップル", phonetic: "/bʌt ɪt tɜːrnd aʊt ðæt ˈɡɛtɪŋ ˈfaɪərd frɒm ˈæpəl/" },
-            { en: "was the best thing that could have ever happened to me.", ja: "私の人生で起こり得た最良の出来事だったと判明したのです。", kana: "ワズ ザ ベスト シング ザット クド ハブ エバー ハプンド トゥ ミー", phonetic: "/wɒz ðə bɛst θɪŋ ðæt kʊd hæv ˈɛvər ˈhæpənd tuː miː/" },
-            { en: "The heaviness of being successful was replaced", ja: "成功者であることの重みが、置き換えられました。", kana: "ザ ヘビネス オブ ビーイング サクセスフル ワズ リプレイスド", phonetic: "/ðə ˈhɛvinəs ɒv ˈbiːɪŋ səkˈsɛsfəl wɒz rɪˈpleɪst/" },
-            { en: "by the lightness of being a beginner again, less sure about everything.", ja: "再び初心者となり、あらゆる物事に確信を持たない軽やかさに。", kana: "バイ ザ ライトネス オブ ビーイング ア ビギナー アゲイン、 レス シュア アバウト エブリシング", phonetic: "/baɪ ðə ˈlaɪtnəs ɒv ˈbiːɪŋ ə bɪˈɡɪnər əˈɡɛn, lɛs ʃʊər əˈbaʊt ˈɛvriθɪŋ/" },
-            { en: "It freed me to enter one of the most creative periods of my life.", ja: "おかげで私は解放され、人生で最も創造的な時期のひとつに入ることができました。", kana: "イット フリード ミー トゥ エンター ワン オブ ザ モスト クリエイティブ ピリオズ オブ マイ ライフ", phonetic: "/ɪt friːd miː tuː ˈɛntər wʌn ɒv ðə moʊst kriˈeɪtɪv ˈpɪəriədz ɒv maɪ laɪf/" },
-            { en: "During the next five years, I started a company named NeXT, another company named Pixar,", ja: "続く5年の間に、私はNeXTという会社と、ピクサーという別の会社を立ち上げ、", kana: "デュアリング ザ ネクスト ファイブ イヤーズ、 アイ スターティド ア カンパニー ネームド ネクスト、 アナザー カンパニー ネームド ピクサー", phonetic: "/ˈdjʊərɪŋ ðə nɛkst faɪv jɪərz, aɪ ˈstɑːrtɪd ə ˈkʌmpəni neɪmd nɛkst, əˈnʌðər ˈkʌmpəni neɪmd ˈpɪksɑːr/" },
-            { en: "and fell in love with an amazing woman who would become my wife.", ja: "後に妻となる素晴らしい女性と恋に落ちました。", kana: "アンド フェル イン ラブ ウィズ アン アメイジング ウーマン フー ウド ビカム マイ ワイフ", phonetic: "/ænd fɛl ɪn lʌv wɪð ən əˈmeɪzɪŋ ˈwʊmən huː wʊd bɪˈkʌm maɪ waɪf/" }
+            { en: "So I decided to drop out and trust that it would all work out OK.", ja: "そこで私は中退し、すべてがうまくいくと信じることにしました。", kana: "ソー アイ ディサイデッド トゥ ドロップ アウト アンド トラスト ザット イット ウッド オール ワーク アウト オーケー。", phonetic: "/soʊ aɪ dɪˈsaɪdəd tə drɑp aʊt ænd trʌst ðæt ɪt wʊd ɔl wɜrk aʊt ˈoʊˈkeɪ./" },
+            { en: "It was pretty scary at the time, but looking back it was one of the best decisions I ever made.", ja: "当時はかなり怖かったですが、振り返ってみると、それは私がこれまでに下した最良の決断の一つでした。", kana: "イット ワズ プリティ スケアリー アット ザ タイム、 バット ルッキング バック イット ワズ ワン オブ ザ ベスト デシジョンズ アイ エバー メイド。", phonetic: "/ɪt wʌz ˈprɪti ˈskɛri æt ðə taɪm, bʌt ˈlʊkɪŋ bæk ɪt wʌz wʌn ʌv ðə bɛst dɪˈsɪʒənz aɪ ˈɛvər meɪd./" },
+            { en: "The minute I dropped out I could stop taking the required classes that didn't interest me, and begin dropping in on the ones that looked interesting.", ja: "中退した瞬間、興味のない必修科目を履修するのをやめ、面白そうな科目に顔を出すことができるようになりました。", kana: "ザ ミニット アイ ドロップト アウト アイ クッド ストップ テイキング ザ リクワイアド クラスィズ ザット ディドント インタレスト ミー、 アンド ビギン ドロッピング イン オン ザ ワンズ ザット ルックト インタレスティング。", phonetic: "/ðə ˈmɪnət aɪ drɑpt aʊt aɪ kʊd stɑp ˈteɪkɪŋ ðə rɪˈkwaɪərd ˈklæsəz ðæt ˈdɪdənt ˈɪntərɛst mi, ænd bɪˈgɪn ˈdrɑpɪŋ ɪn ɑn ðə wʌnz ðæt lʊkt ˈɪntərɛstɪŋ./" }
         ],
-        // 10. 愛せる仕事を見つけよう
         [
-            { en: "I'm pretty sure none of this would have happened if I hadn't been fired from Apple.", ja: "アップルをクビになっていなければ、これらのことは何ひとつ起こらなかったと確信しています。", kana: "アイム プリティ シュア ナン オブ ディス ウド ハブ ハプンド イフ アイ ハドゥント ビーン ファイアード フロム アップル", phonetic: "/aɪm ˈprɪti ʃʊər nʌn ɒv ðɪs wʊd hæv ˈhæpənd ɪf aɪ ˈhædənt biːn ˈfaɪərd frɒm ˈæpəl/" },
-            { en: "It was awful tasting medicine, but I guess the patient needed it.", ja: "ひどく苦い薬でしたが、患者にはそれが必要だったのでしょう。", kana: "イット ワズ オーフル テイスティング メディスン、 バット アイ ゲス ザ ペイシェント ニーディド イット", phonetic: "/ɪt wɒz ˈɔːfəl ˈteɪstɪŋ ˈmɛdɪsɪn, bʌt aɪ ɡɛs ðə ˈpeɪʃənt ˈniːdɪd ɪt/" },
-            { en: "Sometimes life hits you in the head with a brick. Don't lose faith.", ja: "時として人生はレンガで頭を殴りつけてきます。信念を失わないでください。", kana: "サムタイムズ ライフ ヒッツ ユー イン ザ ヘッド ウィズ ア ブリック。 ドント ルーズ フェイス", phonetic: "/ˈsʌmtaɪmz laɪf hɪts juː ɪn ðə hɛd wɪð ə brɪk. doʊnt luːz feɪθ/" },
-            { en: "I'm convinced that the only thing that kept me going was that I loved what I did.", ja: "私が前進し続けられた唯一の理由は、自分の仕事を愛していたことだと確信しています。", kana: "アイム コンビンスド ザット ザ オンリー シング ザット ケプト ミー ゴーイング ワズ ザット アイ ラブド ホワット アイ ディド", phonetic: "/aɪm kənˈvɪnst ðæt ðə ˈoʊnli θɪŋ ðæt kɛpt miː ˈɡoʊɪŋ wɒz ðæt aɪ lʌvd wɒt aɪ dɪd/" },
-            { en: "You've got to find what you love.", ja: "自分が愛せるものを見つけなければなりません。", kana: "ユーブ ガット トゥ ファインド ホワット ユー ラブ", phonetic: "/juːv ɡɒt tuː faɪnd wɒt juː lʌv/" },
-            { en: "Your work is going to fill a large part of your life,", ja: "仕事は人生の大きな部分を占めることになります。", kana: "ユア ワーク イズ ゴーイング トゥ フィル ア ラージ パート オブ ユア ライフ", phonetic: "/jɔːr wɜːrk ɪz ˈɡoʊɪŋ tuː fɪl ə lɑːrdʒ pɑːrt ɒv jɔːr laɪf/" },
-            { en: "and the only way to be truly satisfied is to do what you believe is great work.", ja: "心から満足する唯一の方法は、素晴らしい仕事だと信じることをやることです。", kana: "アンド ザ オンリー ウェイ トゥ ビー トゥルーリー サティスファイド イズ トゥ ドゥ ホワット ユー ビリーブ イズ グレート ワーク", phonetic: "/ænd ðə ˈoʊnli weɪ tuː biː ˈtruːli ˈsætɪsfaɪd ɪz tuː duː wɒt juː bɪˈliːv ɪz ɡreɪt wɜːrk/" },
-            { en: "And the only way to do great work is to love what you do.", ja: "そして素晴らしい仕事をする唯一の方法は、自分がやることを愛することです。", kana: "アンド ザ オンリー ウェイ トゥ ドゥ グレート ワーク イズ トゥ ラブ ホワット ユー ドゥ", phonetic: "/ænd ðə ˈoʊnli weɪ tuː duː ɡreɪt wɜːrk ɪz tuː lʌv wɒt juː duː/" },
-            { en: "If you haven't found it yet, keep looking. Don't settle.", ja: "まだ見つかっていないなら、探し続けてください。妥協してはいけません。", kana: "イフ ユー ハブント ファウンド イット イェット、 キープ ルッキング。 ドント セトル", phonetic: "/ɪf juː ˈhævənt faʊnd ɪt jɛt, kiːp ˈlʊkɪŋ. doʊnt ˈsɛtəl/" }
+            { en: "It wasn't all romantic.", ja: "すべてがロマンチックだったわけではありません。", kana: "イット ワズント オール ロマンティック。", phonetic: "/ɪt ˈwɑzənt ɔl roʊˈmæntɪk./" },
+            { en: "I didn't have a dorm room, so I slept on the floor in friends' rooms, I returned coke bottles for the 5 - deposits to buy food with, and I would walk the 7 miles across town every Sunday night to get one good meal a week at the Hare Krishna temple.", ja: "寮の部屋がなかったので、友達の部屋の床で寝泊まりし、コカ・コーラの瓶を5セントのデポジットで返して食費の足しにし、毎週日曜の夜には7マイル離れたハレ・クリシュナ寺院まで歩いて、週に一度のまともな食事にありつきました。", kana: "アイ ディドント ハブ ア ドーム ルーム、 ソー アイ スレプト オン ザ フロア イン フレンズ ルームズ、 アイ リターンド コーク ボトルズ フォー ザ ファイブ - デポジッツ トゥ バイ フード ウィズ、 アンド アイ ウッド ウォーク ザ セブン マイルズ アクロス タウン エブリー サンデー ナイト トゥ ゲット ワン グッド ミール ア ウィーク アット ザ ハレ クリシュナ テンプル。", phonetic: "/aɪ ˈdɪdənt hæv ə dɔrm rum, soʊ aɪ slɛpt ɑn ðə flɔr ɪn frɛndz rumz, aɪ rɪˈtɜrnd koʊk ˈbɑtəlz fɔr ðə 5 - dɪˈpɑzɪts tə baɪ fud wɪð, ænd aɪ wʊd wɔk ðə 7 maɪlz əˈkrɔs taʊn ˈɛvəri ˈsʌndeɪ naɪt tə gɛt wʌn gʊd mil ə wik æt ðə hɑr krɪʃnə ˈtɛmpəl./" },
+            { en: "I loved it.", ja: "それが大好きでした。", kana: "アイ ラブド イット。", phonetic: "/aɪ lʌvd ɪt./" },
+            { en: "And much of what I stumbled into by following my curiosity and intuition turned out to be priceless later on.", ja: "そして、好奇心と直感に従って偶然出会ったものの多くが、後になってかけがえのないものになりました。", kana: "アンド マッチ オブ ホワット アイ スタンブルド イントゥ バイ フォロイング マイ キュリオシティ アンド イントゥイション ターンド アウト トゥ ビー プライスレス レイター オン。", phonetic: "/ænd mʌʧ ʌv wʌt aɪ ˈstʌmbəld ˈɪntu baɪ ˈfɑloʊɪŋ maɪ ˌkjʊəriˈɑsəti ænd ˌɪntuˈɪʃən tɜrnd aʊt tə bi ˈpraɪsləs ˈleɪtər ɑn./" },
+            { en: "Let me give you one example:", ja: "一つ例を挙げさせてください。", kana: "レット ミー ギブ ユー ワン エグザンプル：", phonetic: "/lɛt mi gɪv ju wʌn ɪgˈzæmpəl:/" }
         ],
-        // 11. 3つ目は死に関する話
         [
-            { en: "My third story is about death.", ja: "3つ目は、死に関する話です。", kana: "マイ サード ストーリー イズ アバウト デス", phonetic: "/maɪ θɜːrd ˈstɔːri ɪz əˈbaʊt dɛθ/" },
-            { en: "When I was 17, I read a quote that went something like:", ja: "私は17歳のとき、次のような言葉を読みました。", kana: "ホエン アイ ワズ セブンティーン、 アイ レッド ア クオート ザット ウェント サムシング ライク", phonetic: "/wɛn aɪ wɒz ˌsɛvənˈtiːn, aɪ rɛd ə kwoʊt ðæt wɛnt ˈsʌmθɪŋ laɪk/" },
-            { en: "If you live each day as if it was your last, someday you'll most certainly be right.", ja: "「毎日を人生最後の日であるかのように生きれば、いつか必ずその通りになる」", kana: "イフ ユー リブ イーチ デイ アズ イフ イット ワズ ユア ラスト、 サムデイ ユール モスト サーテンリー ビー ライト", phonetic: "/ɪf juː lɪv iːtʃ deɪ æz ɪf ɪt wɒz jɔːr læst, ˈsʌmdeɪ juːl moʊst ˈsɜːrtənli biː raɪt/" },
-            { en: "It made an impression on me, and since then, for the past 33 years,", ja: "それは私の心に残り、それ以来33年間、", kana: "イット メイド アン インプレッション オン ミー、 アンド シンス ゼン、 フォー ザ パスト サーティスリー イヤーズ", phonetic: "/ɪt meɪd ən ɪmˈprɛʃən ɒn miː, ænd sɪns ðɛn, fɔːr ðə pæst ˈθɜːrti-θriː jɪərz/" },
-            { en: "I have looked in the mirror every morning and asked myself:", ja: "毎朝鏡を見て、自分自身に問いかけてきました。", kana: "アイ ハブ ルックト イン ザ ミラー エブリ モーニング アンド アスクト マイセルフ", phonetic: "/aɪ hæv lʊkt ɪn ðə ˈmɪrər ˈɛvri ˈmɔːrnɪŋ ænd æskt maɪˈsɛlf/" },
-            { en: "If today were the last day of my life,", ja: "「もし今日が人生最後の日だとしたら、", kana: "イフ トゥデイ ワー ザ ラスト デイ オブ マイ ライフ", phonetic: "/ɪf təˈdeɪ wɜːr ðə læst deɪ ɒv maɪ laɪf/" },
-            { en: "would I want to do what I am about to do today?", ja: "今日やろうとしていることを、私は本当にやりたいだろうか？」", kana: "ウド アイ ウォント トゥ ドゥ ホワット アイ アム アバウト トゥ ドゥ トゥデイ？", phonetic: "/wʊd aɪ wɒnt tuː duː wɒt aɪ æm əˈbaʊt tuː duː təˈdeɪ?/" },
-            { en: "And whenever the answer has been 'No' for too many days in a row,", ja: "そして、その答えが「No」である日が何日も続くと、", kana: "アンド ホエンエバー ザ アンサー ハズ ビーン ノー フォー トゥー メニー デイズ イン ア ロウ", phonetic: "/ænd wɛnˈɛvər ðə ˈænsər hæz biːn noʊ fɔːr tuː ˈmɛni deɪz ɪn ə roʊ/" },
-            { en: "I know I need to change something.", ja: "何かを変える必要があると気づくのです。", kana: "アイ ノウ アイ ニード トゥ チェンジ サムシング", phonetic: "/aɪ noʊ aɪ niːd tuː tʃeɪndʒ ˈsʌmθɪŋ/" }
+            { en: "Reed College at that time offered perhaps the best calligraphy instruction in the country.", ja: "当時のリード大学は、おそらく国内で最高のカリグラフィ教育を提供していました。", kana: "リード カレッジ アット ザット タイム オファード パーハップス ザ ベスト カリグラフィ インストラクション イン ザ カントリー。", phonetic: "/rid ˈkɑlɪʤ æt ðæt taɪm ˈɔfərd pərˈhæps ðə bɛst kəˈlɪgrəfi ɪnˈstrʌkʃən ɪn ðə ˈkʌntri./" },
+            { en: "Throughout the campus every poster, every label on every drawer, was beautifully hand calligraphed.", ja: "キャンパス中のすべてのポスター、すべての引き出しのすべてのラベルが、美しく手書きでカリグラフィされていました。", kana: "スルーアウト ザ キャンパス エブリー ポスター、 エブリー ラベル オン エブリー ドロワー、 ワズ ビューティフリー ハンド カリグラフド。", phonetic: "/θruˈaʊt ðə ˈkæmpəs ˈɛvəri ˈpoʊstər, ˈɛvəri ˈleɪbəl ɑn ˈɛvəri drɔr, wʌz ˈbjutəfəli hænd kəˈlɪgrəft./" },
+            { en: "Because I had dropped out and didn't have to take the normal classes, I decided to take a calligraphy class to learn how to do this.", ja: "私は中退していて、通常の授業を受ける必要がなかったので、カリグラフィのクラスを受講して、その方法を学ぶことにしました。", kana: "ビコーズ アイ ハッド ドロップト アウト アンド ディドント ハブ トゥ テイク ザ ノーマル クラシズ、 アイ ディサイデッド トゥ テイク ア カリグラフィ クラス トゥ ラーン ハウ トゥ ドゥー ディス。", phonetic: "/bɪˈkɔz aɪ hæd drɑpt aʊt ænd ˈdɪdənt hæv tə teɪk ðə ˈnɔrməl ˈklæsəz, aɪ dɪˈsaɪdəd tə teɪk ə kəˈlɪgrəfi klæs tə lɜrn haʊ tə du ðɪs./" },
+            { en: "I learned about serif and san serif typefaces, about varying the amount of space between different letter combinations, about what makes great typography great.", ja: "私はセリフ体とサンセリフ体、文字の組み合わせによるスペースの調整、そして素晴らしいタイポグラフィを素晴らしいものにする要素について学びました。", kana: "アイ ラーンド アバウト セリフ アンド サンセリフ タイプフェイスィズ、 アバウト ヴェリイング ジ アマウント オブ スペース ビトウィーン ディファレント レター コンビネーションズ、 アバウト ホワット メイクス グレート タイポグラフィ グレート。", phonetic: "/aɪ lɜrnd əˈbaʊt ˈsɛrəf ænd sæn ˈsɛrəf ˈtaɪpˌfeɪsəz, əˈbaʊt ˈvɛriɪŋ ði əˈmaʊnt ʌv speɪs bɪˈtwin ˈdɪfərənt ˈlɛtər ˌkɑmbəˈneɪʃənz, əˈbaʊt wʌt meɪks greɪt taɪˈpɑgrəfi greɪt./" },
+            { en: "It was beautiful, historical, artistically subtle in a way that science can't capture, and I found it fascinating.", ja: "それは美しく、歴史的で、科学では捉えられない芸術的な繊細さがあり、私はそれに魅了されました。", kana: "イット ワズ ビューティフル、 ヒストリカル、 アーティスティカリー サトル イン ア ウェイ ザット サイエンス キャント キャプチャー、 アンド アイ ファウンド イット ファシネイティング。", phonetic: "/ɪt wʌz ˈbjutəfəl, hɪˈstɔrɪkəl, ɑrˈtɪstɪkli ˈsʌtəl ɪn ə weɪ ðæt ˈsaɪəns kænt ˈkæpʧər, ænd aɪ faʊnd ɪt ˈfæsəˌneɪtɪŋ./" }
         ],
-        // 12. がんで死の宣告
         [
-            { en: "About a year ago I was diagnosed with cancer.", ja: "およそ1年前、私は癌と診断されました。", kana: "アバウト ア イヤー アゴー アイ ワズ ダイアグノーズド ウィズ キャンサー", phonetic: "/əˈbaʊt ə jɪər əˈɡoʊ aɪ wɒz ˈdaɪəɡnoʊzd wɪð ˈkænsər/" },
-            { en: "I had a scan at 7:30 in the morning,", ja: "朝の7時半にスキャンを受けたところ、", kana: "アイ ハド ア スキャン アット セブン サーティ イン ザ モーニング", phonetic: "/aɪ hæd ə skæn æt ˈsɛvən ˈθɜːrti ɪn ðə ˈmɔːrnɪŋ/" },
-            { en: "and it clearly showed a tumor on my pancreas.", ja: "膵臓に腫瘍があることがはっきりと写っていました。", kana: "アンド イット クリアリー ショウド ア チューマー オン マイ パンクリアス", phonetic: "/ænd ɪt ˈklɪərli ʃoʊd ə ˈtuːmər ɒn maɪ ˈpæŋkriəs/" },
-            { en: "I didn't even know what a pancreas was.", ja: "私は膵臓が何なのかさえ知りませんでした。", kana: "アイ ディドゥント イーブン ノウ ホワット ア パンクリアス ワズ", phonetic: "/aɪ ˈdɪdənt ˈiːvən noʊ wɒt ə ˈpæŋkriəs wɒz/" },
-            { en: "The doctors told me this was almost certainly a type of cancer that is incurable,", ja: "医者は、ほぼ間違いなく治療不可能な種類の癌であり、", kana: "ザ ドクターズ トールド ミー ディス ワズ オールモスト サーテンリー ア タイプ オブ キャンサー ザット イズ インキュアラブル", phonetic: "/ðə ˈdɒktərz toʊld miː ðɪs wɒz ˈɔːlmoʊst ˈsɜːrtənli ə taɪp ɒv ˈkænsər ðæt ɪz ɪnˈkjʊərəbəl/" },
-            { en: "and that I should expect to live no longer than three to six months.", ja: "余命は3ヶ月から6ヶ月だろうと告げました。", kana: "アンド ザット アイ シュッド ɪkˈspɛkt トゥ リブ ノー ロンガー ザン スリー トゥ シックス マンス", phonetic: "/ænd ðæt aɪ ʃʊd ɪkˈspɛkt tuː lɪv noʊ ˈlɒŋɡər ðæn θriː tuː sɪks mʌnθs/" },
-            { en: "My doctor advised me to go home and get my affairs in order,", ja: "医者は家に帰って身辺整理をするように言いました。", kana: "マイ ドクター アドバイスド ミー トゥ ゴー ホーム アンド ゲット マイ アフェアーズ イン オーダー", phonetic: "/maɪ ˈdɒktər ædˈvaɪzd miː tuː ɡoʊ hoʊm ænd ɡɛt maɪ əˈfɛərz ɪn ˈɔːrdər/" },
-            { en: "which is doctor's code for prepare to die.", ja: "それは、死ぬ準備をしろという医者なりの合図なのです。", kana: "フィッチ イズ ドクターズ コード フォー プリペア トゥ ダイ", phonetic: "/wɪtʃ ɪz ˈdɒktərz koʊd fɔːr prɪˈpɛər tuː daɪ/" }
+            { en: "None of this had even a hope of any practical application in my life.", ja: "このどれもが、私の人生で実用的に応用できる見込みは全くありませんでした。", kana: "ノン オブ ディス ハッド イーブン ア ホープ オブ エニー プラクティカル アプリケーション イン マイ ライフ。", phonetic: "/nʌn ʌv ðɪs hæd ˈivɪn ə hoʊp ʌv ˈɛni ˈpræktɪkəl ˌæpləˈkeɪʃən ɪn maɪ laɪf./" },
+            { en: "But ten years later, when we were designing the first Macintosh computer, it all came back to me.", ja: "しかし10年後、私たちが最初のマッキントッシュコンピュータを設計していたとき、それがすべて私の中に蘇ってきました。", kana: "バット テン イヤーズ レイター、 ウェン ウィー ワー デザイニング ザ ファースト マッキントッシュ コンピューター、 イット オール ケイム バック トゥ ミー。", phonetic: "/bʌt tɛn jɪrz ˈleɪtər, wɛn wi wɜr dɪˈzaɪnɪŋ ðə fɜrst ˈmækɪnˌtɑʃ kəmˈpjutər, ɪt ɔl keɪm bæk tə mi./" },
+            { en: "And we designed it all into the Mac.", ja: "そして、私たちはそれをすべてMacに組み込みました。", kana: "アンド ウィー デザインど イット オール イントゥ ザ マック。", phonetic: "/ænd wi dɪˈzaɪnd ɪt ɔl ˈɪntu ðə mæk./" }
         ],
-        // 13. 死に近づいた経験
         [
-            { en: "I lived with that diagnosis all day.", ja: "私は一日中、その診断を抱えて過ごしました。", kana: "アイ リブド ウィズ ザット ダイアグノーシス オール デイ", phonetic: "/aɪ lɪvd wɪð ðæt ˌdaɪəɡˈnoʊsɪs ɔːl deɪ/" },
-            { en: "Later that evening I had a biopsy.", ja: "その日の夕方、生検を受けました。", kana: "レイター ザット イーブニング アイ ハド ア バイオプシー", phonetic: "/ˈleɪtər ðæt ˈiːvnɪŋ aɪ hæd ə ˈbaɪɒpsi/" },
-            { en: "They stuck an endoscope down my throat, through my stomach and into my intestines,", ja: "喉から内視鏡を入れ、胃を通って腸に達し、", kana: "ゼイ スタック アン エンドスコープ ダウン マイ スロート、 スルー マイ ストマック アンド イントゥ マイ インテスティンズ", phonetic: "/ðeɪ stʌk ən ˈɛndoʊˌskoʊp daʊn maɪ θroʊt, θruː maɪ ˈstʌmək ænd ˈɪntuː maɪ ɪnˈtɛstɪnz/" },
-            { en: "put a needle into my pancreas and got a few cells from the tumor.", ja: "膵臓に針を刺して腫瘍から細胞を採取しました。", kana: "プット ア ニードル イントゥ マイ パンクリアス アンド ガット ア フュー セルズ フロム ザ チューマー", phonetic: "/pʊt ə ˈniːdəl ˈɪntuː maɪ ˈpæŋkriəs ænd ɡɒt ə fjuː sɛlz frɒm ðə ˈtuːmər/" },
-            { en: "I was sedated, but my wife, who was there, told me that", ja: "私は麻酔で眠っていましたが、そこにいた妻が教えてくれました。", kana: "アイ ワズ セデイティド、 バット マイ ワイフ、 フー ワズ ゼア、 トールド ミー ザット", phonetic: "/aɪ wɒz sɪˈdeɪtɪd, bʌt maɪ waɪf, huː wɒz ðɛər, toʊld miː ðæt/" },
-            { en: "when they viewed the cells under a microscope the doctors started crying", ja: "顕微鏡で細胞を見たとき、医者たちが泣き出したと。", kana: "ホエン ゼイ ビュード ザ セルズ アンダー ア マイクロスコープ ザ ドクターズ スターティド クライング", phonetic: "/wɛn ðeɪ vjuːd ðə sɛlz ˈʌndər ə ˈmaɪkrəˌskoʊp ðə ˈdɒktərz ˈstɑːrtɪd ˈkraɪɪŋ/" },
-            { en: "because it turned out to be a very rare form of pancreatic cancer", ja: "なぜなら、それは非常に稀な種類の膵臓癌で、", kana: "ビコーズ イット ターンド アウト トゥ ビー ア ベリー レア フォーム オブ パンクリアティック キャンサー", phonetic: "/bɪˈkɒz ɪt tɜːrnd aʊt tuː biː ə ˈvɛri rɛər fɔːrm ɒv ˌpæŋkriˈætɪk ˈkænsər/" },
-            { en: "that is curable with surgery. I had the surgery and I'm fine now.", ja: "手術で治せるものだと判明したからです。私は手術を受け、今は元気です。", kana: "ザット イズ キュアラブル ウィズ サージェリー。 アイ ハド ザ サージェリー アンド アイム ファイン ナウ", phonetic: "/ðæt ɪz ˈkjʊərəbəl wɪð ˈsɜːrdʒəri. aɪ hæd ðə ˈsɜːrdʒəri ænd aɪm faɪn naʊ/" }
+            { en: "It was the first computer with beautiful typography.", ja: "それは美しいタイポグラフィを持つ最初のコンピュータでした。", kana: "イット ワズ ザ ファースト コンピューター ウィズ ビューティフル タイポグラフィ。", phonetic: "/ɪt wʌz ðə fɜrst kəmˈpjutər wɪð ˈbjutəfəl taɪˈpɑgrəfi./" },
+            { en: "If I had never dropped in on that single course in college, the Mac would have never had multiple typefaces or proportionally spaced fonts.", ja: "もし私が大学でそのたった一つのコースに潜り込んでいなければ、Macは複数の書体やプロポーショナルフォントを持つことはなかったでしょう。", kana: "イフ アイ ハッド ネバー ドロップト イン オン ザット シングル コース イン カレッジ、 ザ マック ウッド ハブ ネバー ハッド マルチプル タイプフェイスィズ オア プロポーショナリー スペースド フォンツ。", phonetic: "/ɪf aɪ hæd ˈnɛvər drɑpt ɪn ɑn ðæt ˈsɪŋgəl kɔrs ɪn ˈkɑlɪʤ, ðə mæk wʊd hæv ˈnɛvər hæd ˈmʌltəpəl ˈtaɪpˌfeɪsəz ɔr prəˈpɔrʃənəli speɪst fɑnts./" },
+            { en: "And since Windows just copied the Mac, it's likely that no personal computer would have them.", ja: "そして、WindowsはMacをコピーしただけなので、どのパソコンにもそれらが搭載されていなかった可能性が高いです。", kana: "アンド シンス ウィンドウズ ジャスト コピード ザ マック、 イッツ ライクリー ザット ノー パーソナル コンピューター ウッド ハブ ゼム。", phonetic: "/ænd sɪns ˈwɪndoʊz ʤəst ˈkɑpid ðə mæk, ɪts ˈlaɪkli ðæt noʊ ˈpɜrsənəl kəmˈpjutər wʊd hæv ðɛm./" },
+            { en: "If I had never dropped out, I would have never dropped in on this calligraphy class, and personal computers might not have the wonderful typography that they do.", ja: "もし私が中退していなかったら、このカリグラフィのクラスに潜り込むこともなく、パソコンは今のような素晴らしいタイポグラフィを持っていなかったかもしれません。", kana: "イフ アイ ハッド ネバー ドロップト アウト、 アイ ウッド ハブ ネバー ドロップト イン オン ディス カリグラフィ クラス、 アンド パーソナル コンピューターズ マイト ノット ハブ ザ ワンダフル タイポグラフィ ザット ゼイ ドゥー。", phonetic: "/ɪf aɪ hæd ˈnɛvər drɑpt aʊt, aɪ wʊd hæv ˈnɛvər drɑpt ɪn ɑn ðɪs kəˈlɪgrəfi klæs, ænd ˈpɜrsənəl kəmˈpjutərz maɪt nɑt hæv ðə ˈwʌndərfəl taɪˈpɑgrəfi ðæt ðeɪ du./" },
+            { en: "Of course it was impossible to connect the dots looking forward when I was in college.", ja: "もちろん、大学時代に将来を見据えて点と点をつなぐことは不可能でした。", kana: "オブ コース イット ワズ インポッシブル トゥ コネクト ザ ドッツ ルッキング フォワード ウェン アイ ワズ イン カレッジ。", phonetic: "/ʌv kɔrs ɪt wʌz ɪmˈpɑsəbəl tə kəˈnɛkt ðə dɑts ˈlʊkɪŋ ˈfɔrwərd wɛn aɪ wʌz ɪn ˈkɑlɪʤ./" },
+            { en: "But it was very, very clear looking backwards ten years later.", ja: "しかし、10年後に振り返ってみると、それはとても、とても明白でした。", kana: "バット イット ワズ ベリー、 ベリー クリア ルッキング バックワーズ テン イヤーズ レイター。", phonetic: "/bʌt ɪt wʌz ˈvɛri, ˈvɛri klɪr ˈlʊkɪŋ ˈbækwərdz tɛn jɪrz ˈleɪtər./" }
         ],
-        // 14. 自分の心と直感
         [
-            { en: "No one wants to die.", ja: "死にたい人なんていません。", kana: "ノー ワン ウォンツ トゥ ダイ", phonetic: "/noʊ wʌn wɒnts tuː daɪ/" },
-            { en: "And yet death is the destination we all share. No one has ever escaped it.", ja: "それでもなお、死は我々全員が共有する行き先です。誰もそこから逃れることはできません。", kana: "アンド イェット デス イズ ザ デスティネイション ウィー オール シェア。 ノー ワン ハズ エバー エスケイプド イット", phonetic: "/ænd jɛt dɛθ ɪz ðə ˌdɛstɪˈneɪʃən wiː ɔːl ʃɛər. noʊ wʌn hæz ˈɛvər ɪˈskeɪpt ɪt/" },
-            { en: "And that is as it should be, because Death is very likely the single best invention of Life.", ja: "そして、そうあるべきなのです。なぜなら死はおそらく、生命にとって最高の発明だからです。", kana: "アンド ザット イズ アズ イット シュッド ビー、 ビコーズ デス イズ ベリー ライクリー ザ シングル ベスト インベンション オブ ライフ", phonetic: "/ænd ðæt ɪz æz ɪt ʃʊd biː, bɪˈkɒz dɛθ ɪz ˈvɛri ˈlaɪkli ðə ˈsɪŋɡəl bɛst ɪnˈvɛnʃən ɒv laɪf/" },
-            { en: "It is Life's change agent. It clears out the old to make way for the new.", ja: "それは生命の変革を担うものです。古きを取り去り、新しきに道を開くのです。", kana: "イット イズ ライフズ チェンジ エージェント。 イット クリアーズ アウト ザ オールド トゥ メイク ウェイ フォー ザ ニュー", phonetic: "/ɪt ɪz laɪfs tʃeɪndʒ ˈeɪdʒənt. ɪt klɪərz aʊt ðə oʊld tuː meɪk weɪ fɔːr ðə nuː/" },
-            { en: "Right now the new is you, but someday not too long from now,", ja: "今、新しきは皆さんですが、いつかそれほど遠くない未来に、", kana: "ライト ナウ ザ ニュー イズ ユー、 バット サムデイ ノット トゥー ロング フロム ナウ", phonetic: "/raɪt naʊ ðə nuː ɪz juː, bʌt ˈsʌmdeɪ nɒt tuː lɒŋ frɒm naʊ/" },
-            { en: "you will gradually become the old and be cleared away.", ja: "皆さんもだんだんと古きものとなり、取り去られることになります。", kana: "ユー ウィル グラデュアリー ビカム ザ オールド アンド ビー クリアード アウェイ", phonetic: "/juː wɪl ˈɡrædʒuəli bɪˈkʌm ðə oʊld ænd biː klɪərd əˈweɪ/" },
-            { en: "Sorry to be so dramatic, but it is quite true.", ja: "劇的で申し訳ありませんが、これは紛れもない真実なのです。", kana: "ソーリー トゥ ビー ソー ドラマティック、 バット イット イズ クワイト トゥルー", phonetic: "/ˈsɒri tuː biː soʊ drəˈmætɪk, bʌt ɪt ɪz kwaɪt truː/" },
-            { en: "Your time is limited, so don't waste it living someone else's life.", ja: "時間は限られています。だから、誰かの人生を生きて無駄にしてはいけません。", kana: "ユア タイム イズ リミティド、 ソー ドント ウェイスト イット リビング サムワン エルシズ ライフ", phonetic: "/jɔːr taɪm ɪz ˈlɪmɪtɪd, soʊ doʊnt weɪst ɪt ˈlɪvɪŋ ˈsʌmwʌn ˈɛlsɪz laɪf/" },
-            { en: "Don't be trapped by dogma - which is living with the results of other people's thinking.", ja: "ドグマに囚われてはいけません。それは他人の考えの結果に従って生きることです。", kana: "ドント ビー トラップト バイ ドグマ - フィッチ イズ リビング ウィズ ザ リザルツ オブ アザー ピープルズ シンキング", phonetic: "/doʊnt biː træpt baɪ ˈdɒɡmə - wɪtʃ ɪz ˈlɪvɪŋ wɪð ðə rɪˈzʌlts ɒv ˈʌðər ˈpiːpəlz ˈθɪŋkɪŋ/" },
-            { en: "Have the courage to follow your heart and intuition.", ja: "自分の心と直感に従う勇気を持ってください。", kana: "ハブ ザ カレッジ トゥ フォロー ユア ハート アンド インテュイション", phonetic: "/hæv ðə ˈkʌrɪdʒ tuː ˈfɒloʊ jɔːr hɑːrt ænd ˌɪntjuˈɪʃən/" },
-            { en: "They somehow already know what you truly want to become.", ja: "それらは、あなたが本当になりたいものをすでによく知っています。", kana: "ゼイ サムハウ オールレディ ノウ ホワット ユー トゥルーリー ウォント トゥ ビカム", phonetic: "/ðeɪ ˈsʌmhaʊ ɔːlˈrɛdi noʊ wɒt juː ˈtruːli wɒnt tuː bɪˈkʌm/" }
+            { en: "Again, you can't connect the dots looking forward; you can only connect them looking backwards.", ja: "繰り返しになりますが、将来を見据えて点と点をつなぐことはできません。過去を振り返って初めて、それらをつなぐことができるのです。", kana: "アゲイン、 ユー キャント コネクト ザ ドッツ ルッキング フォワード、 ユー キャン オンリー コネクト ゼム ルッキング バックワーズ。", phonetic: "/əˈgɛn, ju kænt kəˈnɛkt ðə dɑts ˈlʊkɪŋ ˈfɔrwərd; ju kæn ˈoʊnli kəˈnɛkt ðɛm ˈlʊkɪŋ ˈbækwərdz./" },
+            { en: "So you have to trust that the dots will somehow connect in your future.", ja: "だから、点と点が将来、何らかの形でつながると信じなければなりません。", kana: "ソー ユー ハブ トゥ トラスト ザット ザ ドッツ ウィル サムハウ コネクト イン ユア フューチャー。", phonetic: "/soʊ ju hæv tə trʌst ðæt ðə dɑts wɪl ˈsʌmˌhaʊ kəˈnɛkt ɪn jʊər ˈfjuʧər./" },
+            { en: "You have to trust in something - your gut, destiny, life, karma, whatever.", ja: "何かを信じなければなりません。あなたの直感、運命、人生、カルマ、何でもいい。", kana: "ユー ハブ トゥ トラスト イン サムシング - ユア ガット、 デスティニー、 ライフ、 カーマ、 ホワットエバー。", phonetic: "/ju hæv tə trʌst ɪn ˈsʌmθɪŋ - jʊər gʌt, ˈdɛstəni, laɪf, ˈkɑrmə, wəˈtɛvər./" },
+            { en: "This approach has never let me down, and it has made all the difference in my life.", ja: "この考え方が私を裏切ったことは一度もなく、私の人生に大きな違いをもたらしました。", kana: "ディス アプローチ ハズ ネバー レット ミー ダウン、 アンド イット ハズ メイド オール ザ ディファレンス イン マイ ライフ。", phonetic: "/ðɪs əˈproʊʧ hæz ˈnɛvər lɛt mi daʊn, ænd ɪt hæz meɪd ɔl ðə ˈdɪfərəns ɪn maɪ laɪf./" }
         ],
-        // 15. 全地球カタログ
         [
-            { en: "When I was young, there was an amazing publication called The Whole Earth Catalog,", ja: "私が若かった頃、『全地球カタログ』という素晴らしい出版物がありました。", kana: "ホエン アイ ワズ ヤング、 ゼア ワズ アン アメイジング パブリケーション コールド ザ ホール アース カタログ", phonetic: "/wɛn aɪ wɒz jʌŋ, ðɛər wɒz ən əˈmeɪzɪŋ ˌpʌblɪˈkeɪʃən kɔːld ðə hoʊl ɜːrθ ˈkætəlɒɡ/" },
-            { en: "which was one of the bibles of my generation.", ja: "それは私の世代のバイブルのひとつでした。", kana: "フィッチ ワズ ワン オブ ザ バイブルズ オブ マイ ジェネレーション", phonetic: "/wɪtʃ wɒz wʌn ɒv ðə ˈbaɪbəlz ɒv maɪ ˌdʒɛnəˈreɪʃən/" },
-            { en: "It was created by a fellow named Stewart Brand not far from here in Menlo Park,", ja: "ここから遠くないメンローパークに住むスチュアート・ブランドという男が作り出し、", kana: "イット ワズ クリエイティド バイ ア フェロー ネームド スチュアート ブランド ノット ファー フロム ヒア イン メンロー パーク", phonetic: "/ɪt wɒz kriˈeɪtɪd baɪ ə ˈfɛloʊ neɪmd ˈstjuːərt brænd nɒt fɑːr frɒm hɪər ɪn ˈmɛnloʊ pɑːrk/" },
-            { en: "and he brought it to life with his poetic touch.", ja: "詩的なタッチでそれに命を吹き込みました。", kana: "アンド ヒー ブロート イット トゥ ライフ ウィズ ヒズ ポエティック タッチ", phonetic: "/ænd hiː brɔːt ɪt tuː laɪf wɪð hɪz poʊˈɛtɪk tʌtʃ/" },
-            { en: "This was in the late 1960's, before personal computers and desktop publishing,", ja: "それは60年代後半、パソコンやDTPが登場する前のことだったので、", kana: "ディス ワズ イン ザ レイト ナインティーン シクスティーズ、 ビフォー パーソナル コンピューターズ アンド デスクトップ パブリッシング", phonetic: "/ðɪs wɒz ɪn ðə leɪt 1960ɛs, bɪˈfɔːr ˈpɜːrsənəl kəmˈpjuːtərz ænd ˈdɛskˌtɒp ˈpʌblɪʃɪŋ/" },
-            { en: "so it was all made with typewriters, scissors, and polaroid cameras.", ja: "すべてタイプライターとハサミ、ポラロイドカメラで作られていました。", kana: "ソー イット ワズ オール メイド ウィズ タイプライターズ、 シザーズ、 アンド ˌpoʊləˈrɔɪd ˈkæmərəz", phonetic: "/soʊ ɪt wɒz ɔːl meɪd wɪð ˈtaɪpˌraɪtərz, ˈsɪzərz, ænd ˌpoʊləˈrɔɪd ˈkæmərəz/" },
-            { en: "It was sort of like Google in paperback form, 35 years before Google came along:", ja: "それは、グーグルが登場する35年前の、ペーパーバック版グーグルのようなものでした。", kana: "イット ワズ ソート オブ ライク グーグル イン ペーパーバック フォーム、 サーティファイブ イヤーズ ビフォー グーグル ケイム アロング", phonetic: "/ɪt wɒz sɔːrt ɒv laɪk ˈɡuːɡəl ɪn ˈpeɪpərˌbæk fɔːrm, 35 jɪərz bɪˈfɔːr ˈɡuːɡəl keɪm əˈlɒŋ/" },
-            { en: "it was idealistic, and overflowing with neat tools and great notions.", ja: "理想に満ちていて、素晴らしいツールや偉大な概念で溢れていました。", kana: "イット ワズ アイディアリスティック、 アンド オーバーフローイング ウィズ ニート ツールズ アンド グレート ノーションズ", phonetic: "/ɪt wɒz ˌaɪdiəˈlɪstɪk, ænd ˌoʊvərˈfloʊɪŋ wɪð niːt tuːlz ænd ɡreɪt ˈnoʊʃənz/" }
+            { en: "My second story is about love and loss.", ja: "私の2つ目の話は、愛と喪失についてです。", kana: "マイ セカンド ストーリー イズ アバウト ラブ アンド ロス。", phonetic: "/maɪ ˈsɛkənd ˈstɔri ɪz əˈbaʊt lʌv ænd lɔs./" },
+            { en: "I was lucky I found what I loved to do early in life.", ja: "私は幸運でした。人生の早い段階で、自分が愛することを見つけたからです。", kana: "アイ ワズ ラッキー アイ ファウンド ホワット アイ ラブド トゥ ドゥー アーリー イン ライフ。", phonetic: "/aɪ wʌz ˈlʌki aɪ faʊnd wʌt aɪ lʌvd tə du ˈɜrli ɪn laɪf./" },
+            { en: "Woz and I started Apple in my parents garage when I was 20.", ja: "ウォズと私は、私が20歳のときに両親のガレージでAppleを始めました。", kana: "ウォズ アンド アイ スターテッド アップル イン マイ ペアレンツ ガレージ ウェン アイ ワズ トウェンティ。", phonetic: "/wɑz ænd aɪ ˈstɑrtəd ˈæpəl ɪn maɪ ˈpɛrənts gəˈrɑʒ wɛn aɪ wʌz 20./" },
+            { en: "We worked hard, and in 10 years Apple had grown from just the two of us in a garage into a $2 billion company with over 4000 employees.", ja: "私たちは懸命に働き、10年でAppleはガレージの2人だけの会社から、従業員4000人以上、20億ドル規模の企業へと成長しました。", kana: "ウィー ワークト ハード、 アンド イン テン イヤーズ アップル ハッド グローン フロム ジャスト ザ トゥー オブ アス イン ア ガレージ イントゥ ア トゥー ビリオン ダラー カンパニー ウィズ オーバー フォーサウザンド エンプロイーズ。", phonetic: "/wi wɜrkt hɑrd, ænd ɪn 10 jɪrz ˈæpəl hæd groʊn frʌm ʤəst ðə tu ʌv ʌs ɪn ə gəˈrɑʒ ˈɪntu ə $2 ˈbɪljən ˈkʌmpəni wɪð ˈoʊvər 4000 ɛmˈplɔɪiz./" },
+            { en: "We had just released our finest creation -the Macintosh- a year earlier, and I had just turned 30.", ja: "私たちは最高の作品であるマッキントッシュを1年前に発表したばかりで、私はちょうど30歳になったところでした。", kana: "ウィー ハッド ジャスト リリースド アワ ファイネスト クリエイション - ザ マッキントッシュ - ア イヤー アーリーアー、 アンド アイ ハッド ジャスト ターンド サーティー。", phonetic: "/wi hæd ʤəst rɪˈlist ˈaʊər ˈfaɪnəst kriˈeɪʃən - ðə ˈmækɪnˌtɑʃ - ə jɪr ˈɜrliər, ænd aɪ hæd ʤəst tɜrnd 30./" },
+            { en: "And then I got fired.", ja: "そして、私は解雇されました。", kana: "アンド ゼン アイ ガット ファイアード。", phonetic: "/ænd ðɛn aɪ gɑt ˈfaɪərd./" }
         ],
-        // 16. Stay Hungry. Stay Foolish.
         [
-            { en: "Stewart and his team put out several issues of The Whole Earth Catalog,", ja: "スチュアートと彼のチームは『全地球カタログ』を何度か発行し、", kana: "スチュアート アンド ヒズ チーム プット アウト セベラル イシューズ オブ ザ ホール アース カタログ", phonetic: "/ˈstjuːərt ænd hɪz tiːm pʊt aʊt ˈsɛvərəl ˈɪʃuːz ɒv ðə hoʊl ɜːrθ ˈkætəlɒɡ/" },
-            { en: "and then when it had run its course, they put out a final issue.", ja: "一通りやり終えたとき、最終号を出しました。", kana: "アンド ゼン ホエン イット ハド ラン イッツ コース、 ゼイ プット アウト ア ファイナル イシュー", phonetic: "/ænd ðɛn wɛn ɪt hæd rʌn ɪts kɔːrs, ðeɪ pʊt aʊt ə ˈfaɪnəl ˈɪʃuː/" },
-            { en: "It was the mid-1970s, and I was your age.", ja: "それは70年代半ばで、私は皆さんと同じ年頃でした。", kana: "イット ワズ ザ ミッド ナインティーン セブンティーズ、 アンド アイ ワズ ユア エイジ", phonetic: "/ɪt wɒz ðə mɪd-1970ɛs, ænd aɪ wɒz jɔːr eɪdʒ/" },
-            { en: "On the back cover of their final issue was a photograph of an early morning country road,", ja: "最終号の裏表紙には、早朝の田舎道の写真がありました。", kana: "オン ザ バック カバー オブ ゼア ファイナル イシュー ワズ ア フォトグラフ オブ アン アーリー モーニング カントリー ロード", phonetic: "/ɒn ðə bæk ˈkʌvər ɒv ðɛər ˈfaɪnəl ˈɪʃuː wɒz ə ˈfoʊtəˌɡræf ɒv ən ˈɜːrli ˈmɔːrnɪŋ ˈkʌntri roʊd/" },
-            { en: "the kind you might find yourself hitchhiking on if you were so adventurous.", ja: "冒険好きな人なら、ヒッチハイクをするような風景です。", kana: "ザ カインド ユー マイト ファインド ユアセルフ ヒッチハイキング オン イフ ユー ワー ソー アドベンチャラス", phonetic: "/ðə kaɪnd juː maɪt faɪnd jʊərˈsɛlf ˈhɪtʃˌhaɪkɪŋ ɒn ɪf juː wɜːr soʊ ædˈvɛntʃərəs/" },
-            { en: "Beneath it were the words: Stay Hungry. Stay Foolish.", ja: "その下には、こう書かれていました。「ハングリーであれ。愚か者であれ」", kana: "ビニース イット ワー ザ ワーズ： ステイ ハングリー。 ステイ フーリッシュ", phonetic: "/bɪˈniːθ ɪt wɜːr ðə wɜːrdz: steɪ ˈhʌŋɡri. steɪ ˈfuːlɪʃ/" },
-            { en: "It was their farewell message as they signed off.", ja: "それが、彼らの別れのメッセージでした。", kana: "イット ワズ ゼア フェアウェル メッセージ アズ ゼイ サインド オフ", phonetic: "/ɪt wɒz ðɛər ˌfɛərˈwɛl ˈmɛsɪdʒ æz ðeɪ saɪnd ɒf/" },
-            { en: "Stay Hungry. Stay Foolish.", ja: "ハングリーであれ。愚か者であれ。", kana: "ステイ ハングリー。 ステイ フーリッシュ", phonetic: "/steɪ ˈhʌŋɡri. steɪ ˈfuːlɪʃ/" },
-            { en: "And I have always wished that for myself.", ja: "そして私は常に、自分自身そうありたいと願ってきました。", kana: "アンド アイ ハブ オールウェイズ ウィッシュド ザット フォー マイセルフ", phonetic: "/ænd aɪ hæv ˈɔːlweɪz wɪʃt ðæt fɔːr maɪˈsɛlf/" },
-            { en: "And now, as you graduate to begin anew, I wish that for you.", ja: "そして今、卒業して新たな始まりを迎える皆さんに、私はそれを願います。", kana: "アンド ナウ、 アズ ユー グラジュエイト トゥ ビギン アニュー、 アイ ウィッシュ ザット フォー ユー", phonetic: "/ænd naʊ, æz juː ˈɡrædʒuət tuː bɪˈɡɪn əˈnuː, aɪ wɪʃ ðæt fɔːr juː/" },
-            { en: "Stay Hungry. Stay Foolish.", ja: "ハングリーであれ。愚か者であれ。", kana: "ステイ ハングリー。 ステイ フーリッシュ", phonetic: "/steɪ ˈhʌŋɡri. steɪ ˈfuːlɪʃ/" },
-            { en: "Thank you all very much.", ja: "ご清聴ありがとうございました。", kana: "サンキュー オール ベリー マッチ", phonetic: "/θæŋk juː ɔːl ˈvɛri mʌtʃ/" }
+            { en: "How can you get fired from a company you started?", ja: "自分が始めた会社から、どうして解雇されるのでしょうか？", kana: "ハウ キャン ユー ゲット ファイアード フロム ア カンパニー ユー スターテッド？", phonetic: "/haʊ kæn ju gɛt ˈfaɪərd frʌm ə ˈkʌmpəni ju ˈstɑrtəd?/" },
+            { en: "Well, as Apple grew we hired someone who I thought was very talented to run the company with me, and for the first year or so things went well.", ja: "Appleが成長するにつれて、私は非常に才能があると思った人物を、私と一緒に会社を経営するために雇いました。そして最初の1年ほどは、物事は順調に進みました。", kana: "ウェル、 アズ アップル グルー ウィー ハイヤード サムワン フー アイ ソート ワズ ベリー タレンテッド トゥ ラン ザ カンパニー ウィズ ミー、 アンド フォー ザ ファースト イヤー オア ソー シングス ウェント ウェル。", phonetic: "/wɛl, æz ˈæpəl gru wi ˈhaɪərd ˈsʌmˌwʌn hu aɪ θɔt wʌz ˈvɛri ˈtæləntəd tə rʌn ðə ˈkʌmpəni wɪð mi, ænd fɔr ðə fɜrst jɪr ɔr soʊ θɪŋz wɛnt wɛl./" },
+            { en: "But then our visions of the future began to diverge and eventually we had a falling out.", ja: "しかし、私たちの将来に対するビジョンは乖離し始め、最終的に私たちは仲違いしました。", kana: "バット ゼン アワ ビジョンズ オブ ザ フューチャー ビギャン トゥ ダイバージ アンド イベンチュアリー ウィー ハッド ア フォーリング アウト。", phonetic: "/bʌt ðɛn ˈaʊər ˈvɪʒənz ʌv ðə ˈfjuʧər bɪˈgæn tə daɪˈvɜrʤ ænd ɪˈvɛnʧuəli wi hæd ə ˈfɔlɪŋ aʊt./" },
+            { en: "When we did, our Board of Directors sided with him.", ja: "そのとき、取締役会は彼に味方しました。", kana: "ウェン ウィー ディド、 アワ ボード オブ ダイレクターズ サイデッド ウィズ ヒム。", phonetic: "/wɛn wi dɪd, ˈaʊər bɔrd ʌv dəˈrɛktərz ˈsaɪdəd wɪð hɪm./" },
+            { en: "So at 30 I was out.", ja: "それで、30歳で私は追い出されました。", kana: "ソー アット サーティー アイ ワズ アウト。", phonetic: "/soʊ æt 30 aɪ wʌz aʊt./" },
+            { en: "And very publicly out.", ja: "そして、非常に公然と。", kana: "アンド ベリー パブリックリー アウト。", phonetic: "/ænd ˈvɛri ˈpʌblɪkli aʊt./" },
+            { en: "What had been the focus of my entire adult life was gone, and it was devastating.", ja: "私の成人後の人生のすべてが失われ、それは壊滅的でした。", kana: "ホワット ハッド ビーン ザ フォーカス オブ マイ エンタイア アダルト ライフ ワズ ゴーン、 アンド イット ワズ デバステイティング。", phonetic: "/wʌt hæd bɪn ðə ˈfoʊkəs ʌv maɪ ɪnˈtaɪər əˈdʌlt laɪf wʌz gɔn, ænd ɪt wʌz ˈdɛvəˌsteɪtɪŋ./" }
+        ],
+        [
+            { en: "I really didn't know what to do for a few months.", ja: "数ヶ月間、本当に何をすべきかわかりませんでした。", kana: "アイ リアリー ディドント ノウ ホワット トゥ ドゥー フォー ア フュー マンス。", phonetic: "/aɪ ˈrili ˈdɪdənt noʊ wʌt tə du fɔr ə fju mʌnθs./" },
+            { en: "I felt that I had let the previous generation of entrepreneurs down - that I had dropped the baton as it was being passed to me.", ja: "私は、前の世代の起業家たちをがっかりさせてしまった、私に渡されようとしていたバトンを落としてしまった、と感じました。", kana: "アイ フェルト ザット アイ ハッド レット ザ プリビアス ジェネレーション オブ アントレプレナーズ ダウン - ザット アイ ハッド ドロップト ザ バトン アズ イット ワズ ビーイング パスド トゥ ミー。", phonetic: "/aɪ fɛlt ðæt aɪ hæd lɛt ðə ˈpriviəs ˌʤɛnəˈreɪʃən ʌv ˌɑntrəprəˈnɜrz daʊn - ðæt aɪ hæd drɑpt ðə bəˈtɑn æz ɪt wʌz ˈbiɪŋ pæst tə mi./" },
+            { en: "I met with David Packard and Bob Noyce and tried to apologize for screwing up so badly.", ja: "私はデビッド・パッカードとボブ・ノイスに会い、大失敗したことを謝罪しようとしました。", kana: "アイ メット ウィズ デイビッド パッカード アンド ボブ ノイス アンド トライド トゥ アポロジャイズ フォー スクルーイング アップ ソー バッドリー。", phonetic: "/aɪ mɛt wɪð ˈdeɪvɪd ˈpækərd ænd bɑb nɔɪs ænd traɪd tə əˈpɑləˌʤaɪz fɔr ˈskruɪŋ ʌp soʊ ˈbædli./" },
+            { en: "I was a very public failure, and I even thought about running away from the valley.", ja: "私は非常に公然の失敗者であり、シリコンバレーから逃げることさえ考えました。", kana: "アイ ワズ ア ベリー パブリック フェイリャー、 アンド アイ イーブン ソート アバウト ランニング アウェイ フロム ザ バレー。", phonetic: "/aɪ wʌz ə ˈvɛri ˈpʌblɪk ˈfeɪljər, ænd aɪ ˈivɪn θɔt əˈbaʊt ˈrʌnɪŋ əˈweɪ frʌm ðə ˈvæli./" },
+            { en: "But something slowly began to dawn on me I still loved what I did.", ja: "しかし、何かがゆっくりと私の中で夜明けを迎え始めました。私はまだ自分のやっていることを愛していました。", kana: "バット サムシング スローリー ビギャン トゥ ドーン オン ミー アイ スティル ラブド ホワット アイ ディド。", phonetic: "/bʌt ˈsʌmθɪŋ ˈsloʊli bɪˈgæn tə dɔn ɑn mi aɪ stɪl lʌvd wʌt aɪ dɪd./" },
+            { en: "The turn of events at Apple had not changed that one bit.", ja: "Appleでの出来事は、それを少しも変えませんでした。", kana: "ザ ターン オブ イベンツ アット アップル ハッド ノット チェンジド ザット ワン ビット。", phonetic: "/ðə tɜrn ʌv ɪˈvɛnts æt ˈæpəl hæd nɑt ʧeɪnʤd ðæt wʌn bɪt./" },
+            { en: "I had been rejected, but I was still in love.", ja: "私は拒絶されましたが、まだ恋をしていました。", kana: "アイ ハッド ビーン リジェクテッド、 バット アイ ワズ スティル イン ラブ。", phonetic: "/aɪ hæd bɪn rɪˈʤɛktəd, bʌt aɪ wʌz stɪl ɪn lʌv./" },
+            { en: "And so I decided to start over.", ja: "そこで私は、最初からやり直すことにしました。", kana: "アンド ソー アイ ディサイデッド トゥ スタート オーバー。", phonetic: "/ænd soʊ aɪ dɪˈsaɪdəd tə stɑrt ˈoʊvər./" }
+        ],
+        [
+            { en: "I didn't see it then, but it turned out that getting fired from Apple was the best thing that could have ever happened to me.", ja: "その時はわかりませんでしたが、Appleから解雇されたことは、私に起こり得た最高のことだったとわかりました。", kana: "アイ ディドント シー イット ゼン、 バット イット ターンド アウト ザット ゲッティング ファイアード フロム アップル ワズ ザ ベスト シング ザット クッド ハブ エバー ハプンド トゥ ミー。", phonetic: "/aɪ ˈdɪdənt si ɪt ðɛn, bʌt ɪt tɜrnd aʊt ðæt ˈgɛtɪŋ ˈfaɪərd frʌm ˈæpəl wʌz ðə bɛst θɪŋ ðæt kʊd hæv ˈɛvər ˈhæpənd tə mi./" },
+            { en: "The heaviness of being successful was replaced by the lightness of being a beginner again, less sure about everything.", ja: "成功者であることの重さは、再び初心者になることの軽やかさ、すべてについて確信が持てないことに取って代わられました。", kana: "ザ ヘビネス オブ ビーイング サクセスフル ワズ リプレースド バイ ザ ライトネス オブ ビーイング ア ビギナー アゲイン、 レス シュア アバウト エブリシング。", phonetic: "/ðə ˈhɛvinəs ʌv ˈbiɪŋ səkˈsɛsfəl wʌz rɪˈpleɪst baɪ ðə ˈlaɪtnəs ʌv ˈbiɪŋ ə bɪˈgɪnər əˈgɛn, lɛs ʃʊr əˈbaʊt ˈɛvriˌθɪŋ./" },
+            { en: "It freed me to enter one of the most creative periods of my life.", ja: "それは私を解放し、私の人生で最も創造的な時期の一つに入ることを可能にしました。", kana: "イット フリード ミー トゥ エンター ワン オブ ザ モスト クリエイティブ ピリオズ オブ マイ ライフ。", phonetic: "/ɪt frid mi tə ˈɛntər wʌn ʌv ðə moʊst kriˈeɪtɪv ˈpɪriədz ʌv maɪ laɪf./" }
+        ],
+        [
+            { en: "During the next five years, I started a company named NeXT, another company named Pixar, and fell in love with an amazing woman who would become my wife.", ja: "その後5年間で、私はNeXTという会社と、Pixarという別の会社を設立し、後に妻となる素晴らしい女性と恋に落ちました。", kana: "デューリング ザ ネクスト ファイブ イヤーズ、 アイ スターテッド ア カンパニー ネームド ネクスト、 アナザー カンパニー ネームド ピクサー、 アンド フェル イン ラブ ウィズ アン アメイジング ウーマン フー ウッド ビカム マイ ワイフ。", phonetic: "/ˈdʊrɪŋ ðə nɛkst faɪv jɪrz, aɪ ˈstɑrtəd ə ˈkʌmpəni neɪmd nɛkst, əˈnʌðər ˈkʌmpəni neɪmd ˈpɪksɑr, ænd fɛl ɪn lʌv wɪð ən əˈmeɪzɪŋ ˈwʊmən hu wʊd bɪˈkʌm maɪ waɪf./" },
+            { en: "Pixar went on to create the worlds first computer animated feature film, Toy Story, and is now the most successful animation studio in the world.", ja: "ピクサーは世界初のコンピュータアニメーション長編映画『トイ・ストーリー』を制作し、今では世界で最も成功したアニメーションスタジオです。", kana: "ピクサー ウェント オン トゥ クリエイト ザ ワールズ ファースト コンピューター アニメイテッド フィーチャー フィルム、 トイ ストーリー、 アンド イズ ナウ ザ モスト サクセスフル アニメーション スタジオ イン ザ ワールド。", phonetic: "/ˈpɪksɑr wɛnt ɑn tə kriˈeɪt ðə wɜrldz fɜrst kəmˈpjutər ˈænəˌmeɪtəd ˈfiʧər fɪlm, tɔɪ ˈstɔri, ænd ɪz naʊ ðə moʊst səkˈsɛsfəl ˌænəˈmeɪʃən ˈstudiˌoʊ ɪn ðə wɜrld./" },
+            { en: "In a remarkable turn of events, Apple bought NeXT, I returned to Apple, and the technology we developed at NeXT is at the heart of Apple's current renaissance.", ja: "驚くべきことに、AppleがNeXTを買収し、私はAppleに復帰し、私たちがNeXTで開発した技術は、Appleの現在のルネサンスの中心となっています。", kana: "イン ア リマーカブル ターン オブ イベンツ、 アップル ボート ネクスト、 アイ リターンド トゥ アップル、 アンド ザ テクノロジー ウィー デベロプト アット ネクスト イズ アット ザ ハート オブ アップルズ カレント レネサンス。", phonetic: "/ɪn ə rɪˈmɑrkəbəl tɜrn ʌv ɪˈvɛnts, ˈæpəl bɔt nɛkst, aɪ rɪˈtɜrnd tə ˈæpəl, ænd ðə tɛkˈnɑləʤi wi dɪˈvɛləpt æt nɛkst ɪz æt ðə hɑrt ʌv ˈæpəlz ˈkɜrənt ˈrɛnəˌsɑns./" },
+            { en: "And Laurene and I have a wonderful family together.", ja: "そして、ローリーンと私は素晴らしい家庭を築いています。", kana: "アンド ローリーン アンド アイ ハブ ア ワンダフル ファミリー トゥギャザー。", phonetic: "/ænd ˈlɔrin ænd aɪ hæv ə ˈwʌndərfəl ˈfæməli təˈgɛðər./" }
+        ],
+        [
+            { en: "I'm pretty sure none of this would have happened if I hadn't been fired from Apple.", ja: "もし私がAppleから解雇されていなかったら、このどれも起こらなかったと確信しています。", kana: "アイム プリティ シュア ノン オブ ディス ウッド ハブ ハプンド イフ アイ ハドント ビーン ファイアード フロム アップル。", phonetic: "/aɪm ˈprɪti ʃʊr nʌn ʌv ðɪs wʊd hæv ˈhæpənd ɪf aɪ ˈhædənt bɪn ˈfaɪərd frʌm ˈæpəl./" },
+            { en: "It was awful tasting medicine, but I guess the patient needed it.", ja: "ひどくまずい薬でしたが、患者にはそれが必要だったのだと思います。", kana: "イット ワズ オーフル テイスティング メディシン、 バット アイ ゲス ザ ペイシェント ニーデッド イット。", phonetic: "/ɪt wʌz ˈɔfəl ˈteɪstɪŋ ˈmɛdəsən, bʌt aɪ gɛs ðə ˈpeɪʃənt ˈnidəd ɪt./" },
+            { en: "Sometimes life hits you in the head with a brick.", ja: "時々、人生はレンガであなたの頭を殴ります。", kana: "サムタイムズ ライフ ヒッツ ユー イン ザ ヘッド ウィズ ア ブリック。", phonetic: "/ˈsʌmˌtaɪmz laɪf hɪts ju ɪn ðə hɛd wɪð ə brɪk./" },
+            { en: "Don't lose faith.", ja: "信念を失わないでください。", kana: "ドント ルーズ フェイス。", phonetic: "/doʊnt luz feɪθ./" },
+            { en: "I'm convinced that the only thing that kept me going was that I loved what I did.", ja: "私を前進させ続けた唯一のことは、自分のやっていることを愛していたことだと確信しています。", kana: "アイム コンビンスト ザット ジ オンリー シング ザット ケプト ミー ゴーイング ワズ ザット アイ ラブド ホワット アイ ディド。", phonetic: "/aɪm kənˈvɪnst ðæt ði ˈoʊnli θɪŋ ðæt kɛpt mi ˈgoʊɪŋ wʌz ðæt aɪ lʌvd wʌt aɪ dɪd./" },
+            { en: "You've got to find what you love.", ja: "自分が愛することを見つけなければなりません。", kana: "ユーブ ガット トゥ ファインド ホワット ユー ラブ。", phonetic: "/juv gɑt tə faɪnd wʌt ju lʌv./" },
+            { en: "And that is as true for your work as it is for your lovers.", ja: "そしてそれは、あなたの恋人にとってと同じように、あなたの仕事にとっても真実です。", kana: "アンド ザット イズ アズ トゥルー フォー ユア ワーク アズ イット イズ フォー ユア ラバーズ。", phonetic: "/ænd ðæt ɪz æz tru fɔr jʊər wɜrk æz ɪt ɪz fɔr jʊər ˈlʌvərz./" },
+            { en: "Your work is going to fill a large part of your life, and the only way to be truly satisfied is to do what you believe is great work.", ja: "あなたの仕事はあなたの人生の大部分を占めることになり、本当に満足する唯一の方法は、あなたが素晴らしい仕事だと信じることをすることです。", kana: "ユア ワーク イズ ゴーイング トゥ フィル ア ラージ パート オブ ユア ライフ、 アンド ジ オンリー ウェイ トゥ ビー トゥルーリー サティスファイド イズ トゥ ドゥー ホワット ユー ビリーブ イズ グレート ワーク。", phonetic: "/jʊər wɜrk ɪz ˈgoʊɪŋ tə fɪl ə lɑrʤ pɑrt ʌv jʊər laɪf, ænd ði ˈoʊnli weɪ tə bi ˈtruli ˈsætɪsˌfaɪd ɪz tə du wʌt ju bɪˈliv ɪz greɪt wɜrk./" },
+            { en: "And the only way to do great work is to love what you do.", ja: "そして、素晴らしい仕事をする唯一の方法は、自分のやっていることを愛することです。", kana: "アンド ジ オンリー ウェイ トゥ ドゥー グレート ワーク イズ トゥ ラブ ホワット ユー ドゥー。", phonetic: "/ænd ði ˈoʊnli weɪ tə du greɪt wɜrk ɪz tə lʌv wʌt ju du./" },
+            { en: "If you haven't found it yet, keep looking.", ja: "まだ見つかっていないなら、探し続けてください。", kana: "イフ ユー ハブント ファウンド イット イェット、 キープ ルッキング。", phonetic: "/ɪf ju ˈhævənt faʊnd ɪt jɛt, kip ˈlʊkɪŋ./" },
+            { en: "Don't settle.", ja: "妥協しないでください。", kana: "ドント セトル。", phonetic: "/doʊnt ˈsɛtəl./" },
+            { en: "As with all matters of the heart, you'll know when you find it.", ja: "心に関するすべての事柄と同様に、それを見つけたときにはわかるでしょう。", kana: "アズ ウィズ オール マターズ オブ ザ ハート、 ユール ノウ ウェン ユー ファインド イット。", phonetic: "/æz wɪð ɔl ˈmætərz ʌv ðə hɑrt, jul noʊ wɛn ju faɪnd ɪt./" },
+            { en: "And, like any great relationship, it just gets better and better as the years roll on.", ja: "そして、どんな素晴らしい関係のように、年月が経つにつれてどんどん良くなっていきます。", kana: "アンド、 ライク エニー グレート リレーションシップ、 イット ジャスト ゲッツ ベター アンド ベター アズ ザ イヤーズ ロール オン。", phonetic: "/ænd, laɪk ˈɛni greɪt riˈleɪʃənˌʃɪp, ɪt ʤəst gɛts ˈbɛtər ænd ˈbɛtər æz ðə jɪrz roʊl ɑn./" },
+            { en: "So keep looking until you find it.", ja: "だから、見つかるまで探し続けてください。", kana: "ソー キープ ルッキング アンティル ユー ファインド イット。", phonetic: "/soʊ kip ˈlʊkɪŋ əntɪl ju faɪnd ɪt./" },
+            { en: "Don't settle.", ja: "妥協しないでください。", kana: "ドント セトル。", phonetic: "/doʊnt ˈsɛtəl./" }
+        ],
+        [
+            { en: "My third story is about death.", ja: "私の3つ目の話は、死についてです。", kana: "マイ サード ストーリー イズ アバウト デス。", phonetic: "/maɪ θɜrd ˈstɔri ɪz əˈbaʊt dɛθ./" },
+            { en: "When I was 17, I read a quote that went something like: \"If you live each day as if it was your last, someday you'll most certainly be right.\"", ja: "私が17歳のとき、「毎日を人生最後の日であるかのように生きれば、いつか必ずその通りになるだろう」という言葉を読みました。", kana: "ウェン アイ ワズ セブンティーン、 アイ レッド ア クオート ザット ウェント サムシング ライク： イフ ユー リブ イーチ デイ アズ イフ イット ワズ ユア ラスト、 サムデイ ユール モスト サーテンリー ビー ライト。", phonetic: "/wɛn aɪ wʌz 17, aɪ rɛd ə kwoʊt ðæt wɛnt ˈsʌmθɪŋ laɪk: \"ɪf ju lɪv iʧ deɪ æz ɪf ɪt wʌz jʊər læst, ˈsʌmˌdeɪ jul moʊst ˈsɜrtənli bi raɪt.\""/ },
+            { en: "It made an impression on me, and since then, for the past 33 years, I have looked in the mirror every morning and asked myself: \"If today were the last day of my life, would I want to do what I am about to do today?\"", ja: "それは私に感銘を与え、それ以来、過去33年間、毎朝鏡を見て自問自答してきました。「もし今日が人生最後の日だとしたら、今日やろうとしていることをやりたいだろうか？」", kana: "イット メイド アン インプレッション オン ミー、 アンド シンス ゼン、 フォー ザ パスト サーティスリー イヤーズ、 アイ ハブ ルックト イン ザ ミラー エブリー モーニング アンド アスクト マイセルフ： イフ トゥデイ ワー ザ ラスト デイ オブ マイ ライフ、 ウッド アイ ウォント トゥ ドゥー ホワット アイ アム アバウト トゥ ドゥー トゥデイ？", phonetic: "/ɪt meɪd ən ɪmˈprɛʃən ɑn mi, ænd sɪns ðɛn, fɔr ðə pæst 33 jɪrz, aɪ hæv lʊkt ɪn ðə ˈmɪrər ˈɛvəri ˈmɔrnɪŋ ænd æskt maɪˈsɛlf: \"ɪf təˈdeɪ wɜr ðə læst deɪ ʌv maɪ laɪf, wʊd aɪ wɑnt tə du wʌt aɪ æm əˈbaʊt tə du təˈdeɪ?\"/" },
+            { en: "And whenever the answer has been \"No\" for too many days in a row, I know I need to change something.", ja: "そして、その答えが何日も連続で「いいえ」だったときはいつでも、何かを変える必要があるとわかります。", kana: "アンド ウェンエバー ジ アンサー ハズ ビーン ノー フォー トゥー メニー デイズ イン ア ロウ、 アイ ノウ アイ ニード トゥ チェンジ サムシング。", phonetic: "/ænd wɛˈnɛvər ði ˈænsər hæz bɪn \"noʊ\" fɔr tu ˈmɛni deɪz ɪn ə roʊ, aɪ noʊ aɪ nid tə ʧeɪnʤ ˈsʌmθɪŋ./" }
+        ],
+        [
+            { en: "Remembering that I'll be dead soon is the most important tool I've ever encountered to help me make the big choices in life.", ja: "自分がもうすぐ死ぬということを覚えておくことは、人生の大きな選択をする上で、私がこれまで出会った中で最も重要なツールです。", kana: "リメンバリング ザット アイル ビー デッド スーン イズ ザ モスト インポータント ツール アイブ エバー エンカウンタード トゥ ヘルプ ミー メイク ザ ビッグ チョイシズ イン ライフ。", phonetic: "/rɪˈmɛmbərɪŋ ðæt aɪl bi dɛd sun ɪz ðə moʊst ɪmˈpɔrtənt tul aɪv ˈɛvər ɪnˈkaʊntərd tə hɛlp mi meɪk ðə bɪg ˈʧɔɪsəz ɪn laɪf./" },
+            { en: "Because almost everything - all external expectations, all pride, all fear of embarrassment or failure - these things just fall away in the face of death, leaving only what is truly important.", ja: "なぜなら、ほとんどすべてのこと、つまりすべての外部からの期待、すべてのプライド、恥や失敗へのすべての恐れは、死に直面すると消え去り、本当に重要なことだけが残るからです。", kana: "ビコーズ オールモスト エブリシング - オール エクスターナル エクスペクテーションズ、 オール プライド、 オール フィアー オブ エンバラスメント オア フェイリャー - ディーズ シングス ジャスト フォール アウェイ イン ザ フェイス オブ デス、 リービング オンリー ホワット イズ トゥルーリー インポータント。", phonetic: "/bɪˈkɔz ˈɔlˌmoʊst ˈɛvriˌθɪŋ - ɔl ɪkˈstɜrnəl ˌɛkspɛkˈteɪʃənz, ɔl praɪd, ɔl fɪr ʌv ɪmˈbɛrəsmənt ɔr ˈfeɪljər - ðiz θɪŋz ʤəst fɔl əˈweɪ ɪn ðə feɪs ʌv dɛθ, ˈlivɪŋ ˈoʊnli wʌt ɪz ˈtruli ɪmˈpɔrtənt./" },
+            { en: "Remembering that you are going to die is the best way I know to avoid the trap of thinking you have something to lose.", ja: "自分が死ぬということを覚えておくことは、何かを失うという考え方の罠を避けるための最善の方法です。", kana: "リメンバリング ザット ユー アー ゴーイング トゥ ダイ イズ ザ ベスト ウェイ アイ ノウ トゥ アボイド ザ トラップ オブ シンキング ユー ハブ サムシング トゥ ルーズ。", phonetic: "/rɪˈmɛmbərɪŋ ðæt ju ɑr ˈgoʊɪŋ tə daɪ ɪz ðə bɛst weɪ aɪ noʊ tə əˈvɔɪd ðə træp ʌv ˈθɪŋkɪŋ ju hæv ˈsʌmθɪŋ tə luz./" },
+            { en: "You are already naked.", ja: "あなたはすでに裸です。", kana: "ユー アー オールレディ ネイキッド。", phonetic: "/ju ɑr ɔlˈrɛdi ˈneɪkəd./" },
+            { en: "There is no reason not to follow your heart.", ja: "自分の心に従わない理由はありません。", kana: "ゼア イズ ノー リーズン ノット トゥ フォロー ユア ハート。", phonetic: "/ðɛr ɪz noʊ ˈrizən nɑt tə ˈfɑloʊ jʊər hɑrt./" }
+        ],
+        [
+            { en: "No one wants to die.", ja: "誰も死にたくありません。", kana: "ノー ワン ウォンツ トゥ ダイ。", phonetic: "/noʊ wʌn wɑnts tə daɪ./" },
+            { en: "Even people who want to go to heaven don't want to die to get there.", ja: "天国に行きたい人でさえ、そこに行くために死にたくはありません。", kana: "イーブン ピープル フー ウォント トゥ ゴー トゥ ヘブン ドント ウォント トゥ ダイ トゥ ゲット ゼア。", phonetic: "/ˈivɪn ˈpipəl hu wɑnt tə goʊ tə ˈhɛvən doʊnt wɑnt tə daɪ tə gɛt ðɛr./" },
+            { en: "And yet death is the destination we all share.", ja: "それでも、死は私たち全員が共有する目的地です。", kana: "アンド イェット デス イズ ザ デスティネーション ウィー オール シェア。", phonetic: "/ænd jɛt dɛθ ɪz ðə ˌdɛstəˈneɪʃən wi ɔl ʃɛr./" },
+            { en: "No one has ever escaped it.", ja: "誰もそれから逃れたことはありません。", kana: "ノー ワン ハズ エバー エスケープト イット。", phonetic: "/noʊ wʌn hæz ˈɛvər ɪˈskeɪpt ɪt./" },
+            { en: "And that is as it should be, because Death is very likely the single best invention of Life.", ja: "そして、そうあるべきなのです。なぜなら、死は生命の最高の発明である可能性が非常に高いからです。", kana: "アンド ザット イズ アズ イット シュッド ビー、 ビコーズ デス イズ ベリー ライクリー ザ シングル ベスト インベンション オブ ライフ。", phonetic: "/ænd ðæt ɪz æz ɪt ʃʊd bi, bɪˈkɔz dɛθ ɪz ˈvɛri ˈlaɪkli ðə ˈsɪŋgəl bɛst ɪnˈvɛnʃən ʌv laɪf./" },
+            { en: "It is Life's change agent.", ja: "それは生命の変化の担い手です。", kana: "イット イズ ライフズ チェンジ エージェント。", phonetic: "/ɪt ɪz laɪfs ʧeɪnʤ ˈeɪʤənt./" },
+            { en: "It clears out the old to make way for the new.", ja: "それは古いものを一掃し、新しいもののための道を開きます。", kana: "イット クリアーズ アウト ジ オールド トゥ メイク ウェイ フォー ザ ニュー。", phonetic: "/ɪt klɪrz aʊt ði oʊld tə meɪk weɪ fɔr ðə nu./" },
+            { en: "Right now the new is you, but someday not too long from now, you will gradually become the old and be cleared away.", ja: "今、新しいものはあなたですが、そう遠くないいつか、あなたは徐々に古いものになり、一掃されるでしょう。", kana: "ライト ナウ ザ ニュー イズ ユー、 バット サムデイ ノット トゥー ロング フロム ナウ、 ユー ウィル グラジュアリー ビカム ジ オールド アンド ビー クリアード アウェイ。", phonetic: "/raɪt naʊ ðə nu ɪz ju, bʌt ˈsʌmˌdeɪ nɑt tu lɔŋ frʌm naʊ, ju wɪl ˈgræʤuəli bɪˈkʌm ði oʊld ænd bi klɪrd əˈweɪ./" },
+            { en: "Sorry to be so dramatic, but it is quite true.", ja: "こんなにドラマチックで申し訳ありませんが、それはまったくの事実です。", kana: "ソーリー トゥ ビー ソー ドラマチック、 バット イット イズ クワイト トゥルー。", phonetic: "/ˈsɑri tə bi soʊ drəˈmætɪk, bʌt ɪt ɪz kwaɪt tru./" }
+        ],
+        [
+            { en: "Your time is limited, so don't waste it living someone else's life.", ja: "あなたの時間は限られています。だから、誰か他の人の人生を生きて無駄にしないでください。", kana: "ユア タイム イズ リミテッド、 ソー ドント ウェイスト イット リビング サムワン エルスズ ライフ。", phonetic: "/jʊər taɪm ɪz ˈlɪmətəd, soʊ doʊnt weɪst ɪt ˈlɪvɪŋ ˈsʌmˌwʌn ˈɛlsəz laɪf./" },
+            { en: "Don't be trapped by dogma -which is living with the results of other people's thinking.", ja: "ドグマに囚われないでください。それは、他の人々の考えの結果と共に生きることです。", kana: "ドント ビー トラップト バイ ドグマ - ウィッチ イズ リビング ウィズ ザ リザルツ オブ アザー ピープルズ シンキング。", phonetic: "/doʊnt bi træpt baɪ ˈdɑgmə - wɪʧ ɪz ˈlɪvɪŋ wɪð ðə rɪˈzʌlts ʌv ˈʌðər ˈpipəlz ˈθɪŋkɪŋ./" },
+            { en: "Don't let the noise of others' opinions drown out your own inner voice.", ja: "他人の意見の騒音に、あなた自身の内なる声を溺れさせてはいけません。", kana: "ドント レット ザ ノイズ オブ アザーズ オピニオンズ ドラウンド アウト ユア オウン インナー ボイス。", phonetic: "/doʊnt lɛt ðə nɔɪz ʌv ˈʌðərz əˈpɪnjənz draʊnd aʊt jʊər oʊn ˈɪnər vɔɪs./" },
+            { en: "And most important, have the courage to follow your heart and intuition.", ja: "そして最も重要なことは、あなたの心と直感に従う勇気を持つことです。", kana: "アンド モスト インポータント、 ハブ ザ カレッジ トゥ フォロー ユア ハート アンド イントゥイション。", phonetic: "/ænd moʊst ɪmˈpɔrtənt, hæv ðə ˈkɜrəʤ tə ˈfɑloʊ jʊər hɑrt ænd ˌɪntuˈɪʃən./" },
+            { en: "They somehow already know what you truly want to become.", ja: "それらはどういうわけか、あなたが本当になりたいものをすでに知っています。", kana: "ゼイ サムハウ オールレディ ノウ ホワット ユー トゥルーリー ウォント トゥ ビカム。", phonetic: "/ðeɪ ˈsʌmˌhaʊ ɔlˈrɛdi noʊ wʌt ju ˈtruli wɑnt tə bɪˈkʌm./" },
+            { en: "Everything else is secondary.", ja: "他のすべては二の次です。", kana: "エブリシング エルス イズ セカンダリー。", phonetic: "/ˈɛvriˌθɪŋ ɛls ɪz ˈsɛkənˌdɛri./" }
+        ],
+        [
+            { en: "When I was young, there was an amazing publication called The Whole Earth Catalog, which was one of the bibles of my generation.", ja: "私が若かった頃、『ホール・アース・カタログ』という素晴らしい出版物があり、それは私の世代のバイブルの一つでした。", kana: "ウェン アイ ワズ ヤング、 ゼア ワズ アン アメイジング パブリケーション コールド ザ ホール アース カタログ、 ウィッチ ワズ ワン オブ ザ バイブルズ オブ マイ ジェネレーション。", phonetic: "/wɛn aɪ wʌz jʌŋ, ðɛr wʌz ən əˈmeɪzɪŋ ˌpʌblɪˈkeɪʃən kɔld ðə hoʊl ɜrθ ˈkætəˌlɔg, wɪʧ wʌz wʌn ʌv ðə ˈbaɪbəlz ʌv maɪ ˌʤɛnəˈreɪʃən./" },
+            { en: "It was created by a fellow named Stewart Brand not far from here in Menlo Park, and he brought it to life with his poetic touch.", ja: "それはここからそう遠くないメンローパークに住むスチュワート・ブランドという男によって創刊され、彼は詩的なタッチでそれに命を吹き込みました。", kana: "イット ワズ クリエイテッド バイ ア フェロー ネームド スチュワート ブランド ノット ファー フロム ヒア イン メンロー パーク、 アンド ヒー ブロート イット トゥ ライフ ウィズ ヒズ ポエティック タッチ。", phonetic: "/ɪt wʌz kriˈeɪtəd baɪ ə ˈfɛloʊ neɪmd ˈstuərt brænd nɑt fɑr frʌm hir ɪn ˈmɛnloʊ pɑrk, ænd hi brɔt ɪt tə laɪf wɪð hɪz poʊˈɛtɪk tʌʧ./" },
+            { en: "This was in the late 1960's, before personal computers and desktop publishing, so it was all made with typewriters, scissors, and polaroid cameras.", ja: "これは1960年代後半、パソコンやデスクトップパブリッシングが登場する前のことで、すべてタイプライター、ハサミ、ポラロイドカメラで作られていました。", kana: "ディス ワズ イン ザ レイト ナインティーンシクスティーズ、 ビフォー パーソナル コンピューターズ アンド デスクトップ パブリッシング、 ソー イット ワズ オール メイド ウィズ タイプライターズ、 シザーズ、 アンド ポラロイド カメラズ。", phonetic: "/ðɪs wʌz ɪn ðə leɪt 1960'z, bɪˈfɔr ˈpɜrsənəl kəmˈpjutərz ænd ˈdɛskˌtɑp ˈpʌblɪʃɪŋ, soʊ ɪt wʌz ɔl meɪd wɪð ˈtaɪpˌraɪtərz, ˈsɪzərz, ænd ˈpoʊləˌrɔɪd ˈkæmərəz./" },
+            { en: "It was sort of like Google in paperback form, 35 years before Google came along: it was idealistic, and overflowing with neat tools and great notions.", ja: "それはGoogleが登場する35年前の、いわばペーパーバック版Googleのようなもので、理想主義的で、気の利いた道具や素晴らしい概念であふれていました。", kana: "イット ワズ ソート オブ ライク グーグル イン ペーパーバック フォーム、 サーティファイブ イヤーズ ビフォー グーグル ケイム アロング： イット ワズ アイディアリスティック、 アンド オーバーフローイング ウィズ ニート ツールズ アンド グレート ノーションズ。", phonetic: "/ɪt wʌz sɔrt ʌv laɪk ˈgugəl ɪn ˈpeɪpərˌbæk fɔrm, 35 jɪrz bɪˈfɔr ˈgugəl keɪm əˈlɔŋ: ɪt wʌz aɪˌdiəˈlɪstɪk, ænd ˌoʊvərˈfloʊɪŋ wɪð nit tulz ænd greɪt ˈnoʊʃənz./" },
+            { en: "Stewart and his team put out several issues of The Whole Earth Catalog, and then when it had run its course, they put out a final issue.", ja: "スチュワートと彼のチームは『ホール・アース・カタログ』を数号発行し、そして役目を終えたとき、最終号を発行しました。", kana: "スチュワート アンド ヒズ チーム プット アウト セベラル イシューズ オブ ザ ホール アース カタログ、 アンド ゼン ウェン イット ハッド ラン イッツ コース、 ゼイ プット アウト ア ファイナル イシュー。", phonetic: "/ˈstuərt ænd hɪz tim pʊt aʊt ˈsɛvrəl ˈɪʃuz ʌv ðə hoʊl ɜrθ ˈkætəˌlɔg, ænd ðɛn wɛn ɪt hæd rʌn ɪts kɔrs, ðeɪ pʊt aʊt ə ˈfaɪnəl ˈɪʃu./" },
+            { en: "It was the mid-1970s, and I was your age.", ja: "それは1970年代半ばで、私はあなたたちと同じ年頃でした。", kana: "イット ワズ ザ ミッドナインティーンセブンティーズ、 アンド アイ ワズ ユア エイジ。", phonetic: "/ɪt wʌz ðə mɪd-1970z, ænd aɪ wʌz jʊər eɪʤ./" },
+            { en: "On the back cover of their final issue was a photograph of an early morning country road, the kind you might find yourself hitchhiking on if you were so adventurous.", ja: "最終号の裏表紙には、早朝の田舎道の写真が載っていました。冒険心があればヒッチハイクをしている自分を見つけるかもしれない、そんな道です。", kana: "オン ザ バック カバー オブ ゼア ファイナル イシュー ワズ ア フォトグラフ オブ アン アーリー モーニング カントリー ロード、 ザ カインド ユー マイト ファインド ユアセルフ ヒッチハイキング オン イフ ユー ワー ソー アドベンチャラス。", phonetic: "/ɑn ðə bæk ˈkʌvər ʌv ðɛr ˈfaɪnəl ˈɪʃu wʌz ə ˈfoʊtəˌgræf ʌv ən ˈɜrli ˈmɔrnɪŋ ˈkʌntri roʊd, ðə kaɪnd ju maɪt faɪnd jərˈsɛlf ˈhɪʧˌhaɪkɪŋ ɑn ɪf ju wɜr soʊ ædˈvɛnʧərəs./" },
+            { en: "Beneath it were the words: \"Stay Hungry. Stay Foolish.\"", ja: "その下には、「Stay Hungry. Stay Foolish.」という言葉がありました。", kana: "ビニース イット ワー ザ ワーズ： ステイ ハングリー。 ステイ フーリッシュ。", phonetic: "/bɪˈniθ ɪt wɜr ðə wɜrdz: \"steɪ ˈhʌŋgri. steɪ ˈfulɪʃ.\"" },
+            { en: "It was their farewell message as they signed off.", ja: "それは彼らが活動を終える際の、別れのメッセージでした。", kana: "イット ワズ ゼア フェアウェル メッセージ アズ ゼイ サインド オフ。", phonetic: "/ɪt wʌz ðɛr ˌfɛrˈwɛl ˈmɛsəʤ æz ðeɪ saɪnd ɔf./" },
+            { en: "Stay Hungry. Stay Foolish.", ja: "Stay Hungry. Stay Foolish.", kana: "ステイ ハングリー。 ステイ フーリッシュ。", phonetic: "/steɪ ˈhʌŋgri. steɪ ˈfulɪʃ./" },
+            { en: "And I have always wished that for myself.", ja: "そして私はいつも、自分自身にそう願ってきました。", kana: "アンド アイ ハブ オールウェイズ ウィッシュト ザット フォー マイセルフ。", phonetic: "/ænd aɪ hæv ˈɔlweɪz wɪʃt ðæt fɔr maɪˈsɛlf./" },
+            { en: "And now, as you graduate to begin anew, I wish that for you.", ja: "そして今、卒業して新たに歩み始める皆さんに、私はそれを願っています。", kana: "アンド ナウ、 アズ ユー グラジュエート トゥ ビギン アニュー、 アイ ウィッシュ ザット フォー ユー。", phonetic: "/ænd naʊ, æz ju ˈgræʤuət tə bɪˈgɪn əˈnu, aɪ wɪʃ ðæt fɔr ju./" },
+            { en: "Stay Hungry. Stay Foolish.", ja: "Stay Hungry. Stay Foolish.", kana: "ステイ ハングリー。 ステイ フーリッシュ。", phonetic: "/steɪ ˈhʌŋgri. steɪ ˈfulɪʃ./" },
+            { en: "Thank you all very much.", ja: "どうもありがとうございました。", kana: "サンキュー オール ベリー マッチ。", phonetic: "/θæŋk ju ɔl ˈvɛri mʌʧ./" }
         ]
     ];
 
@@ -301,7 +297,7 @@
 
     const jaDisplay = document.getElementById('japanese');
     const kanaDisplay = document.getElementById('kana-display');
-    const phoneticDisplay = document.getElementById('phonetic-display'); // 追加
+    const phoneticDisplay = document.getElementById('phonetic-display');
     const enDisplay = document.getElementById('english-display');
     const inputArea = document.getElementById('input-area');
     const statusDisplay = document.getElementById('status');
@@ -314,7 +310,7 @@
         availableVoices = speechSynthesis.getVoices();
     }
     speechSynthesis.onvoiceschanged = loadVoices;
-    loadVoices(); 
+    loadVoices();
 
     function startPractice() {
         if (speechSynthesis.paused) {
@@ -323,7 +319,7 @@
 
         const selectedValue = chapterSelect.value;
         currentQueue = [];
-        
+
         if (selectedValue === "all") {
             speechData.forEach(chapter => {
                 chapter.forEach(sentence => currentQueue.push(sentence));
@@ -361,39 +357,34 @@
         const current = currentQueue[currentIndex];
         jaDisplay.innerText = current.ja;
         kanaDisplay.innerText = current.kana;
-        phoneticDisplay.innerText = current.phonetic; // 発音記号表示
-        
-        // 英文表示の初期化（文字判定用にレンダリング）
+        phoneticDisplay.innerText = current.phonetic;
+
         renderEnglishText("");
-        
+
         statusDisplay.innerText = "Listening...";
         inputArea.value = "";
         updateProgress();
 
-        // 許可を頂いたので、待ち時間を長く設定（800ms）
         setTimeout(() => {
             speak(current.en);
         }, 800);
     }
 
-    // 英文を文字単位で描画する関数
     function renderEnglishText(userInput) {
         if (!currentQueue[currentIndex]) return;
         const targetText = currentQueue[currentIndex].en;
-        
+
         let html = '';
         for (let i = 0; i < targetText.length; i++) {
             const char = targetText[i];
-            
+
             if (i < userInput.length) {
-                // 入力済みの文字判定
                 if (userInput[i] === char) {
                     html += `<span class="char-correct">${char}</span>`;
                 } else {
                     html += `<span class="char-wrong">${char}</span>`;
                 }
             } else {
-                // 未入力の文字
                 html += `<span class="char-pending">${char}</span>`;
             }
         }
@@ -403,11 +394,9 @@
     function speak(text) {
         speechSynthesis.cancel();
 
-        // 念のためダミーを2回入れてエンジンを確実に起こす
-        const dummy1 = new SpeechSynthesisUtterance(" "); dummy1.volume = 0; 
+        const dummy1 = new SpeechSynthesisUtterance(" "); dummy1.volume = 0;
         const dummy2 = new SpeechSynthesisUtterance(" "); dummy2.volume = 0;
 
-        // 冒頭音飛び対策
         const modifiedText = ", " + text;
 
         const uttr = new SpeechSynthesisUtterance(modifiedText);
@@ -415,11 +404,11 @@
         uttr.pitch = 1.0;
         uttr.lang = 'en-US';
 
-        const preferredVoice = availableVoices.find(voice => 
-            (voice.name.includes('Google US English') || voice.name.includes('Samantha') || voice.name.includes('Zira')) 
+        const preferredVoice = availableVoices.find(voice =>
+            (voice.name.includes('Google US English') || voice.name.includes('Samantha') || voice.name.includes('Zira'))
             && voice.lang.includes('en')
         );
-        
+
         if (preferredVoice) {
             uttr.voice = preferredVoice;
             uttr.lang = preferredVoice.lang;
@@ -428,7 +417,7 @@
         uttr.onend = () => {
              statusDisplay.innerText = "Type it!";
         };
-        
+
         uttr.onerror = (e) => {
             console.error('Speech synthesis error:', e);
             speechSynthesis.cancel();
@@ -448,17 +437,16 @@
 
     inputArea.addEventListener('input', () => {
         if (!currentQueue[currentIndex]) return;
-        
+
         const currentEn = currentQueue[currentIndex].en;
         const userInput = inputArea.value;
 
-        // 文字単位の色付け更新
         renderEnglishText(userInput);
 
         if (userInput === currentEn) {
             statusDisplay.innerText = "Correct! Next...";
             statusDisplay.className = "correct";
-            inputArea.disabled = true; 
+            inputArea.disabled = true;
             setTimeout(() => {
                 currentIndex++;
                 inputArea.disabled = false;
@@ -484,4 +472,3 @@
 
 </body>
 </html>
-```
