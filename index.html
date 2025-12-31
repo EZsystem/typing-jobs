@@ -26,7 +26,31 @@
         min-height: 1.5em;
         color: #bbb;
         word-wrap: break-word;
+        flex-grow: 1;
     }
+
+    #english-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    #replay-btn {
+        background: none;
+        border: none;
+        font-size: 1.8em;
+        cursor: pointer;
+        padding: 0;
+        color: #aaa;
+        transition: color 0.2s;
+        display: none; /* Initially hidden */
+    }
+
+    #replay-btn:hover {
+        color: #007bff;
+    }
+
 
     .char-correct { color: #333; }
     .char-wrong { color: #dc3545; background-color: #f8d7da; border-radius: 3px; }
@@ -92,7 +116,10 @@
     <div id="japanese">テーマを選択してスタートしてください</div>
     <div id="kana-display"></div>
     <div id="phonetic-display"></div>
-    <div id="english-display">Stay Hungry. Stay Foolish.</div>
+    <div id="english-container">
+        <div id="english-display">Stay Hungry. Stay Foolish.</div>
+        <button id="replay-btn">🔊</button>
+    </div>
 
     <input type="text" id="input-area" placeholder="Type here..." disabled autocomplete="off">
 
@@ -305,6 +332,7 @@
     const chapterSelect = document.getElementById('chapter-select');
     const speedSelect = document.getElementById('speed-select');
     const progressFill = document.getElementById('progress-fill');
+    const replayBtn = document.getElementById('replay-btn');
 
     function loadVoices() {
         availableVoices = speechSynthesis.getVoices();
@@ -338,6 +366,7 @@
         inputArea.value = "";
         inputArea.focus();
         startBtn.innerText = "リスタート (Restart)";
+        replayBtn.style.display = 'block';
         updateProgress();
         loadSentence();
     }
@@ -351,6 +380,7 @@
             inputArea.disabled = true;
             statusDisplay.innerText = "Select a theme to start again.";
             progressFill.style.width = "100%";
+            replayBtn.style.display = 'none';
             return;
         }
 
@@ -465,6 +495,12 @@
 
     inputArea.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' && inputArea.value === '') {
+            speak(currentQueue[currentIndex].en);
+        }
+    });
+
+    replayBtn.addEventListener('click', () => {
+        if (currentQueue.length > 0 && currentIndex < currentQueue.length) {
             speak(currentQueue[currentIndex].en);
         }
     });
