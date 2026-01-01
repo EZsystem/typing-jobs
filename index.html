@@ -319,6 +319,8 @@
 
     let currentQueue = [];
     let currentIndex = 0;
+    let currentChapterIndex = 0;
+    let isFullStoryMode = false;
     let currentUttr = null;
     let availableVoices = [];
 
@@ -346,22 +348,24 @@
         }
 
         const selectedValue = chapterSelect.value;
+        currentIndex = 0;
         currentQueue = [];
 
         if (selectedValue === "all") {
-            speechData.forEach(chapter => {
-                chapter.forEach(sentence => currentQueue.push(sentence));
-            });
+            isFullStoryMode = true;
+            currentChapterIndex = 0;
+            chapterSelect.value = 0;
+            currentQueue = [...speechData[currentChapterIndex]];
         } else {
-            const index = parseInt(selectedValue);
-            if (speechData[index]) {
-                currentQueue = [...speechData[index]];
+            isFullStoryMode = false;
+            currentChapterIndex = parseInt(selectedValue);
+            if (speechData[currentChapterIndex]) {
+                currentQueue = [...speechData[currentChapterIndex]];
             }
         }
 
         if (currentQueue.length === 0) return;
 
-        currentIndex = 0;
         inputArea.disabled = false;
         inputArea.value = "";
         inputArea.focus();
@@ -373,15 +377,35 @@
 
     function loadSentence() {
         if (currentIndex >= currentQueue.length) {
-            jaDisplay.innerText = "Congratulations! All finished.";
-            kanaDisplay.innerText = "";
-            phoneticDisplay.innerText = "";
-            enDisplay.innerText = "Stay Hungry. Stay Foolish.";
-            inputArea.disabled = true;
-            statusDisplay.innerText = "Select a theme to start again.";
-            progressFill.style.width = "100%";
-            replayBtn.style.display = 'none';
-            return;
+            if (isFullStoryMode) {
+                currentChapterIndex++;
+                if (currentChapterIndex < speechData.length) {
+                    currentIndex = 0;
+                    currentQueue = [...speechData[currentChapterIndex]];
+                    chapterSelect.value = currentChapterIndex;
+                } else {
+                    isFullStoryMode = false;
+                    jaDisplay.innerText = "Congratulations! All finished.";
+                    kanaDisplay.innerText = "";
+                    phoneticDisplay.innerText = "";
+                    enDisplay.innerText = "Stay Hungry. Stay Foolish.";
+                    inputArea.disabled = true;
+                    statusDisplay.innerText = "Select a theme to start again.";
+                    progressFill.style.width = "100%";
+                    replayBtn.style.display = 'none';
+                    return;
+                }
+            } else {
+                jaDisplay.innerText = "Congratulations! All finished.";
+                kanaDisplay.innerText = "";
+                phoneticDisplay.innerText = "";
+                enDisplay.innerText = "Stay Hungry. Stay Foolish.";
+                inputArea.disabled = true;
+                statusDisplay.innerText = "Select a theme to start again.";
+                progressFill.style.width = "100%";
+                replayBtn.style.display = 'none';
+                return;
+            }
         }
 
         const current = currentQueue[currentIndex];
@@ -461,7 +485,21 @@
     }
 
     function updateProgress() {
-        const percent = (currentIndex / currentQueue.length) * 100;
+        let percent = 0;
+        if (isFullStoryMode) {
+            let totalSentences = 0;
+            for(let i = 0; i < speechData.length; i++) {
+                totalSentences += speechData[i].length;
+            }
+            let completedSentences = 0;
+            for(let i = 0; i < currentChapterIndex; i++) {
+                completedSentences += speechData[i].length;
+            }
+            completedSentences += currentIndex;
+            percent = (completedSentences / totalSentences) * 100;
+        } else {
+            percent = (currentIndex / currentQueue.length) * 100;
+        }
         progressFill.style.width = percent + "%";
     }
 
