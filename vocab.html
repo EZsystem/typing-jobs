@@ -1,0 +1,2347 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>土木英単語タイピング (Civil Engineering Vocabulary Typing)</title>
+<style>
+    body {
+        font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'BIZ UDPGothic', Meiryo, sans-serif;
+        text-align: center;
+        padding: 30px;
+        background-color: #f0f2f5;
+        color: #333;
+    }
+    h1 {
+        color: #2c3e50;
+        font-size: 1.6em;
+        margin-bottom: 6px;
+        letter-spacing: 0.5px;
+    }
+    .subtitle {
+        font-size: 0.88em;
+        color: #6c757d;
+        margin-bottom: 18px;
+    }
+    
+    #container {
+        background: white;
+        max-width: 820px;
+        margin: 0 auto;
+        padding: 32px 30px;
+        border-radius: 12px;
+        box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+    }
+    
+    .controls {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 20px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    select {
+        padding: 10px 12px;
+        font-size: 1em;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+        background: #fff;
+        color: #333;
+        outline: none;
+        transition: border-color 0.2s;
+    }
+    select:focus {
+        border-color: #007bff;
+    }
+    #lesson-select {
+        flex: 2;
+        min-width: 260px;
+    }
+    #speed-select {
+        flex: 1;
+        min-width: 130px;
+    }
+
+    /* --- 単語表示エリア --- */
+    #lesson-badge {
+        font-size: 0.92em;
+        font-weight: bold;
+        color: #007bff;
+        margin-bottom: 8px;
+        min-height: 1.4em;
+    }
+    /* 1. 意味 (Jobs の和訳位置) */
+    #meaning-display {
+        font-size: 1.25em;
+        color: #222;
+        margin-bottom: 6px;
+        min-height: 1.5em;
+        line-height: 1.5;
+        font-weight: bold;
+    }
+    
+    /* 2. カタカナ */
+    #katakana-display {
+        font-size: 0.95em;
+        color: #666;
+        margin-bottom: 4px;
+        min-height: 1.3em;
+        letter-spacing: 0.5px;
+    }
+
+    /* 3. 発音記号 (IPA) */
+    #ipa-display {
+        font-size: 1.0em;
+        color: #007bff;
+        margin-bottom: 18px;
+        font-family: "Lucida Sans Unicode", "Arial Unicode MS", "Segoe UI", sans-serif;
+        min-height: 1.3em;
+    }
+
+    /* 4. 打つ英単語 (判定用装飾) */
+    #word-display {
+        font-size: 1.85em;
+        font-weight: bold;
+        margin-bottom: 22px;
+        letter-spacing: 1px;
+        min-height: 1.5em;
+        color: #bbb;
+        word-wrap: break-word;
+        white-space: pre-wrap;
+    }
+
+    /* 文字単位の判定スタイル */
+    .char-correct { color: #222; }
+    .char-wrong { color: #dc3545; background-color: #f8d7da; border-radius: 3px; padding: 0 1px; }
+    .char-pending { color: #aaa; }
+    /* スペース文字の可視化補助（未入力時） */
+    .space-char { border-bottom: 1.5px dashed #bbb; display: inline-block; min-width: 0.5em; }
+    .space-correct { border-bottom: 1.5px solid #222; display: inline-block; min-width: 0.5em; }
+    .space-wrong { border-bottom: 1.5px solid #dc3545; background-color: #f8d7da; display: inline-block; min-width: 0.5em; }
+    
+    #input-area {
+        width: 88%;
+        max-width: 600px;
+        padding: 14px 18px;
+        font-size: 1.35em;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        outline: none;
+        transition: border-color 0.25s, box-shadow 0.25s;
+        text-align: center;
+        letter-spacing: 0.5px;
+    }
+    #input-area:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
+    }
+    
+    #status {
+        margin-top: 18px;
+        font-weight: bold;
+        color: #007bff;
+        min-height: 1.5em;
+        font-size: 1.05em;
+    }
+    #status.correct {
+        color: #28a745;
+    }
+    #status.incorrect {
+        color: #dc3545;
+    }
+    
+    .btn-group {
+        margin-top: 18px;
+    }
+    button.main-btn {
+        padding: 12px 30px;
+        font-size: 1.1em;
+        font-weight: bold;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background 0.2s, transform 0.1s;
+    }
+    button.main-btn:hover {
+        background-color: #0056b3;
+    }
+    button.main-btn:active {
+        transform: translateY(1px);
+    }
+    
+    .progress-bar {
+        height: 8px;
+        background: #eee;
+        width: 100%;
+        margin-top: 22px;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+    .progress-fill {
+        height: 100%;
+        background: #28a745;
+        width: 0%;
+        transition: width 0.3s;
+    }
+
+    /* 進行・診断ログパネル */
+    #log-wrapper {
+        margin-top: 25px;
+        text-align: left;
+        border-top: 1px solid #eee;
+        padding-top: 15px;
+    }
+    .log-btn {
+        padding: 4px 10px;
+        font-size: 0.8em;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: opacity 0.2s;
+    }
+    .log-btn:hover { opacity: 0.85; }
+    #log-box {
+        background: #1e1e1e;
+        color: #d4d4d4;
+        font-family: Consolas, 'Courier New', monospace;
+        font-size: 0.82em;
+        padding: 10px 12px;
+        border-radius: 6px;
+        height: 140px;
+        overflow-y: auto;
+        line-height: 1.45;
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+    }
+</style>
+</head>
+<body>
+
+<div id="container">
+    <h1>土木英単語タイピング</h1>
+    <div class="subtitle">Civil Engineering Vocabulary Typing Practice</div>
+    
+    <div class="controls">
+        <select id="lesson-select">
+            <option value="all">★ 全語を通して実行 (All 105 Words)</option>
+        </select>
+
+        <select id="speed-select">
+            <option value="0.5">速度: 0.5 (Slow)</option>
+            <option value="0.7" selected>速度: 0.7</option>
+            <option value="0.8">速度: 0.8</option>
+            <option value="1.0">速度: 1.0 (Normal)</option>
+        </select>
+    </div>
+
+    <hr style="border: 0; border-top: 1px solid #eee; margin: 18px 0;">
+
+    <div id="lesson-badge"></div>
+    <div id="meaning-display">レッスンを選択してスタートしてください</div>
+    <div id="katakana-display"></div>
+    <div id="ipa-display"></div>
+    <div id="word-display">Civil Engineering</div>
+    
+    <input type="text" id="input-area" placeholder="Type here..." disabled autocomplete="off">
+    
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+    <div id="status"></div>
+    
+    <div class="btn-group">
+        <button id="start-btn" class="main-btn" onclick="startPractice()">スタート (Start)</button>
+    </div>
+
+    <!-- 進行・診断ログ表示パネル -->
+    <div id="log-wrapper">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <span style="font-weight: bold; font-size: 0.9em; color: #555;">📋 進行・診断ログ (Realtime Log)</span>
+            <div style="display: flex; gap: 6px;">
+                <button id="copy-log-btn" class="log-btn" type="button" onclick="copyLogPanel()" style="background: #007bff;">コピー</button>
+                <button id="toggle-log-btn" class="log-btn" type="button" onclick="toggleLogPanel()" style="background: #6c757d;">ログを隠す</button>
+                <button id="clear-log-btn" class="log-btn" type="button" onclick="clearLogPanel()" style="background: #dc3545;">消去</button>
+            </div>
+        </div>
+        <div id="log-box"></div>
+    </div>
+</div>
+
+<script>
+    /* =====================================================================
+       土木英単語タイピング - アプリケーション定義
+       - 正本: D:\My_Projects\Upskilling\_docs\study\vocab\words.json
+       - ローカルコピー: practice/data/words.json
+       - file:// 直開き環境と Web サーバー環境の双方で 100% 動作するよう、
+         内蔵フォールバックデータと fetch 自動更新を併用。
+
+       【新語追加フロー】
+       1. upskilling 側で words.json に追記後、practice/data/words.json へコピー
+       2. Webサーバー（HTTP/HTTPS）経由で実行する場合は、data/words.json を読み込むため
+          自動で最新語が反映されます。
+       3. 必要に応じて LESSON_DEFINITIONS の該当レッスン（または「12. 基本語・その他」）の
+          wordIds 配列に新語の id を追加してください。
+       4. file:// 直開きで利用する場合は、scratch/generate_app.py または
+          HTML 内の DEFAULT_WORDS_DATA も合わせて最新化してください。
+       ===================================================================== */
+
+    // 1. レッスン定義 (12レッスン・105語確定)
+    const LESSON_DEFINITIONS = [
+        {
+                "id": "lesson-1",
+                "title": "1. 密度①",
+                "wordIds": [
+                        "mass",
+                        "solid",
+                        "water",
+                        "volume",
+                        "void",
+                        "density",
+                        "wet",
+                        "dry",
+                        "particle",
+                        "ratio"
+                ]
+        },
+        {
+                "id": "lesson-2",
+                "title": "2. 密度②・含水比",
+                "wordIds": [
+                        "saturation",
+                        "compressibility-phrase",
+                        "content",
+                        "natural",
+                        "container",
+                        "water-content"
+                ]
+        },
+        {
+                "id": "lesson-3",
+                "title": "3. 圧密",
+                "wordIds": [
+                        "consolidation",
+                        "settlement",
+                        "compressibility",
+                        "increment",
+                        "effective",
+                        "thickness",
+                        "volumetric",
+                        "time",
+                        "drainage",
+                        "path"
+                ]
+        },
+        {
+                "id": "lesson-4",
+                "title": "4. 一軸①",
+                "wordIds": [
+                        "strain",
+                        "unconfined",
+                        "compressive",
+                        "cohesion",
+                        "undrained",
+                        "deformation",
+                        "axial",
+                        "failure",
+                        "initial",
+                        "corrected"
+                ]
+        },
+        {
+                "id": "lesson-5",
+                "title": "5. 一軸②・三軸",
+                "wordIds": [
+                        "diameter",
+                        "sensitivity",
+                        "drained",
+                        "internal",
+                        "friction",
+                        "angle",
+                        "consolidated"
+                ]
+        },
+        {
+                "id": "lesson-6",
+                "title": "6. 土圧",
+                "wordIds": [
+                        "active",
+                        "passive",
+                        "earth",
+                        "pressure",
+                        "unit",
+                        "weight"
+                ]
+        },
+        {
+                "id": "lesson-7",
+                "title": "7. 斜面①",
+                "wordIds": [
+                        "minimum",
+                        "safety",
+                        "resistance",
+                        "slice",
+                        "sliding",
+                        "resisting",
+                        "moment",
+                        "radius",
+                        "distance",
+                        "summation"
+                ]
+        },
+        {
+                "id": "lesson-8",
+                "title": "8. 斜面②・粒度",
+                "wordIds": [
+                        "center",
+                        "slip",
+                        "circle",
+                        "factor-of-safety",
+                        "uniformity",
+                        "curvature"
+                ]
+        },
+        {
+                "id": "lesson-9",
+                "title": "9. 液性・塑性",
+                "wordIds": [
+                        "liquid",
+                        "limit",
+                        "plastic",
+                        "plasticity",
+                        "index",
+                        "liquidity",
+                        "liquid-limit",
+                        "plastic-limit"
+                ]
+        },
+        {
+                "id": "lesson-10",
+                "title": "10. 締固め・土量",
+                "wordIds": [
+                        "compaction",
+                        "optimum",
+                        "optimum-water-content",
+                        "quantity",
+                        "bank",
+                        "loose",
+                        "compacted",
+                        "swell",
+                        "shrinkage"
+                ]
+        },
+        {
+                "id": "lesson-11",
+                "title": "11. 原位置試験",
+                "wordIds": [
+                        "subgrade",
+                        "reaction",
+                        "loading",
+                        "total",
+                        "elastic",
+                        "rebound",
+                        "penetration",
+                        "standard",
+                        "cone",
+                        "load"
+                ]
+        },
+        {
+                "id": "lesson-12",
+                "title": "12. 基本語・その他",
+                "wordIds": [
+                        "degree",
+                        "soil",
+                        "coefficient",
+                        "stress",
+                        "factor",
+                        "length",
+                        "strength",
+                        "shear",
+                        "modulus",
+                        "force",
+                        "maximum",
+                        "area",
+                        "height"
+                ]
+        }
+];
+
+    // 2. 内蔵フォールバックデータ (105語)
+    const DEFAULT_WORDS_DATA = {
+        "version": 1,
+        "updated": "2026-10-14",
+        "description": "土木一次学習の英単語（タイピング練習用）。学んだ語のみ。",
+        "words": [
+                {
+                        "id": "mass",
+                        "word": "mass",
+                        "meaning": "質量",
+                        "ipa": "/mæs/",
+                        "katakana": "マス",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "密度"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "solid",
+                        "word": "solid",
+                        "meaning": "固体・土粒子",
+                        "ipa": "/ˈsɑːlɪd/",
+                        "katakana": "ソリッド",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "密度"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "water",
+                        "word": "water",
+                        "meaning": "水",
+                        "ipa": "/ˈwɔːtər/",
+                        "katakana": "ウォーター",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "密度"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "volume",
+                        "word": "volume",
+                        "meaning": "体積",
+                        "ipa": "/ˈvɑːljuːm/",
+                        "katakana": "ボリューム",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "密度"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "void",
+                        "word": "void",
+                        "meaning": "間隙",
+                        "ipa": "/vɔɪd/",
+                        "katakana": "ボイド",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "密度"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "density",
+                        "word": "density",
+                        "meaning": "密度",
+                        "ipa": "/ˈdensəti/",
+                        "katakana": "デンシティ",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "密度"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "wet",
+                        "word": "wet",
+                        "meaning": "湿った・湿潤",
+                        "ipa": "/wet/",
+                        "katakana": "ウェット",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "密度"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "dry",
+                        "word": "dry",
+                        "meaning": "乾燥した",
+                        "ipa": "/draɪ/",
+                        "katakana": "ドライ",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "密度"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "particle",
+                        "word": "particle",
+                        "meaning": "粒子",
+                        "ipa": "/ˈpɑːrtɪkl/",
+                        "katakana": "パーティクル",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "密度",
+                                "粒度"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "ratio",
+                        "word": "ratio",
+                        "meaning": "比",
+                        "ipa": "/ˈreɪʃioʊ/",
+                        "katakana": "レシオ",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "密度"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "degree",
+                        "word": "degree",
+                        "meaning": "度（割合・程度）",
+                        "ipa": "/dɪˈɡriː/",
+                        "katakana": "ディグリー",
+                        "tags": [
+                                "土木",
+                                "土質"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "saturation",
+                        "word": "saturation",
+                        "meaning": "飽和",
+                        "ipa": "/ˌsætʃəˈreɪʃn/",
+                        "katakana": "サチュレーション",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "密度"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "content",
+                        "word": "content",
+                        "meaning": "含有量（含水比の content）",
+                        "ipa": "/ˈkɑːntent/",
+                        "katakana": "コンテンツ",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "含水比"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "natural",
+                        "word": "natural",
+                        "meaning": "自然の",
+                        "ipa": "/ˈnætʃrəl/",
+                        "katakana": "ナチュラル",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "含水比"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "container",
+                        "word": "container",
+                        "meaning": "容器",
+                        "ipa": "/kənˈteɪnər/",
+                        "katakana": "コンテナ",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "含水比"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "soil",
+                        "word": "soil",
+                        "meaning": "土",
+                        "ipa": "/sɔɪl/",
+                        "katakana": "ソイル",
+                        "tags": [
+                                "土木",
+                                "土質"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "consolidation",
+                        "word": "consolidation",
+                        "meaning": "圧密",
+                        "ipa": "/kənˌsɑːlɪˈdeɪʃn/",
+                        "katakana": "コンソリデーション",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "圧密"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "settlement",
+                        "word": "settlement",
+                        "meaning": "沈下",
+                        "ipa": "/ˈsetlmənt/",
+                        "katakana": "セトルメント",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "圧密",
+                                "平板載荷"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "coefficient",
+                        "word": "coefficient",
+                        "meaning": "係数",
+                        "ipa": "/ˌkoʊɪˈfɪʃnt/",
+                        "katakana": "コエフィシェント",
+                        "tags": [
+                                "土木",
+                                "土質"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "compressibility",
+                        "word": "compressibility",
+                        "meaning": "圧縮性",
+                        "ipa": "/kəmˌpresəˈbɪləti/",
+                        "katakana": "コンプレシビリティ",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "圧密"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "increment",
+                        "word": "increment",
+                        "meaning": "増分・増加量",
+                        "ipa": "/ˈɪŋkrəmənt/",
+                        "katakana": "インクリメント",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "圧密"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "effective",
+                        "word": "effective",
+                        "meaning": "有効な",
+                        "ipa": "/ɪˈfektɪv/",
+                        "katakana": "エフェクティブ",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "圧密"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "stress",
+                        "word": "stress",
+                        "meaning": "応力",
+                        "ipa": "/stres/",
+                        "katakana": "ストレス",
+                        "tags": [
+                                "土木",
+                                "土質"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "thickness",
+                        "word": "thickness",
+                        "meaning": "厚さ・層厚",
+                        "ipa": "/ˈθɪknəs/",
+                        "katakana": "シックネス",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "圧密"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "volumetric",
+                        "word": "volumetric",
+                        "meaning": "体積の",
+                        "ipa": "/ˌvɑːljəˈmetrɪk/",
+                        "katakana": "ボリュメトリック",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "圧密"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "strain",
+                        "word": "strain",
+                        "meaning": "ひずみ",
+                        "ipa": "/streɪn/",
+                        "katakana": "ストレイン",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "一軸"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "time",
+                        "word": "time",
+                        "meaning": "時間",
+                        "ipa": "/taɪm/",
+                        "katakana": "タイム",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "圧密"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "factor",
+                        "word": "factor",
+                        "meaning": "係数・要因",
+                        "ipa": "/ˈfæktər/",
+                        "katakana": "ファクター",
+                        "tags": [
+                                "土木",
+                                "土質"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "drainage",
+                        "word": "drainage",
+                        "meaning": "排水",
+                        "ipa": "/ˈdreɪnɪdʒ/",
+                        "katakana": "ドレナージ",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "圧密"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "path",
+                        "word": "path",
+                        "meaning": "経路・道",
+                        "ipa": "/pæθ/",
+                        "katakana": "パス",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "圧密"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "length",
+                        "word": "length",
+                        "meaning": "長さ",
+                        "ipa": "/leŋθ/",
+                        "katakana": "レングス",
+                        "tags": [
+                                "土木",
+                                "土質"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "unconfined",
+                        "word": "unconfined",
+                        "meaning": "拘束なし（一軸）",
+                        "ipa": "/ˌʌnkənˈfaɪnd/",
+                        "katakana": "アンコンファインド",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "一軸"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "compressive",
+                        "word": "compressive",
+                        "meaning": "圧縮の",
+                        "ipa": "/kəmˈpresɪv/",
+                        "katakana": "コンプレッシブ",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "一軸"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "strength",
+                        "word": "strength",
+                        "meaning": "強さ",
+                        "ipa": "/streŋθ/",
+                        "katakana": "ストレングス",
+                        "tags": [
+                                "土木",
+                                "土質"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "cohesion",
+                        "word": "cohesion",
+                        "meaning": "粘着力",
+                        "ipa": "/koʊˈhiːʒn/",
+                        "katakana": "コヒージョン",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "一軸",
+                                "三軸"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "undrained",
+                        "word": "undrained",
+                        "meaning": "非排水",
+                        "ipa": "/ʌnˈdreɪnd/",
+                        "katakana": "アンドレインド",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "一軸",
+                                "三軸"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "drained",
+                        "word": "drained",
+                        "meaning": "排水した",
+                        "ipa": "/dreɪnd/",
+                        "katakana": "ドレインド",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "三軸"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "shear",
+                        "word": "shear",
+                        "meaning": "せん断",
+                        "ipa": "/ʃɪr/",
+                        "katakana": "シア",
+                        "tags": [
+                                "土木",
+                                "土質"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "deformation",
+                        "word": "deformation",
+                        "meaning": "変形",
+                        "ipa": "/ˌdiːfɔːrˈmeɪʃn/",
+                        "katakana": "デフォーメーション",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "一軸"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "modulus",
+                        "word": "modulus",
+                        "meaning": "係数（弾性・変形など）",
+                        "ipa": "/ˈmɑːdʒələs/",
+                        "katakana": "モジュラス",
+                        "tags": [
+                                "土木",
+                                "土質"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "axial",
+                        "word": "axial",
+                        "meaning": "軸の",
+                        "ipa": "/ˈæksiəl/",
+                        "katakana": "アクシャル",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "一軸"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "failure",
+                        "word": "failure",
+                        "meaning": "破壊",
+                        "ipa": "/ˈfeɪljər/",
+                        "katakana": "フェイラー",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "一軸"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "force",
+                        "word": "force",
+                        "meaning": "力",
+                        "ipa": "/fɔːrs/",
+                        "katakana": "フォース",
+                        "tags": [
+                                "土木",
+                                "土質"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "maximum",
+                        "word": "maximum",
+                        "meaning": "最大",
+                        "ipa": "/ˈmæksɪməm/",
+                        "katakana": "マキシマム",
+                        "tags": [
+                                "土木",
+                                "土質"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "minimum",
+                        "word": "minimum",
+                        "meaning": "最小",
+                        "ipa": "/ˈmɪnɪməm/",
+                        "katakana": "ミニマム",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "斜面"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "initial",
+                        "word": "initial",
+                        "meaning": "初期の",
+                        "ipa": "/ɪˈnɪʃl/",
+                        "katakana": "イニシャル",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "一軸"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "area",
+                        "word": "area",
+                        "meaning": "面積",
+                        "ipa": "/ˈeriə/",
+                        "katakana": "エリア",
+                        "tags": [
+                                "土木",
+                                "土質"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "corrected",
+                        "word": "corrected",
+                        "meaning": "補正した",
+                        "ipa": "/kəˈrektɪd/",
+                        "katakana": "コレクテッド",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "一軸"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "height",
+                        "word": "height",
+                        "meaning": "高さ",
+                        "ipa": "/haɪt/",
+                        "katakana": "ハイト",
+                        "tags": [
+                                "土木",
+                                "土質"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "diameter",
+                        "word": "diameter",
+                        "meaning": "直径",
+                        "ipa": "/daɪˈæmɪtər/",
+                        "katakana": "ダイアメーター",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "一軸",
+                                "粒度"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "sensitivity",
+                        "word": "sensitivity",
+                        "meaning": "鋭敏比",
+                        "ipa": "/ˌsensəˈtɪvəti/",
+                        "katakana": "センシティビティ",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "一軸"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "internal",
+                        "word": "internal",
+                        "meaning": "内部の",
+                        "ipa": "/ɪnˈtɜːrnl/",
+                        "katakana": "インターナル",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "三軸"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "friction",
+                        "word": "friction",
+                        "meaning": "摩擦",
+                        "ipa": "/ˈfrɪkʃn/",
+                        "katakana": "フリクション",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "三軸"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "angle",
+                        "word": "angle",
+                        "meaning": "角",
+                        "ipa": "/ˈæŋɡl/",
+                        "katakana": "アングル",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "三軸"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "consolidated",
+                        "word": "consolidated",
+                        "meaning": "圧密した",
+                        "ipa": "/kənˈsɑːlɪdeɪtɪd/",
+                        "katakana": "コンソリデーテッド",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "三軸"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "active",
+                        "word": "active",
+                        "meaning": "主働の",
+                        "ipa": "/ˈæktɪv/",
+                        "katakana": "アクティブ",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "土圧"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "passive",
+                        "word": "passive",
+                        "meaning": "受働の",
+                        "ipa": "/ˈpæsɪv/",
+                        "katakana": "パッシブ",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "土圧"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "earth",
+                        "word": "earth",
+                        "meaning": "土（土圧の earth）",
+                        "ipa": "/ɜːrθ/",
+                        "katakana": "アース",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "土圧"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "pressure",
+                        "word": "pressure",
+                        "meaning": "圧力・土圧",
+                        "ipa": "/ˈpreʃər/",
+                        "katakana": "プレッシャー",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "土圧"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "unit",
+                        "word": "unit",
+                        "meaning": "単位",
+                        "ipa": "/ˈjuːnɪt/",
+                        "katakana": "ユニット",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "土圧"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "weight",
+                        "word": "weight",
+                        "meaning": "重量",
+                        "ipa": "/weɪt/",
+                        "katakana": "ウェイト",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "土圧",
+                                "斜面"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "safety",
+                        "word": "safety",
+                        "meaning": "安全",
+                        "ipa": "/ˈseɪfti/",
+                        "katakana": "セイフティ",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "斜面"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "resistance",
+                        "word": "resistance",
+                        "meaning": "抵抗",
+                        "ipa": "/rɪˈzɪstəns/",
+                        "katakana": "レジスタンス",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "斜面"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "slice",
+                        "word": "slice",
+                        "meaning": "スライス（分割片）",
+                        "ipa": "/slaɪs/",
+                        "katakana": "スライス",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "斜面"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "sliding",
+                        "word": "sliding",
+                        "meaning": "滑動する",
+                        "ipa": "/ˈslaɪdɪŋ/",
+                        "katakana": "スライディング",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "斜面"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "resisting",
+                        "word": "resisting",
+                        "meaning": "抵抗する",
+                        "ipa": "/rɪˈzɪstɪŋ/",
+                        "katakana": "リジスティング",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "斜面"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "moment",
+                        "word": "moment",
+                        "meaning": "モーメント",
+                        "ipa": "/ˈmoʊmənt/",
+                        "katakana": "モーメント",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "斜面"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "radius",
+                        "word": "radius",
+                        "meaning": "半径",
+                        "ipa": "/ˈreɪdiəs/",
+                        "katakana": "レイディアス",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "斜面"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "distance",
+                        "word": "distance",
+                        "meaning": "距離",
+                        "ipa": "/ˈdɪstəns/",
+                        "katakana": "ディスタンス",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "斜面"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "summation",
+                        "word": "summation",
+                        "meaning": "総和",
+                        "ipa": "/səˈmeɪʃn/",
+                        "katakana": "サメーション",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "斜面"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "center",
+                        "word": "center",
+                        "meaning": "中心",
+                        "ipa": "/ˈsentər/",
+                        "katakana": "センター",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "斜面"
+                        ],
+                        "source": "SYMBOLS",
+                        "note": "英綴り centre も同義。ここは center"
+                },
+                {
+                        "id": "slip",
+                        "word": "slip",
+                        "meaning": "すべり",
+                        "ipa": "/slɪp/",
+                        "katakana": "スリップ",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "斜面"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "circle",
+                        "word": "circle",
+                        "meaning": "円",
+                        "ipa": "/ˈsɜːrkl/",
+                        "katakana": "サークル",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "斜面"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "uniformity",
+                        "word": "uniformity",
+                        "meaning": "均等・一様",
+                        "ipa": "/ˌjuːnɪˈfɔːrməti/",
+                        "katakana": "ユニフォーミティ",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "粒度"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "curvature",
+                        "word": "curvature",
+                        "meaning": "曲率",
+                        "ipa": "/ˈkɜːrvətʃər/",
+                        "katakana": "カーバチャー",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "粒度"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "liquid",
+                        "word": "liquid",
+                        "meaning": "液体・液性の",
+                        "ipa": "/ˈlɪkwɪd/",
+                        "katakana": "リキッド",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "液性塑性"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "limit",
+                        "word": "limit",
+                        "meaning": "限界",
+                        "ipa": "/ˈlɪmɪt/",
+                        "katakana": "リミット",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "液性塑性"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "plastic",
+                        "word": "plastic",
+                        "meaning": "塑性の",
+                        "ipa": "/ˈplæstɪk/",
+                        "katakana": "プラスチック",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "液性塑性"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "plasticity",
+                        "word": "plasticity",
+                        "meaning": "塑性",
+                        "ipa": "/plæˈstɪsəti/",
+                        "katakana": "プラスティシティ",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "液性塑性"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "index",
+                        "word": "index",
+                        "meaning": "指数",
+                        "ipa": "/ˈɪndeks/",
+                        "katakana": "インデックス",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "液性塑性"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "liquidity",
+                        "word": "liquidity",
+                        "meaning": "液性",
+                        "ipa": "/lɪˈkwɪdəti/",
+                        "katakana": "リクイディティ",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "液性塑性"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "compaction",
+                        "word": "compaction",
+                        "meaning": "締固め",
+                        "ipa": "/kəmˈpækʃn/",
+                        "katakana": "コンパクション",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "締固め"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "optimum",
+                        "word": "optimum",
+                        "meaning": "最適",
+                        "ipa": "/ˈɑːptɪməm/",
+                        "katakana": "オプティマム",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "締固め"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "quantity",
+                        "word": "quantity",
+                        "meaning": "数量・土量",
+                        "ipa": "/ˈkwɑːntəti/",
+                        "katakana": "クオンティティ",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "土量"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "bank",
+                        "word": "bank",
+                        "meaning": "地山（bank volume）",
+                        "ipa": "/bæŋk/",
+                        "katakana": "バンク",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "土量"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "loose",
+                        "word": "loose",
+                        "meaning": "ほぐした",
+                        "ipa": "/luːs/",
+                        "katakana": "ルース",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "土量"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "compacted",
+                        "word": "compacted",
+                        "meaning": "締固めた",
+                        "ipa": "/kəmˈpæktɪd/",
+                        "katakana": "コンパクテッド",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "土量"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "swell",
+                        "word": "swell",
+                        "meaning": "膨張・ほぐし（swell factor）",
+                        "ipa": "/swel/",
+                        "katakana": "スウェル",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "土量"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "shrinkage",
+                        "word": "shrinkage",
+                        "meaning": "収縮（締固め率側）",
+                        "ipa": "/ˈʃrɪŋkɪdʒ/",
+                        "katakana": "シュリンケージ",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "土量"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "subgrade",
+                        "word": "subgrade",
+                        "meaning": "路床",
+                        "ipa": "/ˈsʌbɡreɪd/",
+                        "katakana": "サブグレード",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "平板載荷"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "reaction",
+                        "word": "reaction",
+                        "meaning": "反力",
+                        "ipa": "/riˈækʃn/",
+                        "katakana": "リアクション",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "平板載荷"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "loading",
+                        "word": "loading",
+                        "meaning": "載荷",
+                        "ipa": "/ˈloʊdɪŋ/",
+                        "katakana": "ローディング",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "平板載荷"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "total",
+                        "word": "total",
+                        "meaning": "総・全体",
+                        "ipa": "/ˈtoʊtl/",
+                        "katakana": "トータル",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "平板載荷"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "elastic",
+                        "word": "elastic",
+                        "meaning": "弾性の",
+                        "ipa": "/ɪˈlæstɪk/",
+                        "katakana": "エラスティック",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "平板載荷"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "rebound",
+                        "word": "rebound",
+                        "meaning": "回復（弾性回復）",
+                        "ipa": "/ˈriːbaʊnd/",
+                        "katakana": "リバウンド",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "平板載荷"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "penetration",
+                        "word": "penetration",
+                        "meaning": "貫入",
+                        "ipa": "/ˌpenɪˈtreɪʃn/",
+                        "katakana": "ペネトレーション",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "標準貫入"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "standard",
+                        "word": "standard",
+                        "meaning": "標準",
+                        "ipa": "/ˈstændərd/",
+                        "katakana": "スタンダード",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "標準貫入"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "cone",
+                        "word": "cone",
+                        "meaning": "コーン",
+                        "ipa": "/koʊn/",
+                        "katakana": "コーン",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "コーン"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "load",
+                        "word": "load",
+                        "meaning": "荷重",
+                        "ipa": "/loʊd/",
+                        "katakana": "ロード",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "スクリューウエイト"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "compressibility-phrase",
+                        "word": "void ratio",
+                        "meaning": "間隙比",
+                        "ipa": "/vɔɪd ˈreɪʃioʊ/",
+                        "katakana": "ボイド・レシオ",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "密度",
+                                "句"
+                        ],
+                        "source": "SYMBOLS",
+                        "note": "個別語 void / ratio と併用可"
+                },
+                {
+                        "id": "water-content",
+                        "word": "water content",
+                        "meaning": "含水比",
+                        "ipa": "/ˈwɔːtər ˈkɑːntent/",
+                        "katakana": "ウォーター・コンテンツ",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "含水比",
+                                "句"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "factor-of-safety",
+                        "word": "factor of safety",
+                        "meaning": "安全率",
+                        "ipa": "/ˈfæktər əv ˈseɪfti/",
+                        "katakana": "ファクター・オブ・セイフティ",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "斜面",
+                                "句"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "liquid-limit",
+                        "word": "liquid limit",
+                        "meaning": "液性限界",
+                        "ipa": "/ˈlɪkwɪd ˈlɪmɪt/",
+                        "katakana": "リキッド・リミット",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "液性塑性",
+                                "句"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "plastic-limit",
+                        "word": "plastic limit",
+                        "meaning": "塑性限界",
+                        "ipa": "/ˈplæstɪk ˈlɪmɪt/",
+                        "katakana": "プラスチック・リミット",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "液性塑性",
+                                "句"
+                        ],
+                        "source": "SYMBOLS"
+                },
+                {
+                        "id": "optimum-water-content",
+                        "word": "optimum water content",
+                        "meaning": "最適含水比",
+                        "ipa": "/ˈɑːptɪməm ˈwɔːtər ˈkɑːntent/",
+                        "katakana": "オプティマム・ウォーター・コンテンツ",
+                        "tags": [
+                                "土木",
+                                "土質",
+                                "締固め",
+                                "句"
+                        ],
+                        "source": "SYMBOLS"
+                }
+        ]
+};
+
+    // アプリ内状態
+    let wordsMap = {};
+    let currentQueue = [];
+    let currentIndex = 0;
+    let preferredVoice = null;
+    let engineWarmed = false;
+    let speakToken = 0;
+    let nextSentenceTimer = null;
+    let loadDelayTimer = null;
+    let isNumericalSession = false;
+    let lastLessonLogged = '';
+    let wordHasLoggedMiss = false;
+
+    // DOM要素
+    const lessonSelect = document.getElementById('lesson-select');
+    const speedSelect = document.getElementById('speed-select');
+    const lessonBadge = document.getElementById('lesson-badge');
+    const meaningDisplay = document.getElementById('meaning-display');
+    const katakanaDisplay = document.getElementById('katakana-display');
+    const ipaDisplay = document.getElementById('ipa-display');
+    const wordDisplay = document.getElementById('word-display');
+    const inputArea = document.getElementById('input-area');
+    const progressFill = document.getElementById('progress-fill');
+    const statusDisplay = document.getElementById('status');
+    const startBtn = document.getElementById('start-btn');
+    const logBox = document.getElementById('log-box');
+
+    // ログ出力関数
+    function logEvent(type, message) {
+        const time = new Date().toLocaleTimeString('ja-JP', { hour12: false });
+        const line = document.createElement('div');
+        let color = '#d4d4d4';
+        if (type === 'SUCCESS') color = '#4ec9b0';
+        else if (type === 'WARN') color = '#ce9178';
+        else if (type === 'ERROR') color = '#f14c4c';
+        else if (type === 'INFO') color = '#9cdcfe';
+        else if (type === 'AUDIO') color = '#dcdcaa';
+        else if (type === 'START' || type === 'COMPLETE') color = '#c586c0';
+        line.innerHTML = `<span style="color:#858585;">[${time}]</span> <span style="color:${color}; font-weight:bold;">[${type}]</span> ${message}`;
+        logBox.appendChild(line);
+        logBox.scrollTop = logBox.scrollHeight;
+    }
+
+    function copyLogPanel() {
+        const text = logBox.innerText;
+        navigator.clipboard.writeText(text).then(() => {
+            alert('ログをクリップボードにコピーしました');
+        }).catch(() => {
+            alert('コピーに失敗しました');
+        });
+    }
+
+    function toggleLogPanel() {
+        const isHidden = logBox.style.display === 'none';
+        logBox.style.display = isHidden ? 'block' : 'none';
+        document.getElementById('toggle-log-btn').innerText = isHidden ? 'ログを隠す' : 'ログを表示';
+    }
+
+    function clearLogPanel() {
+        logBox.innerHTML = '';
+        logEvent('INFO', 'ログを消去しました');
+    }
+
+    function waitMs(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    // 単語マップの構築
+    function buildWordsMap(wordsList) {
+        const map = {};
+        wordsList.forEach(w => {
+            if (w && w.id) {
+                map[w.id] = w;
+            }
+        });
+        return map;
+    }
+
+    // レッスンセレクトの初期化
+    function initLessonSelect() {
+        // option[0] は「★ 全語を通して実行」
+        LESSON_DEFINITIONS.forEach((lesson, idx) => {
+            const opt = document.createElement('option');
+            opt.value = String(idx);
+            opt.text = `${lesson.title} (${lesson.wordIds.length}語)`;
+            lessonSelect.appendChild(opt);
+        });
+    }
+
+    // データ初期化 (内蔵データをまず展開し、fetch可能なら外部 data/words.json を取得)
+    async function initData() {
+        // 1. まず内蔵データで構築
+        wordsMap = buildWordsMap(DEFAULT_WORDS_DATA.words);
+        logEvent('INFO', `内蔵フォールバックデータを読み込みました (${Object.keys(wordsMap).length}語)`);
+
+        // 2. 外部 data/words.json を fetch 試行
+        try {
+            const res = await fetch('data/words.json', { cache: 'no-store' });
+            if (res.ok) {
+                const extData = await res.json();
+                if (extData && Array.isArray(extData.words) && extData.words.length > 0) {
+                    wordsMap = buildWordsMap(extData.words);
+                    logEvent('SUCCESS', `外部 data/words.json を読み込みました (全${Object.keys(wordsMap).length}語, version:${extData.version || 1})`);
+                }
+            } else {
+                logEvent('INFO', `data/words.json 応答ステータス: ${res.status} (内蔵データで継続)`);
+            }
+        } catch (e) {
+            // file:// プロトコルなどの制約
+            logEvent('INFO', 'file:// プロトコルまたはローカル制限を検知。内蔵データで正常に動作します。');
+        }
+    }
+
+    // 音声初期化 (Jobs 実績コードを踏襲)
+    function selectEnglishVoice() {
+        if (!('speechSynthesis' in window)) return null;
+        const voices = speechSynthesis.getVoices();
+        if (!voices || voices.length === 0) return null;
+
+        return (
+            voices.find(v => v.lang === 'en-US' && /natural|premium|enhanced/i.test(v.name)) ||
+            voices.find(v => v.lang === 'en-US' && /google|samantha|zira|david/i.test(v.name)) ||
+            voices.find(v => v.lang === 'en-US') ||
+            voices.find(v => v.lang && v.lang.startsWith('en')) ||
+            null
+        );
+    }
+
+    function applyVoice(uttr) {
+        if (!preferredVoice) preferredVoice = selectEnglishVoice();
+        if (preferredVoice) {
+            uttr.voice = preferredVoice;
+            uttr.lang = preferredVoice.lang;
+        }
+    }
+
+    function runUtterance(uttr) {
+        return new Promise((resolve, reject) => {
+            let settled = false;
+            const finish = (fn, arg) => {
+                if (settled) return;
+                settled = true;
+                fn(arg);
+            };
+            uttr.onend = () => finish(resolve);
+            uttr.onerror = (e) => finish(reject, e);
+            speechSynthesis.speak(uttr);
+            setTimeout(() => finish(resolve), 1200);
+        });
+    }
+
+    async function warmEngine() {
+        if (engineWarmed) return;
+        if (speechSynthesis.paused) speechSynthesis.resume();
+        const warm = new SpeechSynthesisUtterance('ready');
+        warm.volume = 0.01;
+        warm.rate = 1.2;
+        applyVoice(warm);
+        try {
+            await runUtterance(warm);
+        } catch (e) {}
+        engineWarmed = true;
+    }
+
+    function getLessonTitle(idx) {
+        const lesson = LESSON_DEFINITIONS[idx];
+        return lesson ? lesson.title : `レッスン ${idx + 1}`;
+    }
+
+    // 練習開始
+    async function startPractice() {
+        speakToken++;
+        if (nextSentenceTimer) {
+            clearTimeout(nextSentenceTimer);
+            nextSentenceTimer = null;
+        }
+        if (loadDelayTimer) {
+            clearTimeout(loadDelayTimer);
+            loadDelayTimer = null;
+        }
+        if (speechSynthesis.speaking || speechSynthesis.pending || speechSynthesis.paused) {
+            speechSynthesis.cancel();
+        }
+
+        const selectedValue = lessonSelect.value;
+        currentQueue = [];
+        lastLessonLogged = '';
+
+        if (selectedValue === 'all') {
+            isNumericalSession = false;
+            LESSON_DEFINITIONS.forEach((lesson, lIdx) => {
+                const title = lesson.title;
+                lesson.wordIds.forEach((wid, wIdx) => {
+                    const wItem = wordsMap[wid];
+                    if (wItem) {
+                        currentQueue.push({
+                            id: wid,
+                            word: wItem.word,
+                            meaning: wItem.meaning,
+                            ipa: wItem.ipa,
+                            katakana: wItem.katakana,
+                            lessonTitle: title,
+                            lessonIndex: lIdx,
+                            wordIndexInLesson: wIdx + 1,
+                            wordTotalInLesson: lesson.wordIds.length
+                        });
+                    }
+                });
+            });
+            logEvent('START', `★ 全語を通して実行を開始 (全${currentQueue.length}語)`);
+        } else {
+            isNumericalSession = true;
+            const startIndex = parseInt(selectedValue, 10);
+            const startTitle = getLessonTitle(startIndex);
+            // 選択したレッスンから最終レッスンまで継続実行
+            for (let i = startIndex; i < LESSON_DEFINITIONS.length; i++) {
+                const lesson = LESSON_DEFINITIONS[i];
+                if (lesson) {
+                    const title = lesson.title;
+                    lesson.wordIds.forEach((wid, wIdx) => {
+                        const wItem = wordsMap[wid];
+                        if (wItem) {
+                            currentQueue.push({
+                                id: wid,
+                                word: wItem.word,
+                                meaning: wItem.meaning,
+                                ipa: wItem.ipa,
+                                katakana: wItem.katakana,
+                                lessonTitle: title,
+                                lessonIndex: i,
+                                wordIndexInLesson: wIdx + 1,
+                                wordTotalInLesson: lesson.wordIds.length
+                            });
+                        }
+                    });
+                }
+            }
+            logEvent('START', `【継続実行】「${startTitle}」〜 最終レッスンまで開始 (全${currentQueue.length}語)`);
+        }
+
+        if (currentQueue.length === 0) {
+            logEvent('WARN', '単語データが0件のため開始できませんでした。');
+            return;
+        }
+
+        currentIndex = 0;
+        inputArea.disabled = false;
+        inputArea.value = '';
+        inputArea.focus();
+        startBtn.innerText = 'リスタート (Restart)';
+        updateProgress();
+        statusDisplay.innerText = 'Preparing audio...';
+        await warmEngine();
+        inputArea.focus();
+        loadWord();
+    }
+
+    // 単語の読み込み表示
+    function loadWord() {
+        wordHasLoggedMiss = false;
+
+        if (currentIndex >= currentQueue.length) {
+            meaningDisplay.innerText = '🎉 全単語達成！すべての練習が終了しました';
+            katakanaDisplay.innerText = '';
+            ipaDisplay.innerText = '';
+            wordDisplay.innerText = 'Congratulations! All Finished.';
+            if (lessonBadge) lessonBadge.innerText = '';
+            inputArea.disabled = true;
+            statusDisplay.innerText = 'レッスンを選択して再度スタートしてください。';
+            statusDisplay.className = '';
+            progressFill.style.width = '100%';
+            logEvent('COMPLETE', `🎉 全単語達成！すべての練習が終了しました (全${currentQueue.length}語 完了)`);
+            return;
+        }
+
+        const current = currentQueue[currentIndex];
+        if (lessonBadge && current.lessonTitle) {
+            lessonBadge.innerText = `${current.lessonTitle} （単語 ${current.wordIndexInLesson}/${current.wordTotalInLesson} · 全体 ${currentIndex + 1}/${currentQueue.length}）`;
+        }
+        if (current.lessonTitle && current.lessonTitle !== lastLessonLogged) {
+            lastLessonLogged = current.lessonTitle;
+            logEvent('INFO', `▶ 【レッスン進行】「${current.lessonTitle}」に入りました (レッスン内全${current.wordTotalInLesson}語)`);
+            if (isNumericalSession && current.lessonIndex !== undefined) {
+                lessonSelect.value = String(current.lessonIndex);
+            }
+        }
+
+        meaningDisplay.innerText = current.meaning;
+        katakanaDisplay.innerText = current.katakana;
+        ipaDisplay.innerText = current.ipa;
+
+        renderEnglishText('');
+
+        statusDisplay.innerText = 'Listening... (読み上げ中)';
+        statusDisplay.className = '';
+        inputArea.value = '';
+        updateProgress();
+        logEvent('INFO', `[${currentIndex + 1}/${currentQueue.length}] 出題: "${current.word}" (${current.meaning})`);
+
+        if (loadDelayTimer) {
+            clearTimeout(loadDelayTimer);
+            loadDelayTimer = null;
+        }
+        const tokenAtLoad = speakToken;
+        loadDelayTimer = setTimeout(() => {
+            loadDelayTimer = null;
+            if (tokenAtLoad !== speakToken) return;
+            speak(current.word);
+        }, 300);
+    }
+
+    // 単語（文字単位）の描画
+    function renderEnglishText(userInput) {
+        if (!currentQueue[currentIndex]) return;
+        const targetText = currentQueue[currentIndex].word;
+
+        let html = '';
+        for (let i = 0; i < targetText.length; i++) {
+            const char = targetText[i];
+            const isSpace = char === ' ';
+
+            if (i < userInput.length) {
+                if (userInput[i] === char) {
+                    if (isSpace) {
+                        html += `<span class="char-correct space-correct">&nbsp;</span>`;
+                    } else {
+                        html += `<span class="char-correct">${char}</span>`;
+                    }
+                } else {
+                    if (isSpace) {
+                        html += `<span class="char-wrong space-wrong">&nbsp;</span>`;
+                    } else {
+                        html += `<span class="char-wrong">${char}</span>`;
+                    }
+                }
+            } else {
+                if (isSpace) {
+                    html += `<span class="char-pending space-char">&nbsp;</span>`;
+                } else {
+                    html += `<span class="char-pending">${char}</span>`;
+                }
+            }
+        }
+        wordDisplay.innerHTML = html;
+    }
+
+    // 音声読み上げ
+    async function speak(text) {
+        const token = ++speakToken;
+
+        if (speechSynthesis.speaking || speechSynthesis.pending) {
+            speechSynthesis.cancel();
+            await waitMs(250);
+        } else if (speechSynthesis.paused) {
+            speechSynthesis.resume();
+        }
+        if (token !== speakToken) return;
+
+        await warmEngine();
+        if (token !== speakToken) return;
+
+        const rate = parseFloat(speedSelect.value) || 1.0;
+        const uttr = new SpeechSynthesisUtterance(text);
+        uttr.rate = rate;
+        uttr.pitch = 1.0;
+        applyVoice(uttr);
+
+        const timeoutMs = Math.max(6000, Math.ceil((text.length * 150) / rate));
+        logEvent('AUDIO', `音声読み上げ開始 (速度: ${rate}): "${text}"`);
+        statusDisplay.innerText = 'Listening... (読み上げ中)';
+        statusDisplay.className = '';
+
+        try {
+            await new Promise((resolve, reject) => {
+                let settled = false;
+                const timer = setTimeout(() => {
+                    if (settled) return;
+                    settled = true;
+                    logEvent('WARN', `音声タイムアウト保護発動 (${timeoutMs}ms) → 入力待機 (Type it!) に復帰`);
+                    speechSynthesis.cancel();
+                    resolve();
+                }, timeoutMs);
+
+                uttr.onend = () => {
+                    if (settled) return;
+                    settled = true;
+                    clearTimeout(timer);
+                    logEvent('AUDIO', '音声読み上げ完了 → 入力待機 (Type it!)');
+                    resolve();
+                };
+                uttr.onerror = (e) => {
+                    if (settled) return;
+                    settled = true;
+                    clearTimeout(timer);
+                    logEvent('ERROR', `音声合成エラー: ${e?.error || 'unknown'}`);
+                    reject(e);
+                };
+
+                speechSynthesis.speak(uttr);
+            });
+
+            if (token !== speakToken) return;
+            statusDisplay.innerText = 'Type it!';
+            statusDisplay.className = '';
+            inputArea.focus();
+        } catch (e) {
+            console.error('Speech synthesis error:', e);
+            if (token !== speakToken) return;
+            speechSynthesis.cancel();
+            statusDisplay.innerText = 'Type it! (Enter で再読み上げ)';
+            statusDisplay.className = '';
+            logEvent('WARN', '音声キャンセル → Enterキーで再読み上げ可能');
+            inputArea.focus();
+        }
+    }
+
+    function updateProgress() {
+        const percent = (currentIndex / currentQueue.length) * 100;
+        progressFill.style.width = percent + '%';
+    }
+
+    // 入力監視リスナー
+    inputArea.addEventListener('input', () => {
+        if (!currentQueue[currentIndex]) return;
+
+        const currentWord = currentQueue[currentIndex].word;
+        const userInput = inputArea.value;
+
+        renderEnglishText(userInput);
+
+        if (userInput === currentWord) {
+            const currentItem = currentQueue[currentIndex];
+            const isEndOfLesson = currentItem && (currentItem.wordIndexInLesson === currentItem.wordTotalInLesson) && (currentIndex + 1 < currentQueue.length);
+
+            inputArea.disabled = true;
+            if (nextSentenceTimer) {
+                clearTimeout(nextSentenceTimer);
+                nextSentenceTimer = null;
+            }
+
+            if (isEndOfLesson) {
+                const nextItem = currentQueue[currentIndex + 1];
+                const nextLessonName = nextItem ? nextItem.lessonTitle : '次のレッスン';
+                statusDisplay.innerText = `🎉 ${currentItem.lessonTitle} クリア！ → ${nextLessonName} へ進みます`;
+                statusDisplay.className = 'correct';
+                logEvent('SUCCESS', `🎉 【レッスンクリア】「${currentItem.lessonTitle}」完了！ 次のレッスンへ進みます (1200ms後)`);
+                nextSentenceTimer = setTimeout(() => {
+                    nextSentenceTimer = null;
+                    currentIndex++;
+                    inputArea.disabled = false;
+                    inputArea.focus();
+                    statusDisplay.className = '';
+                    loadWord();
+                }, 1200);
+            } else {
+                statusDisplay.innerText = 'Correct! Next...';
+                statusDisplay.className = 'correct';
+                logEvent('SUCCESS', `正解！ [${currentIndex + 1}/${currentQueue.length}] 次の単語へ進みます (600ms後)`);
+                nextSentenceTimer = setTimeout(() => {
+                    nextSentenceTimer = null;
+                    currentIndex++;
+                    inputArea.disabled = false;
+                    inputArea.focus();
+                    statusDisplay.className = '';
+                    loadWord();
+                }, 600);
+            }
+        } else if (currentWord.startsWith(userInput)) {
+            statusDisplay.innerText = 'Typing...';
+            statusDisplay.className = '';
+        } else {
+            statusDisplay.innerText = 'Miss!';
+            statusDisplay.className = 'incorrect';
+            if (!wordHasLoggedMiss) {
+                wordHasLoggedMiss = true;
+                const charExpected = currentWord[userInput.length - 1] || '';
+                const charTyped = userInput[userInput.length - 1] || '';
+                logEvent('WARN', `タイピング不一致: 入力='${charTyped}' (期待='${charExpected}')`);
+            }
+        }
+    });
+
+    inputArea.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && inputArea.value === '') {
+            speak(currentQueue[currentIndex].word);
+        }
+    });
+
+    // 初期化実行
+    window.addEventListener('DOMContentLoaded', async () => {
+        initLessonSelect();
+        await initData();
+        if ('speechSynthesis' in window) {
+            speechSynthesis.onvoiceschanged = () => {
+                preferredVoice = selectEnglishVoice();
+            };
+            preferredVoice = selectEnglishVoice();
+        }
+        logEvent('INFO', '土木英単語タイピングの初期化が完了しました。レッスンを選んでスタートしてください。');
+    });
+</script>
+
+</body>
+</html>
