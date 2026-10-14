@@ -1,0 +1,2604 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>プログラム／AI英単語タイピング (Programming & AI Vocabulary Typing)</title>
+<style>
+    body {
+        font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'BIZ UDPGothic', Meiryo, sans-serif;
+        text-align: center;
+        padding: 30px;
+        background-color: #f0f2f5;
+        color: #333;
+    }
+    h1 {
+        color: #2c3e50;
+        font-size: 1.6em;
+        margin-bottom: 6px;
+        letter-spacing: 0.5px;
+    }
+    .subtitle {
+        font-size: 0.88em;
+        color: #6c757d;
+        margin-bottom: 18px;
+    }
+    
+    #container {
+        background: white;
+        max-width: 820px;
+        margin: 0 auto;
+        padding: 32px 30px;
+        border-radius: 12px;
+        box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+    }
+    
+    .controls {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 20px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    select {
+        padding: 10px 12px;
+        font-size: 1em;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+        background: #fff;
+        color: #333;
+        outline: none;
+        transition: border-color 0.2s;
+    }
+    select:focus {
+        border-color: #007bff;
+    }
+    #lesson-select {
+        flex: 2;
+        min-width: 260px;
+    }
+    #speed-select {
+        flex: 1;
+        min-width: 130px;
+    }
+
+    /* --- 単語表示エリア --- */
+    #lesson-badge {
+        font-size: 0.92em;
+        font-weight: bold;
+        color: #007bff;
+        margin-bottom: 8px;
+        min-height: 1.4em;
+    }
+    /* 1. 意味 (Jobs の和訳位置) */
+    #meaning-display {
+        font-size: 1.25em;
+        color: #222;
+        margin-bottom: 6px;
+        min-height: 1.5em;
+        line-height: 1.5;
+        font-weight: bold;
+    }
+    
+    /* 2. カタカナ */
+    #katakana-display {
+        font-size: 0.95em;
+        color: #666;
+        margin-bottom: 4px;
+        min-height: 1.3em;
+        letter-spacing: 0.5px;
+    }
+
+    /* 3. 発音記号 (IPA) */
+    #ipa-display {
+        font-size: 1.0em;
+        color: #007bff;
+        margin-bottom: 18px;
+        font-family: "Lucida Sans Unicode", "Arial Unicode MS", "Segoe UI", sans-serif;
+        min-height: 1.3em;
+    }
+
+    /* 4. 打つ英単語 (判定用装飾) */
+    #word-display {
+        font-size: 1.85em;
+        font-weight: bold;
+        margin-bottom: 22px;
+        letter-spacing: 1px;
+        min-height: 1.5em;
+        color: #bbb;
+        word-wrap: break-word;
+        white-space: pre-wrap;
+    }
+
+    /* 文字単位の判定スタイル */
+    .char-correct { color: #222; }
+    .char-wrong { color: #dc3545; background-color: #f8d7da; border-radius: 3px; padding: 0 1px; }
+    .char-pending { color: #aaa; }
+    /* スペース文字の可視化補助（未入力時） */
+    .space-char { border-bottom: 1.5px dashed #bbb; display: inline-block; min-width: 0.5em; }
+    .space-correct { border-bottom: 1.5px solid #222; display: inline-block; min-width: 0.5em; }
+    .space-wrong { border-bottom: 1.5px solid #dc3545; background-color: #f8d7da; display: inline-block; min-width: 0.5em; }
+    
+    #input-area {
+        width: 88%;
+        max-width: 600px;
+        padding: 14px 18px;
+        font-size: 1.35em;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        outline: none;
+        transition: border-color 0.25s, box-shadow 0.25s;
+        text-align: center;
+        letter-spacing: 0.5px;
+    }
+    #input-area:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
+    }
+    
+    #status {
+        margin-top: 18px;
+        font-weight: bold;
+        color: #007bff;
+        min-height: 1.5em;
+        font-size: 1.05em;
+    }
+    #status.correct {
+        color: #28a745;
+    }
+    #status.incorrect {
+        color: #dc3545;
+    }
+    
+    .btn-group {
+        margin-top: 18px;
+    }
+    button.main-btn {
+        padding: 12px 30px;
+        font-size: 1.1em;
+        font-weight: bold;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background 0.2s, transform 0.1s;
+    }
+    button.main-btn:hover {
+        background-color: #0056b3;
+    }
+    button.main-btn:active {
+        transform: translateY(1px);
+    }
+    
+    .progress-bar {
+        height: 8px;
+        background: #eee;
+        width: 100%;
+        margin-top: 22px;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+    .progress-fill {
+        height: 100%;
+        background: #28a745;
+        width: 0%;
+        transition: width 0.3s;
+    }
+
+    /* 進行・診断ログパネル */
+    #log-wrapper {
+        margin-top: 25px;
+        text-align: left;
+        border-top: 1px solid #eee;
+        padding-top: 15px;
+    }
+    .log-btn {
+        padding: 4px 10px;
+        font-size: 0.8em;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: opacity 0.2s;
+    }
+    .log-btn:hover { opacity: 0.85; }
+    #log-box {
+        background: #1e1e1e;
+        color: #d4d4d4;
+        font-family: Consolas, 'Courier New', monospace;
+        font-size: 0.82em;
+        padding: 10px 12px;
+        border-radius: 6px;
+        height: 140px;
+        overflow-y: auto;
+        line-height: 1.45;
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+    }
+</style>
+</head>
+<body>
+
+<div id="container">
+    <h1>プログラム／AI英単語タイピング</h1>
+    <div class="subtitle">Programming & AI Vocabulary Typing Practice</div>
+    
+    <div class="controls">
+        <select id="lesson-select">
+            <option value="all">★ 全語を通して実行 (All 100 Words)</option>
+        </select>
+
+        <select id="speed-select">
+            <option value="0.5">速度: 0.5 (Slow)</option>
+            <option value="0.7" selected>速度: 0.7</option>
+            <option value="0.8">速度: 0.8</option>
+            <option value="1.0">速度: 1.0 (Normal)</option>
+        </select>
+    </div>
+
+    <hr style="border: 0; border-top: 1px solid #eee; margin: 18px 0;">
+
+    <div id="lesson-badge"></div>
+    <div id="meaning-display">レッスンを選択してスタートしてください</div>
+    <div id="katakana-display"></div>
+    <div id="ipa-display"></div>
+    <div id="word-display">Programming & AI</div>
+    
+    <input type="text" id="input-area" placeholder="Type here..." disabled autocomplete="off">
+    
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+    <div id="status"></div>
+    
+    <div class="btn-group">
+        <button id="start-btn" class="main-btn" onclick="startPractice()">スタート (Start)</button>
+    </div>
+
+    <!-- 進行・診断ログ表示パネル -->
+    <div id="log-wrapper">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <span style="font-weight: bold; font-size: 0.9em; color: #555;">📋 進行・診断ログ (Realtime Log)</span>
+            <div style="display: flex; gap: 6px;">
+                <button id="copy-log-btn" class="log-btn" type="button" onclick="copyLogPanel()" style="background: #007bff;">コピー</button>
+                <button id="toggle-log-btn" class="log-btn" type="button" onclick="toggleLogPanel()" style="background: #6c757d;">ログを隠す</button>
+                <button id="clear-log-btn" class="log-btn" type="button" onclick="clearLogPanel()" style="background: #dc3545;">消去</button>
+            </div>
+        </div>
+        <div id="log-box"></div>
+    </div>
+</div>
+
+<script>
+    /* =====================================================================
+       プログラム／AI英単語タイピング - アプリケーション定義
+       - 正本: practice/data/words_programming_ai.json
+       - ローカルコピー: practice/data/words_programming_ai.json
+       - file:// 直開き環境と Web サーバー環境の双方で 100% 動作するよう、
+         内蔵フォールバックデータと fetch 自動更新を併用。
+
+       【新語追加フロー】
+       1. upskilling 側で words.json に追記後、practice/data/words_programming_ai.json へコピー
+       2. Webサーバー（HTTP/HTTPS）経由で実行する場合は、data/words_programming_ai.json を読み込むため
+          自動で最新語が反映されます。
+       3. 必要に応じて LESSON_DEFINITIONS の該当レッスン（または「12. 基本語・その他」）の
+          wordIds 配列に新語の id を追加してください。
+       4. file:// 直開きで利用する場合は、scratch/generate_app.py または
+          HTML 内の DEFAULT_WORDS_DATA も合わせて最新化してください。
+       ===================================================================== */
+
+    // 1. レッスン定義 (10レッスン・100語確定)
+    let LESSON_DEFINITIONS = [
+        {
+                "id": "lesson-1",
+                "title": "1. エージェント＆ルール",
+                "wordIds": [
+                        "rule",
+                        "agent",
+                        "prompt",
+                        "context",
+                        "task",
+                        "architect",
+                        "planner",
+                        "skill",
+                        "reviewer",
+                        "hook"
+                ]
+        },
+        {
+                "id": "lesson-2",
+                "title": "2. 郵便＆状態管理",
+                "wordIds": [
+                        "audience",
+                        "mailbox",
+                        "pending",
+                        "processing",
+                        "done",
+                        "status",
+                        "draft",
+                        "stable",
+                        "verified",
+                        "deprecated"
+                ]
+        },
+        {
+                "id": "lesson-3",
+                "title": "3. Git＆バージョン管理",
+                "wordIds": [
+                        "repository",
+                        "workspace",
+                        "branch",
+                        "commit",
+                        "push",
+                        "pull",
+                        "merge",
+                        "github",
+                        "patch",
+                        "conflict"
+                ]
+        },
+        {
+                "id": "lesson-4",
+                "title": "4. ファイル＆データ構造",
+                "wordIds": [
+                        "directory",
+                        "path",
+                        "source",
+                        "derived",
+                        "index",
+                        "template",
+                        "schema",
+                        "json",
+                        "yaml",
+                        "markdown"
+                ]
+        },
+        {
+                "id": "lesson-5",
+                "title": "5. システム＆実行環境",
+                "wordIds": [
+                        "container",
+                        "sync",
+                        "cache",
+                        "sandbox",
+                        "deploy",
+                        "session",
+                        "config",
+                        "environment",
+                        "import",
+                        "export"
+                ]
+        },
+        {
+                "id": "lesson-6",
+                "title": "6. プログラミング基本",
+                "wordIds": [
+                        "function",
+                        "variable",
+                        "constant",
+                        "argument",
+                        "iteration",
+                        "array",
+                        "object",
+                        "string",
+                        "class",
+                        "method"
+                ]
+        },
+        {
+                "id": "lesson-7",
+                "title": "7. 非同期＆構成",
+                "wordIds": [
+                        "async",
+                        "await",
+                        "promise",
+                        "callback",
+                        "stream",
+                        "module",
+                        "package",
+                        "dependency",
+                        "interface",
+                        "pipeline"
+                ]
+        },
+        {
+                "id": "lesson-8",
+                "title": "8. テスト＆品質",
+                "wordIds": [
+                        "test",
+                        "debug",
+                        "refactor",
+                        "error",
+                        "warning",
+                        "exception",
+                        "lint",
+                        "log",
+                        "validation",
+                        "remediation"
+                ]
+        },
+        {
+                "id": "lesson-9",
+                "title": "9. AIコア",
+                "wordIds": [
+                        "model",
+                        "token",
+                        "embedding",
+                        "vector",
+                        "inference",
+                        "dataset",
+                        "parameter",
+                        "latency",
+                        "fallback",
+                        "encoding"
+                ]
+        },
+        {
+                "id": "lesson-10",
+                "title": "10. AI応用＆運用",
+                "wordIds": [
+                        "confirm",
+                        "hallucination",
+                        "priority",
+                        "handover",
+                        "doctrine",
+                        "concept",
+                        "response",
+                        "scan",
+                        "reuse",
+                        "timeout"
+                ]
+        }
+];
+
+    // 2. 内蔵フォールバックデータ (105語)
+    const DEFAULT_WORDS_DATA = {
+        "version": 1,
+        "updated": "2026-10-14",
+        "author": "cursor",
+        "status": "merged-final",
+        "description": "プログラム／AI英単語 突合確定版（100語・10レッスン）。土木タイピング互換スキーマ＋lessons定義。",
+        "sources_merged": [
+                "practice/data/candidates/programming_ai_words_cursor.json",
+                "practice/data/candidates/programming_ai_words_antigravity.json"
+        ],
+        "merge_summary": {
+                "base": "antigravity 10categories x 10words",
+                "injected_from_cursor": [
+                        "architect",
+                        "planner",
+                        "reviewer",
+                        "github",
+                        "json",
+                        "yaml",
+                        "markdown",
+                        "container",
+                        "sync",
+                        "cache",
+                        "deploy",
+                        "import",
+                        "export",
+                        "argument",
+                        "class",
+                        "method",
+                        "validation",
+                        "remediation",
+                        "fallback",
+                        "encoding",
+                        "confirm",
+                        "priority",
+                        "handover",
+                        "doctrine",
+                        "concept",
+                        "scan",
+                        "reuse"
+                ],
+                "removed_from_antigravity": [
+                        "subagent",
+                        "artifact",
+                        "plugin",
+                        "diff",
+                        "chunk",
+                        "format",
+                        "memo",
+                        "command",
+                        "terminal",
+                        "execute",
+                        "bypass",
+                        "schedule",
+                        "cron",
+                        "condition",
+                        "boolean",
+                        "integer",
+                        "benchmark",
+                        "result",
+                        "temperature",
+                        "weights",
+                        "grounding",
+                        "retrieval",
+                        "reasoning",
+                        "evaluation",
+                        "query",
+                        "generation",
+                        "workflow"
+                ],
+                "policy": "カテゴリ維持。重複はAGの意味/IPA/カタカナ優先。rulesCursor必須寄りを不足分注入。"
+        },
+        "lessons": [
+                {
+                        "id": "lesson-1",
+                        "title": "1. エージェント＆ルール",
+                        "wordIds": [
+                                "rule",
+                                "agent",
+                                "prompt",
+                                "context",
+                                "task",
+                                "architect",
+                                "planner",
+                                "skill",
+                                "reviewer",
+                                "hook"
+                        ]
+                },
+                {
+                        "id": "lesson-2",
+                        "title": "2. 郵便＆状態管理",
+                        "wordIds": [
+                                "audience",
+                                "mailbox",
+                                "pending",
+                                "processing",
+                                "done",
+                                "status",
+                                "draft",
+                                "stable",
+                                "verified",
+                                "deprecated"
+                        ]
+                },
+                {
+                        "id": "lesson-3",
+                        "title": "3. Git＆バージョン管理",
+                        "wordIds": [
+                                "repository",
+                                "workspace",
+                                "branch",
+                                "commit",
+                                "push",
+                                "pull",
+                                "merge",
+                                "github",
+                                "patch",
+                                "conflict"
+                        ]
+                },
+                {
+                        "id": "lesson-4",
+                        "title": "4. ファイル＆データ構造",
+                        "wordIds": [
+                                "directory",
+                                "path",
+                                "source",
+                                "derived",
+                                "index",
+                                "template",
+                                "schema",
+                                "json",
+                                "yaml",
+                                "markdown"
+                        ]
+                },
+                {
+                        "id": "lesson-5",
+                        "title": "5. システム＆実行環境",
+                        "wordIds": [
+                                "container",
+                                "sync",
+                                "cache",
+                                "sandbox",
+                                "deploy",
+                                "session",
+                                "config",
+                                "environment",
+                                "import",
+                                "export"
+                        ]
+                },
+                {
+                        "id": "lesson-6",
+                        "title": "6. プログラミング基本",
+                        "wordIds": [
+                                "function",
+                                "variable",
+                                "constant",
+                                "argument",
+                                "iteration",
+                                "array",
+                                "object",
+                                "string",
+                                "class",
+                                "method"
+                        ]
+                },
+                {
+                        "id": "lesson-7",
+                        "title": "7. 非同期＆構成",
+                        "wordIds": [
+                                "async",
+                                "await",
+                                "promise",
+                                "callback",
+                                "stream",
+                                "module",
+                                "package",
+                                "dependency",
+                                "interface",
+                                "pipeline"
+                        ]
+                },
+                {
+                        "id": "lesson-8",
+                        "title": "8. テスト＆品質",
+                        "wordIds": [
+                                "test",
+                                "debug",
+                                "refactor",
+                                "error",
+                                "warning",
+                                "exception",
+                                "lint",
+                                "log",
+                                "validation",
+                                "remediation"
+                        ]
+                },
+                {
+                        "id": "lesson-9",
+                        "title": "9. AIコア",
+                        "wordIds": [
+                                "model",
+                                "token",
+                                "embedding",
+                                "vector",
+                                "inference",
+                                "dataset",
+                                "parameter",
+                                "latency",
+                                "fallback",
+                                "encoding"
+                        ]
+                },
+                {
+                        "id": "lesson-10",
+                        "title": "10. AI応用＆運用",
+                        "wordIds": [
+                                "confirm",
+                                "hallucination",
+                                "priority",
+                                "handover",
+                                "doctrine",
+                                "concept",
+                                "response",
+                                "scan",
+                                "reuse",
+                                "timeout"
+                        ]
+                }
+        ],
+        "words": [
+                {
+                        "id": "rule",
+                        "word": "rule",
+                        "meaning": "規則・規約",
+                        "ipa": "/ruːl/",
+                        "katakana": "ルール",
+                        "category": "エージェント＆ルール",
+                        "tags": [
+                                "グローバルルール",
+                                "エージェント",
+                                "基礎"
+                        ],
+                        "source": "rulesCursor"
+                },
+                {
+                        "id": "agent",
+                        "word": "agent",
+                        "meaning": "エージェント",
+                        "ipa": "/ˈeɪ.dʒənt/",
+                        "katakana": "エージェント",
+                        "category": "エージェント＆ルール",
+                        "tags": [
+                                "AI",
+                                "エージェント",
+                                "自律動作"
+                        ],
+                        "source": "rulesCursor"
+                },
+                {
+                        "id": "prompt",
+                        "word": "prompt",
+                        "meaning": "指示文",
+                        "ipa": "/prɑːmpt/",
+                        "katakana": "プロンプト",
+                        "category": "エージェント＆ルール",
+                        "tags": [
+                                "AI",
+                                "指示",
+                                "プロンプト"
+                        ],
+                        "source": "rulesCursor"
+                },
+                {
+                        "id": "context",
+                        "word": "context",
+                        "meaning": "文脈・背景情報",
+                        "ipa": "/ˈkɑːn.tekst/",
+                        "katakana": "コンテキスト",
+                        "category": "エージェント＆ルール",
+                        "tags": [
+                                "AI",
+                                "文脈",
+                                "入力"
+                        ],
+                        "source": "rulesCursor"
+                },
+                {
+                        "id": "task",
+                        "word": "task",
+                        "meaning": "タスク・作業単位",
+                        "ipa": "/tæsk/",
+                        "katakana": "タスク",
+                        "category": "エージェント＆ルール",
+                        "tags": [
+                                "タスク",
+                                "管理",
+                                "プロセス"
+                        ],
+                        "source": "rulesCursor"
+                },
+                {
+                        "id": "architect",
+                        "word": "architect",
+                        "meaning": "設計者・アーキテクト",
+                        "ipa": "/ˈɑːrkɪtekt/",
+                        "katakana": "アーキテクト",
+                        "tags": [
+                                "プログラム",
+                                "ルール",
+                                "役割",
+                                "エージェント＆ルール"
+                        ],
+                        "source": "rulesCursor"
+                },
+                {
+                        "id": "planner",
+                        "word": "planner",
+                        "meaning": "プランナー（計画役）",
+                        "ipa": "/ˈplænər/",
+                        "katakana": "プランナー",
+                        "tags": [
+                                "AI",
+                                "ルール",
+                                "PDCA",
+                                "エージェント＆ルール"
+                        ],
+                        "source": "rulesCursor"
+                },
+                {
+                        "id": "skill",
+                        "word": "skill",
+                        "meaning": "スキル・手順集",
+                        "ipa": "/skɪl/",
+                        "katakana": "スキル",
+                        "category": "エージェント＆ルール",
+                        "tags": [
+                                "手順",
+                                "機能拡張",
+                                "ルール"
+                        ],
+                        "source": "rulesCursor"
+                },
+                {
+                        "id": "reviewer",
+                        "word": "reviewer",
+                        "meaning": "レビュアー（検証役）",
+                        "ipa": "/rɪˈvjuːər/",
+                        "katakana": "レビュアー",
+                        "tags": [
+                                "AI",
+                                "ルール",
+                                "PDCA",
+                                "エージェント＆ルール"
+                        ],
+                        "source": "rulesCursor"
+                },
+                {
+                        "id": "hook",
+                        "word": "hook",
+                        "meaning": "フック・割り込み",
+                        "ipa": "/hʊk/",
+                        "katakana": "フック",
+                        "category": "エージェント＆ルール",
+                        "tags": [
+                                "イベント",
+                                "自動化",
+                                "割り込み"
+                        ],
+                        "source": "rulesCursor"
+                },
+                {
+                        "id": "audience",
+                        "word": "audience",
+                        "meaning": "受信対象",
+                        "ipa": "/ˈɑː.di.əns/",
+                        "katakana": "オーディエンス",
+                        "category": "郵便＆状態管理",
+                        "tags": [
+                                "郵便",
+                                "YAML",
+                                "受信者"
+                        ],
+                        "source": "rulesCursor"
+                },
+                {
+                        "id": "mailbox",
+                        "word": "mailbox",
+                        "meaning": "郵便箱",
+                        "ipa": "/ˈmeɪl.bɑːks/",
+                        "katakana": "メールボックス",
+                        "category": "郵便＆状態管理",
+                        "tags": [
+                                "郵便",
+                                "連携",
+                                "中継"
+                        ],
+                        "source": "rulesCursor"
+                },
+                {
+                        "id": "pending",
+                        "word": "pending",
+                        "meaning": "保留中・未処理",
+                        "ipa": "/ˈpen.dɪŋ/",
+                        "katakana": "ペンディング",
+                        "category": "郵便＆状態管理",
+                        "tags": [
+                                "郵便",
+                                "状態",
+                                "未処理"
+                        ],
+                        "source": "rulesCursor"
+                },
+                {
+                        "id": "processing",
+                        "word": "processing",
+                        "meaning": "処理中",
+                        "ipa": "/ˈprɑː.ses.ɪŋ/",
+                        "katakana": "プロセッシング",
+                        "category": "郵便＆状態管理",
+                        "tags": [
+                                "郵便",
+                                "状態",
+                                "進行中"
+                        ],
+                        "source": "rulesCursor"
+                },
+                {
+                        "id": "done",
+                        "word": "done",
+                        "meaning": "完了・処置済",
+                        "ipa": "/dʌn/",
+                        "katakana": "ダン",
+                        "category": "郵便＆状態管理",
+                        "tags": [
+                                "郵便",
+                                "状態",
+                                "完了"
+                        ],
+                        "source": "rulesCursor"
+                },
+                {
+                        "id": "status",
+                        "word": "status",
+                        "meaning": "状態",
+                        "ipa": "/ˈsteɪ.t̬əs/",
+                        "katakana": "ステータス",
+                        "category": "郵便＆状態管理",
+                        "tags": [
+                                "状態",
+                                "進捗",
+                                "OKF"
+                        ],
+                        "source": "rulesCursor"
+                },
+                {
+                        "id": "draft",
+                        "word": "draft",
+                        "meaning": "下書き・草案",
+                        "ipa": "/dræft/",
+                        "katakana": "ドラフト",
+                        "category": "郵便＆状態管理",
+                        "tags": [
+                                "OKF",
+                                "状態",
+                                "草案"
+                        ],
+                        "source": "rulesCursor"
+                },
+                {
+                        "id": "stable",
+                        "word": "stable",
+                        "meaning": "安定版",
+                        "ipa": "/ˈsteɪ.bəl/",
+                        "katakana": "ステイブル",
+                        "category": "郵便＆状態管理",
+                        "tags": [
+                                "OKF",
+                                "状態",
+                                "安定"
+                        ],
+                        "source": "rulesCursor"
+                },
+                {
+                        "id": "verified",
+                        "word": "verified",
+                        "meaning": "人間検証済",
+                        "ipa": "/ˈver.ə.faɪd/",
+                        "katakana": "ベリファイド",
+                        "category": "郵便＆状態管理",
+                        "tags": [
+                                "OKF",
+                                "状態",
+                                "確認済"
+                        ],
+                        "source": "rulesCursor"
+                },
+                {
+                        "id": "deprecated",
+                        "word": "deprecated",
+                        "meaning": "非推奨・廃止予定",
+                        "ipa": "/ˈdep.rə.keɪ.t̬ɪd/",
+                        "katakana": "デプリケイテッド",
+                        "category": "郵便＆状態管理",
+                        "tags": [
+                                "OKF",
+                                "状態",
+                                "非推奨"
+                        ],
+                        "source": "rulesCursor"
+                },
+                {
+                        "id": "repository",
+                        "word": "repository",
+                        "meaning": "貯蔵庫",
+                        "ipa": "/rɪˈpɑː.zə.tɔːr.i/",
+                        "katakana": "リポジトリ",
+                        "category": "Git＆バージョン管理",
+                        "tags": [
+                                "Git",
+                                "管理",
+                                "コードベース"
+                        ],
+                        "source": "rulesCursor"
+                },
+                {
+                        "id": "workspace",
+                        "word": "workspace",
+                        "meaning": "作業空間",
+                        "ipa": "/ˈwɜːrk.speɪs/",
+                        "katakana": "ワークスペース",
+                        "category": "Git＆バージョン管理",
+                        "tags": [
+                                "環境",
+                                "開発",
+                                "フォルダ"
+                        ],
+                        "source": "rulesCursor"
+                },
+                {
+                        "id": "branch",
+                        "word": "branch",
+                        "meaning": "分岐・作業系",
+                        "ipa": "/bræntʃ/",
+                        "katakana": "ブランチ",
+                        "category": "Git＆バージョン管理",
+                        "tags": [
+                                "Git",
+                                "ブランチ",
+                                "履歴"
+                        ],
+                        "source": "rulesCursor"
+                },
+                {
+                        "id": "commit",
+                        "word": "commit",
+                        "meaning": "変更の確定",
+                        "ipa": "/kəˈmɪt/",
+                        "katakana": "コミット",
+                        "category": "Git＆バージョン管理",
+                        "tags": [
+                                "Git",
+                                "履歴",
+                                "保存"
+                        ],
+                        "source": "rulesCursor"
+                },
+                {
+                        "id": "push",
+                        "word": "push",
+                        "meaning": "リモート送信",
+                        "ipa": "/pʊʃ/",
+                        "katakana": "プッシュ",
+                        "category": "Git＆バージョン管理",
+                        "tags": [
+                                "Git",
+                                "リモート",
+                                "送信"
+                        ],
+                        "source": "rulesCursor"
+                },
+                {
+                        "id": "pull",
+                        "word": "pull",
+                        "meaning": "取得・統合",
+                        "ipa": "/pʊl/",
+                        "katakana": "プル",
+                        "category": "Git＆バージョン管理",
+                        "tags": [
+                                "Git",
+                                "取得",
+                                "更新"
+                        ],
+                        "source": "rulesCursor"
+                },
+                {
+                        "id": "merge",
+                        "word": "merge",
+                        "meaning": "統合",
+                        "ipa": "/mɜːrdʒ/",
+                        "katakana": "マージ",
+                        "category": "Git＆バージョン管理",
+                        "tags": [
+                                "Git",
+                                "ブランチ",
+                                "統合"
+                        ],
+                        "source": "common"
+                },
+                {
+                        "id": "github",
+                        "word": "github",
+                        "meaning": "GitHub（コード托管）",
+                        "ipa": "/ˈɡɪthʌb/",
+                        "katakana": "ギットハブ",
+                        "tags": [
+                                "プログラム",
+                                "ルール",
+                                "Git",
+                                "Git＆バージョン管理"
+                        ],
+                        "source": "rulesCursor"
+                },
+                {
+                        "id": "patch",
+                        "word": "patch",
+                        "meaning": "修正差分データ",
+                        "ipa": "/pætʃ/",
+                        "katakana": "パッチ",
+                        "category": "Git＆バージョン管理",
+                        "tags": [
+                                "差分",
+                                "修正",
+                                "適用"
+                        ],
+                        "source": "rulesCursor"
+                },
+                {
+                        "id": "conflict",
+                        "word": "conflict",
+                        "meaning": "衝突・競合",
+                        "ipa": "/ˈkɑːn.flɪkt/",
+                        "katakana": "コンフリクト",
+                        "category": "Git＆バージョン管理",
+                        "tags": [
+                                "Git",
+                                "競合",
+                                "解決"
+                        ],
+                        "source": "common"
+                },
+                {
+                        "id": "directory",
+                        "word": "directory",
+                        "meaning": "フォルダ・階層",
+                        "ipa": "/daɪˈrek.tɚ.i/",
+                        "katakana": "ディレクトリ",
+                        "category": "ファイル＆データ構造",
+                        "tags": [
+                                "ファイル",
+                                "構造",
+                                "OS"
+                        ],
+                        "source": "rulesCursor"
+                },
+                {
+                        "id": "path",
+                        "word": "path",
+                        "meaning": "経路・場所",
+                        "ipa": "/pæθ/",
+                        "katakana": "パス",
+                        "category": "ファイル＆データ構造",
+                        "tags": [
+                                "ファイル",
+                                "位置",
+                                "指定"
+                        ],
+                        "source": "rulesCursor"
+                },
+                {
+                        "id": "source",
+                        "word": "source",
+                        "meaning": "正本・源泉",
+                        "ipa": "/sɔːrs/",
+                        "katakana": "ソース",
+                        "category": "ファイル＆データ構造",
+                        "tags": [
+                                "正本",
+                                "コード",
+                                "源泉"
+                        ],
+                        "source": "rulesCursor"
+                },
+                {
+                        "id": "derived",
+                        "word": "derived",
+                        "meaning": "派生データ",
+                        "ipa": "/dɪˈraɪvd/",
+                        "katakana": "デライブド",
+                        "category": "ファイル＆データ構造",
+                        "tags": [
+                                "派生",
+                                "非正本",
+                                "再生成"
+                        ],
+                        "source": "rulesCursor"
+                },
+                {
+                        "id": "index",
+                        "word": "index",
+                        "meaning": "索引・目次",
+                        "ipa": "/ˈɪn.deks/",
+                        "katakana": "インデックス",
+                        "category": "ファイル＆データ構造",
+                        "tags": [
+                                "OKF",
+                                "目次",
+                                "検索"
+                        ],
+                        "source": "rulesCursor"
+                },
+                {
+                        "id": "template",
+                        "word": "template",
+                        "meaning": "雛形",
+                        "ipa": "/ˈtem.plət/",
+                        "katakana": "テンプレート",
+                        "category": "ファイル＆データ構造",
+                        "tags": [
+                                "雛形",
+                                "構造",
+                                "定型"
+                        ],
+                        "source": "rulesCursor"
+                },
+                {
+                        "id": "schema",
+                        "word": "schema",
+                        "meaning": "構造定義",
+                        "ipa": "/ˈskiː.mə/",
+                        "katakana": "スキーマ",
+                        "category": "ファイル＆データ構造",
+                        "tags": [
+                                "データ",
+                                "定義",
+                                "JSON"
+                        ],
+                        "source": "rulesCursor"
+                },
+                {
+                        "id": "json",
+                        "word": "json",
+                        "meaning": "JSON（データ交換形式）",
+                        "ipa": "/ˈdʒeɪsən/",
+                        "katakana": "ジェイソン",
+                        "tags": [
+                                "プログラム",
+                                "ルール",
+                                "データ",
+                                "ファイル＆データ構造"
+                        ],
+                        "source": "rulesCursor"
+                },
+                {
+                        "id": "yaml",
+                        "word": "yaml",
+                        "meaning": "YAML（設定向けデータ形式）",
+                        "ipa": "/ˈjæməl/",
+                        "katakana": "ヤムル",
+                        "tags": [
+                                "プログラム",
+                                "ルール",
+                                "データ",
+                                "ファイル＆データ構造"
+                        ],
+                        "source": "rulesCursor"
+                },
+                {
+                        "id": "markdown",
+                        "word": "markdown",
+                        "meaning": "Markdown（文書形式）",
+                        "ipa": "/ˈmɑːrkdaʊn/",
+                        "katakana": "マークダウン",
+                        "tags": [
+                                "プログラム",
+                                "ルール",
+                                "文書",
+                                "ファイル＆データ構造"
+                        ],
+                        "source": "rulesCursor"
+                },
+                {
+                        "id": "container",
+                        "word": "container",
+                        "meaning": "コンテナ（実行環境の箱）",
+                        "ipa": "/kənˈteɪnər/",
+                        "katakana": "コンテナ",
+                        "tags": [
+                                "プログラム",
+                                "ルール",
+                                "環境",
+                                "システム＆実行環境"
+                        ],
+                        "source": "rulesCursor"
+                },
+                {
+                        "id": "sync",
+                        "word": "sync",
+                        "meaning": "同期",
+                        "ipa": "/sɪŋk/",
+                        "katakana": "シンク",
+                        "tags": [
+                                "プログラム",
+                                "ルール",
+                                "同期",
+                                "システム＆実行環境"
+                        ],
+                        "source": "rulesCursor"
+                },
+                {
+                        "id": "cache",
+                        "word": "cache",
+                        "meaning": "キャッシュ（一時保管）",
+                        "ipa": "/kæʃ/",
+                        "katakana": "キャッシュ",
+                        "tags": [
+                                "プログラム",
+                                "ルール",
+                                "性能",
+                                "システム＆実行環境"
+                        ],
+                        "source": "rulesCursor"
+                },
+                {
+                        "id": "sandbox",
+                        "word": "sandbox",
+                        "meaning": "隔離環境",
+                        "ipa": "/ˈsænd.bɑːks/",
+                        "katakana": "サンドボックス",
+                        "category": "システム＆コマンド実行",
+                        "tags": [
+                                "セキュリティ",
+                                "隔離",
+                                "実行"
+                        ],
+                        "source": "rulesCursor"
+                },
+                {
+                        "id": "deploy",
+                        "word": "deploy",
+                        "meaning": "デプロイ（配備・公開）",
+                        "ipa": "/dɪˈplɔɪ/",
+                        "katakana": "デプロイ",
+                        "tags": [
+                                "プログラム",
+                                "ルール",
+                                "公開",
+                                "システム＆実行環境"
+                        ],
+                        "source": "rulesCursor"
+                },
+                {
+                        "id": "session",
+                        "word": "session",
+                        "meaning": "対話期間",
+                        "ipa": "/ˈseʃ.ən/",
+                        "katakana": "セッション",
+                        "category": "システム＆コマンド実行",
+                        "tags": [
+                                "対話",
+                                "接続",
+                                "状態"
+                        ],
+                        "source": "rulesCursor"
+                },
+                {
+                        "id": "config",
+                        "word": "config",
+                        "meaning": "設定",
+                        "ipa": "/kənˈfɪɡ/",
+                        "katakana": "コンフィグ",
+                        "category": "システム＆コマンド実行",
+                        "tags": [
+                                "設定",
+                                "構成",
+                                "環境"
+                        ],
+                        "source": "rulesCursor"
+                },
+                {
+                        "id": "environment",
+                        "word": "environment",
+                        "meaning": "動作環境",
+                        "ipa": "/ɪnˈvaɪ.rən.mənt/",
+                        "katakana": "エンバイロメント",
+                        "category": "システム＆コマンド実行",
+                        "tags": [
+                                "環境",
+                                "変数",
+                                "OS"
+                        ],
+                        "source": "rulesCursor"
+                },
+                {
+                        "id": "import",
+                        "word": "import",
+                        "meaning": "取り込み・インポート",
+                        "ipa": "/ˈɪmpɔːrt/",
+                        "katakana": "インポート",
+                        "tags": [
+                                "プログラム",
+                                "ルール",
+                                "入出力",
+                                "システム＆実行環境"
+                        ],
+                        "source": "rulesCursor"
+                },
+                {
+                        "id": "export",
+                        "word": "export",
+                        "meaning": "書き出し・エクスポート",
+                        "ipa": "/ɪkˈspɔːrt/",
+                        "katakana": "エクスポート",
+                        "tags": [
+                                "プログラム",
+                                "ルール",
+                                "入出力",
+                                "システム＆実行環境"
+                        ],
+                        "source": "rulesCursor"
+                },
+                {
+                        "id": "function",
+                        "word": "function",
+                        "meaning": "関数・機能",
+                        "ipa": "/ˈfʌŋk.ʃən/",
+                        "katakana": "ファンクション",
+                        "category": "プログラミング基本構文",
+                        "tags": [
+                                "構文",
+                                "関数",
+                                "基本"
+                        ],
+                        "source": "rulesCursor"
+                },
+                {
+                        "id": "variable",
+                        "word": "variable",
+                        "meaning": "変数",
+                        "ipa": "/ˈver.i.ə.bəl/",
+                        "katakana": "バリアブル",
+                        "category": "プログラミング基本構文",
+                        "tags": [
+                                "構文",
+                                "変数",
+                                "データ"
+                        ],
+                        "source": "common"
+                },
+                {
+                        "id": "constant",
+                        "word": "constant",
+                        "meaning": "定数",
+                        "ipa": "/ˈkɑːn.stənt/",
+                        "katakana": "コンスタント",
+                        "category": "プログラミング基本構文",
+                        "tags": [
+                                "構文",
+                                "定数",
+                                "基本"
+                        ],
+                        "source": "common"
+                },
+                {
+                        "id": "argument",
+                        "word": "argument",
+                        "meaning": "引数",
+                        "ipa": "/ˈɑːrɡjumənt/",
+                        "katakana": "アーギュメント",
+                        "tags": [
+                                "プログラム",
+                                "基礎",
+                                "プログラミング基本"
+                        ],
+                        "source": "common"
+                },
+                {
+                        "id": "iteration",
+                        "word": "iteration",
+                        "meaning": "反復・ループ",
+                        "ipa": "/ˌɪt̬.əˈreɪ.ʃən/",
+                        "katakana": "イテレーション",
+                        "category": "プログラミング基本構文",
+                        "tags": [
+                                "ループ",
+                                "反復",
+                                "構文"
+                        ],
+                        "source": "common"
+                },
+                {
+                        "id": "array",
+                        "word": "array",
+                        "meaning": "配列",
+                        "ipa": "/əˈreɪ/",
+                        "katakana": "アレイ",
+                        "category": "プログラミング基本構文",
+                        "tags": [
+                                "データ構造",
+                                "配列",
+                                "基本"
+                        ],
+                        "source": "common"
+                },
+                {
+                        "id": "object",
+                        "word": "object",
+                        "meaning": "オブジェクト",
+                        "ipa": "/ˈɑːb.dʒɪkt/",
+                        "katakana": "オブジェクト",
+                        "category": "プログラミング基本構文",
+                        "tags": [
+                                "データ構造",
+                                "オブジェクト",
+                                "基本"
+                        ],
+                        "source": "common"
+                },
+                {
+                        "id": "string",
+                        "word": "string",
+                        "meaning": "文字列",
+                        "ipa": "/strɪŋ/",
+                        "katakana": "ストリング",
+                        "category": "プログラミング基本構文",
+                        "tags": [
+                                "データ型",
+                                "文字列",
+                                "基本"
+                        ],
+                        "source": "common"
+                },
+                {
+                        "id": "class",
+                        "word": "class",
+                        "meaning": "クラス",
+                        "ipa": "/klæs/",
+                        "katakana": "クラス",
+                        "tags": [
+                                "プログラム",
+                                "ルール",
+                                "基礎",
+                                "プログラミング基本"
+                        ],
+                        "source": "rulesCursor"
+                },
+                {
+                        "id": "method",
+                        "word": "method",
+                        "meaning": "メソッド（オブジェクトの関数）",
+                        "ipa": "/ˈmeθəd/",
+                        "katakana": "メソッド",
+                        "tags": [
+                                "プログラム",
+                                "ルール",
+                                "基礎",
+                                "プログラミング基本"
+                        ],
+                        "source": "rulesCursor"
+                },
+                {
+                        "id": "async",
+                        "word": "async",
+                        "meaning": "非同期",
+                        "ipa": "/eɪˈsɪŋk/",
+                        "katakana": "エイシンク",
+                        "category": "非同期＆アーキテクチャ",
+                        "tags": [
+                                "非同期",
+                                "関数",
+                                "通信"
+                        ],
+                        "source": "common"
+                },
+                {
+                        "id": "await",
+                        "word": "await",
+                        "meaning": "待機",
+                        "ipa": "/əˈweɪt/",
+                        "katakana": "アウェイト",
+                        "category": "非同期＆アーキテクチャ",
+                        "tags": [
+                                "非同期",
+                                "待機",
+                                "制御"
+                        ],
+                        "source": "common"
+                },
+                {
+                        "id": "promise",
+                        "word": "promise",
+                        "meaning": "非同期約束",
+                        "ipa": "/ˈprɑː.mɪs/",
+                        "katakana": "プロミス",
+                        "category": "非同期＆アーキテクチャ",
+                        "tags": [
+                                "非同期",
+                                "オブジェクト",
+                                "JavaScript"
+                        ],
+                        "source": "common"
+                },
+                {
+                        "id": "callback",
+                        "word": "callback",
+                        "meaning": "戻り関数",
+                        "ipa": "/ˈkɑːl.bæk/",
+                        "katakana": "コールバック",
+                        "category": "非同期＆アーキテクチャ",
+                        "tags": [
+                                "関数",
+                                "非同期",
+                                "イベント"
+                        ],
+                        "source": "common"
+                },
+                {
+                        "id": "stream",
+                        "word": "stream",
+                        "meaning": "ストリーム",
+                        "ipa": "/striːm/",
+                        "katakana": "ストリーム",
+                        "category": "非同期＆アーキテクチャ",
+                        "tags": [
+                                "通信",
+                                "データフロー",
+                                "逐次処理"
+                        ],
+                        "source": "common"
+                },
+                {
+                        "id": "module",
+                        "word": "module",
+                        "meaning": "モジュール",
+                        "ipa": "/ˈmɑː.dʒuːl/",
+                        "katakana": "モジュール",
+                        "category": "非同期＆アーキテクチャ",
+                        "tags": [
+                                "設計",
+                                "分割",
+                                "モジュール"
+                        ],
+                        "source": "rulesCursor"
+                },
+                {
+                        "id": "package",
+                        "word": "package",
+                        "meaning": "パッケージ",
+                        "ipa": "/ˈpæk.ɪdʒ/",
+                        "katakana": "パッケージ",
+                        "category": "非同期＆アーキテクチャ",
+                        "tags": [
+                                "配布",
+                                "依存関係",
+                                "ライブラリ"
+                        ],
+                        "source": "common"
+                },
+                {
+                        "id": "dependency",
+                        "word": "dependency",
+                        "meaning": "依存関係",
+                        "ipa": "/dɪˈpen.dən.si/",
+                        "katakana": "デペンデンシー",
+                        "category": "非同期＆アーキテクチャ",
+                        "tags": [
+                                "ライブラリ",
+                                "構成",
+                                "パッケージ"
+                        ],
+                        "source": "common"
+                },
+                {
+                        "id": "interface",
+                        "word": "interface",
+                        "meaning": "接合面・規約",
+                        "ipa": "/ˈɪn.t̬ɚ.feɪs/",
+                        "katakana": "インターフェース",
+                        "category": "非同期＆アーキテクチャ",
+                        "tags": [
+                                "設計",
+                                "型",
+                                "接合部"
+                        ],
+                        "source": "common"
+                },
+                {
+                        "id": "pipeline",
+                        "word": "pipeline",
+                        "meaning": "パイプライン",
+                        "ipa": "/ˈpaɪp.laɪn/",
+                        "katakana": "パイプライン",
+                        "category": "非同期＆アーキテクチャ",
+                        "tags": [
+                                "データフロー",
+                                "自動化",
+                                "処理系列"
+                        ],
+                        "source": "rulesCursor"
+                },
+                {
+                        "id": "test",
+                        "word": "test",
+                        "meaning": "テスト・検証",
+                        "ipa": "/test/",
+                        "katakana": "テスト",
+                        "category": "テスト＆品質管理",
+                        "tags": [
+                                "品質",
+                                "検証",
+                                "自動テスト"
+                        ],
+                        "source": "rulesCursor"
+                },
+                {
+                        "id": "debug",
+                        "word": "debug",
+                        "meaning": "バグ修正",
+                        "ipa": "/diːˈbʌɡ/",
+                        "katakana": "デバッグ",
+                        "category": "テスト＆品質管理",
+                        "tags": [
+                                "品質",
+                                "修正",
+                                "調査"
+                        ],
+                        "source": "rulesCursor"
+                },
+                {
+                        "id": "refactor",
+                        "word": "refactor",
+                        "meaning": "構造改善",
+                        "ipa": "/riːˈfæk.tɚ/",
+                        "katakana": "リファクタ",
+                        "category": "テスト＆品質管理",
+                        "tags": [
+                                "リファクタリング",
+                                "品質",
+                                "保守性"
+                        ],
+                        "source": "rulesCursor"
+                },
+                {
+                        "id": "error",
+                        "word": "error",
+                        "meaning": "誤り・エラー",
+                        "ipa": "/ˈer.ɚ/",
+                        "katakana": "エラー",
+                        "category": "テスト＆品質管理",
+                        "tags": [
+                                "異常",
+                                "障害",
+                                "エラー処理"
+                        ],
+                        "source": "common"
+                },
+                {
+                        "id": "warning",
+                        "word": "warning",
+                        "meaning": "警告",
+                        "ipa": "/ˈwɔːr.nɪŋ/",
+                        "katakana": "ウォーニング",
+                        "category": "テスト＆品質管理",
+                        "tags": [
+                                "警告",
+                                "通知",
+                                "品質"
+                        ],
+                        "source": "common"
+                },
+                {
+                        "id": "exception",
+                        "word": "exception",
+                        "meaning": "例外",
+                        "ipa": "/ɪkˈsep.ʃən/",
+                        "katakana": "エクセプション",
+                        "category": "テスト＆品質管理",
+                        "tags": [
+                                "例外",
+                                "エラーハンドリング",
+                                "構文"
+                        ],
+                        "source": "rulesCursor"
+                },
+                {
+                        "id": "lint",
+                        "word": "lint",
+                        "meaning": "静的解析",
+                        "ipa": "/lɪnt/",
+                        "katakana": "リント",
+                        "category": "テスト＆品質管理",
+                        "tags": [
+                                "品質",
+                                "規約",
+                                "静的解析"
+                        ],
+                        "source": "rulesCursor"
+                },
+                {
+                        "id": "log",
+                        "word": "log",
+                        "meaning": "履歴・記録",
+                        "ipa": "/lɑːɡ/",
+                        "katakana": "ログ",
+                        "category": "テスト＆品質管理",
+                        "tags": [
+                                "記録",
+                                "診断",
+                                "履歴"
+                        ],
+                        "source": "rulesCursor"
+                },
+                {
+                        "id": "validation",
+                        "word": "validation",
+                        "meaning": "妥当性検証",
+                        "ipa": "/ˌvælɪˈdeɪʃn/",
+                        "katakana": "バリデーション",
+                        "tags": [
+                                "プログラム",
+                                "ルール",
+                                "品質",
+                                "テスト＆品質"
+                        ],
+                        "source": "rulesCursor"
+                },
+                {
+                        "id": "remediation",
+                        "word": "remediation",
+                        "meaning": "是正・修復対応",
+                        "ipa": "/rɪˌmiːdiˈeɪʃn/",
+                        "katakana": "リメディエーション",
+                        "tags": [
+                                "プログラム",
+                                "ルール",
+                                "品質",
+                                "テスト＆品質"
+                        ],
+                        "source": "rulesCursor"
+                },
+                {
+                        "id": "model",
+                        "word": "model",
+                        "meaning": "AIモデル",
+                        "ipa": "/ˈmɑː.dəl/",
+                        "katakana": "モデル",
+                        "category": "AI＆機械学習コア",
+                        "tags": [
+                                "AI",
+                                "LLM",
+                                "機械学習"
+                        ],
+                        "source": "rulesCursor"
+                },
+                {
+                        "id": "token",
+                        "word": "token",
+                        "meaning": "トークン",
+                        "ipa": "/ˈtoʊ.kən/",
+                        "katakana": "トークン",
+                        "category": "AI＆機械学習コア",
+                        "tags": [
+                                "AI",
+                                "LLM",
+                                "単位"
+                        ],
+                        "source": "rulesCursor"
+                },
+                {
+                        "id": "embedding",
+                        "word": "embedding",
+                        "meaning": "埋め込み",
+                        "ipa": "/ɪmˈbed.ɪŋ/",
+                        "katakana": "エンベディング",
+                        "category": "AI＆機械学習コア",
+                        "tags": [
+                                "AI",
+                                "ベクトル",
+                                "意味表現"
+                        ],
+                        "source": "common"
+                },
+                {
+                        "id": "vector",
+                        "word": "vector",
+                        "meaning": "ベクトル",
+                        "ipa": "/ˈvek.tɚ/",
+                        "katakana": "ベクトル",
+                        "category": "AI＆機械学習コア",
+                        "tags": [
+                                "AI",
+                                "データ",
+                                "数学"
+                        ],
+                        "source": "common"
+                },
+                {
+                        "id": "inference",
+                        "word": "inference",
+                        "meaning": "推論",
+                        "ipa": "/ˈɪn.fɚ.əns/",
+                        "katakana": "インファレンス",
+                        "category": "AI＆機械学習コア",
+                        "tags": [
+                                "AI",
+                                "実行",
+                                "予測"
+                        ],
+                        "source": "common"
+                },
+                {
+                        "id": "dataset",
+                        "word": "dataset",
+                        "meaning": "データセット",
+                        "ipa": "/ˈdeɪ.t̬ə.set/",
+                        "katakana": "データセット",
+                        "category": "AI＆機械学習コア",
+                        "tags": [
+                                "AI",
+                                "学習",
+                                "データ"
+                        ],
+                        "source": "common"
+                },
+                {
+                        "id": "parameter",
+                        "word": "parameter",
+                        "meaning": "パラメータ",
+                        "ipa": "/pəˈræm.ə.t̬ɚ/",
+                        "katakana": "パラメータ",
+                        "category": "AI＆機械学習コア",
+                        "tags": [
+                                "AI",
+                                "設定",
+                                "変数"
+                        ],
+                        "source": "rulesCursor"
+                },
+                {
+                        "id": "latency",
+                        "word": "latency",
+                        "meaning": "遅延時間",
+                        "ipa": "/ˈleɪ.tən.si/",
+                        "katakana": "レイテンシ",
+                        "category": "AI＆機械学習コア",
+                        "tags": [
+                                "性能",
+                                "通信",
+                                "応答速度"
+                        ],
+                        "source": "common"
+                },
+                {
+                        "id": "fallback",
+                        "word": "fallback",
+                        "meaning": "フォールバック（代替経路）",
+                        "ipa": "/ˈfɔːlbæk/",
+                        "katakana": "フォールバック",
+                        "tags": [
+                                "プログラム",
+                                "ルール",
+                                "堅牢性",
+                                "AIコア"
+                        ],
+                        "source": "rulesCursor"
+                },
+                {
+                        "id": "encoding",
+                        "word": "encoding",
+                        "meaning": "文字コード・エンコーディング",
+                        "ipa": "/ɪnˈkoʊdɪŋ/",
+                        "katakana": "エンコーディング",
+                        "tags": [
+                                "プログラム",
+                                "ルール",
+                                "文字コード",
+                                "AIコア"
+                        ],
+                        "source": "rulesCursor"
+                },
+                {
+                        "id": "confirm",
+                        "word": "confirm",
+                        "meaning": "確認する（承認待ち）",
+                        "ipa": "/kənˈfɜːrm/",
+                        "katakana": "コンファーム",
+                        "tags": [
+                                "プログラム",
+                                "ルール",
+                                "郵便",
+                                "AI応用＆運用"
+                        ],
+                        "source": "rulesCursor"
+                },
+                {
+                        "id": "hallucination",
+                        "word": "hallucination",
+                        "meaning": "幻覚・虚偽出力",
+                        "ipa": "/həˌluː.səˈneɪ.ʃən/",
+                        "katakana": "ハルシネーション",
+                        "category": "AI応用＆ワークフロー",
+                        "tags": [
+                                "AI",
+                                "課題",
+                                "安全性"
+                        ],
+                        "source": "common"
+                },
+                {
+                        "id": "priority",
+                        "word": "priority",
+                        "meaning": "優先度",
+                        "ipa": "/praɪˈɔːrəti/",
+                        "katakana": "プライオリティ",
+                        "tags": [
+                                "プログラム",
+                                "ルール",
+                                "運用",
+                                "AI応用＆運用"
+                        ],
+                        "source": "rulesCursor"
+                },
+                {
+                        "id": "handover",
+                        "word": "handover",
+                        "meaning": "申し送り・引き継ぎ",
+                        "ipa": "/ˈhændoʊvər/",
+                        "katakana": "ハンドオーバー",
+                        "tags": [
+                                "プログラム",
+                                "ルール",
+                                "運用",
+                                "AI応用＆運用"
+                        ],
+                        "source": "rulesCursor"
+                },
+                {
+                        "id": "doctrine",
+                        "word": "doctrine",
+                        "meaning": "ドクトリン（方針・教義）",
+                        "ipa": "/ˈdɑːktrɪn/",
+                        "katakana": "ドクトリン",
+                        "tags": [
+                                "プログラム",
+                                "ルール",
+                                "OKF",
+                                "AI応用＆運用"
+                        ],
+                        "source": "rulesCursor"
+                },
+                {
+                        "id": "concept",
+                        "word": "concept",
+                        "meaning": "概念",
+                        "ipa": "/ˈkɑːnsept/",
+                        "katakana": "コンセプト",
+                        "tags": [
+                                "プログラム",
+                                "ルール",
+                                "OKF",
+                                "AI応用＆運用"
+                        ],
+                        "source": "rulesCursor"
+                },
+                {
+                        "id": "response",
+                        "word": "response",
+                        "meaning": "応答",
+                        "ipa": "/rɪˈspɑːns/",
+                        "katakana": "レスポンス",
+                        "category": "AI応用＆ワークフロー",
+                        "tags": [
+                                "通信",
+                                "出力",
+                                "応答"
+                        ],
+                        "source": "rulesCursor"
+                },
+                {
+                        "id": "scan",
+                        "word": "scan",
+                        "meaning": "スキャン（全体走査）",
+                        "ipa": "/skæn/",
+                        "katakana": "スキャン",
+                        "tags": [
+                                "プログラム",
+                                "ルール",
+                                "Check",
+                                "AI応用＆運用"
+                        ],
+                        "source": "rulesCursor"
+                },
+                {
+                        "id": "reuse",
+                        "word": "reuse",
+                        "meaning": "再利用",
+                        "ipa": "/ˌriːˈjuːz/",
+                        "katakana": "リユース",
+                        "tags": [
+                                "プログラム",
+                                "ルール",
+                                "資産",
+                                "AI応用＆運用"
+                        ],
+                        "source": "rulesCursor"
+                },
+                {
+                        "id": "timeout",
+                        "word": "timeout",
+                        "meaning": "時間切れ",
+                        "ipa": "/ˈtaɪm.aʊt/",
+                        "katakana": "タイムアウト",
+                        "category": "AI応用＆ワークフロー",
+                        "tags": [
+                                "制御",
+                                "例外",
+                                "タイマー"
+                        ],
+                        "source": "rulesCursor"
+                }
+        ]
+};
+
+    // アプリ内状態
+    let wordsMap = {};
+    let currentQueue = [];
+    let currentIndex = 0;
+    let preferredVoice = null;
+    let engineWarmed = false;
+    let speakToken = 0;
+    let nextSentenceTimer = null;
+    let loadDelayTimer = null;
+    let isNumericalSession = false;
+    let lastLessonLogged = '';
+    let wordHasLoggedMiss = false;
+
+    // DOM要素
+    const lessonSelect = document.getElementById('lesson-select');
+    const speedSelect = document.getElementById('speed-select');
+    const lessonBadge = document.getElementById('lesson-badge');
+    const meaningDisplay = document.getElementById('meaning-display');
+    const katakanaDisplay = document.getElementById('katakana-display');
+    const ipaDisplay = document.getElementById('ipa-display');
+    const wordDisplay = document.getElementById('word-display');
+    const inputArea = document.getElementById('input-area');
+    const progressFill = document.getElementById('progress-fill');
+    const statusDisplay = document.getElementById('status');
+    const startBtn = document.getElementById('start-btn');
+    const logBox = document.getElementById('log-box');
+
+    // ログ出力関数
+    function logEvent(type, message) {
+        const time = new Date().toLocaleTimeString('ja-JP', { hour12: false });
+        const line = document.createElement('div');
+        let color = '#d4d4d4';
+        if (type === 'SUCCESS') color = '#4ec9b0';
+        else if (type === 'WARN') color = '#ce9178';
+        else if (type === 'ERROR') color = '#f14c4c';
+        else if (type === 'INFO') color = '#9cdcfe';
+        else if (type === 'AUDIO') color = '#dcdcaa';
+        else if (type === 'START' || type === 'COMPLETE') color = '#c586c0';
+        line.innerHTML = `<span style="color:#858585;">[${time}]</span> <span style="color:${color}; font-weight:bold;">[${type}]</span> ${message}`;
+        logBox.appendChild(line);
+        logBox.scrollTop = logBox.scrollHeight;
+    }
+
+    function copyLogPanel() {
+        const text = logBox.innerText;
+        navigator.clipboard.writeText(text).then(() => {
+            alert('ログをクリップボードにコピーしました');
+        }).catch(() => {
+            alert('コピーに失敗しました');
+        });
+    }
+
+    function toggleLogPanel() {
+        const isHidden = logBox.style.display === 'none';
+        logBox.style.display = isHidden ? 'block' : 'none';
+        document.getElementById('toggle-log-btn').innerText = isHidden ? 'ログを隠す' : 'ログを表示';
+    }
+
+    function clearLogPanel() {
+        logBox.innerHTML = '';
+        logEvent('INFO', 'ログを消去しました');
+    }
+
+    function waitMs(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    // 単語マップの構築
+    function buildWordsMap(wordsList) {
+        const map = {};
+        wordsList.forEach(w => {
+            if (w && w.id) {
+                map[w.id] = w;
+            }
+        });
+        return map;
+    }
+
+    // レッスンセレクトの初期化
+    function initLessonSelect() {
+        // option[0]「★ 全語を通して実行」以外を一旦クリア
+        while (lessonSelect.options.length > 1) {
+            lessonSelect.remove(1);
+        }
+        LESSON_DEFINITIONS.forEach((lesson, idx) => {
+            const opt = document.createElement('option');
+            opt.value = String(idx);
+            opt.text = `${lesson.title} (${lesson.wordIds.length}語)`;
+            lessonSelect.appendChild(opt);
+        });
+    }
+
+    // データ初期化 (内蔵データをまず展開し、fetch可能なら外部 data/words_programming_ai.json を取得)
+    async function initData() {
+        // 1. まず内蔵データで構築
+        wordsMap = buildWordsMap(DEFAULT_WORDS_DATA.words);
+        logEvent('INFO', `内蔵フォールバックデータを読み込みました (${Object.keys(wordsMap).length}語)`);
+
+        // 2. 外部 data/words_programming_ai.json を fetch 試行
+        try {
+            const res = await fetch('data/words_programming_ai.json', { cache: 'no-store' });
+            if (res.ok) {
+                const extData = await res.json();
+                let updated = false;
+                if (extData && Array.isArray(extData.words) && extData.words.length > 0) {
+                    wordsMap = buildWordsMap(extData.words);
+                    updated = true;
+                }
+                if (extData && Array.isArray(extData.lessons) && extData.lessons.length > 0) {
+                    LESSON_DEFINITIONS = extData.lessons;
+                    initLessonSelect();
+                }
+                if (updated) {
+                    logEvent('SUCCESS', `外部 data/words_programming_ai.json を読み込みました (全${Object.keys(wordsMap).length}語, version:${extData.version || 1})`);
+                }
+            } else {
+                logEvent('INFO', `data/words_programming_ai.json 応答ステータス: ${res.status} (内蔵データで継続)`);
+            }
+        } catch (e) {
+            // file:// プロトコルなどの制約
+            logEvent('INFO', 'file:// プロトコルまたはローカル制限を検知。内蔵データで正常に動作します。');
+        }
+    }
+
+    // 音声初期化 (Jobs 実績コードを踏襲)
+    function selectEnglishVoice() {
+        if (!('speechSynthesis' in window)) return null;
+        const voices = speechSynthesis.getVoices();
+        if (!voices || voices.length === 0) return null;
+
+        return (
+            voices.find(v => v.lang === 'en-US' && /natural|premium|enhanced/i.test(v.name)) ||
+            voices.find(v => v.lang === 'en-US' && /google|samantha|zira|david/i.test(v.name)) ||
+            voices.find(v => v.lang === 'en-US') ||
+            voices.find(v => v.lang && v.lang.startsWith('en')) ||
+            null
+        );
+    }
+
+    function applyVoice(uttr) {
+        if (!preferredVoice) preferredVoice = selectEnglishVoice();
+        if (preferredVoice) {
+            uttr.voice = preferredVoice;
+            uttr.lang = preferredVoice.lang;
+        }
+    }
+
+    function runUtterance(uttr) {
+        return new Promise((resolve, reject) => {
+            let settled = false;
+            const finish = (fn, arg) => {
+                if (settled) return;
+                settled = true;
+                fn(arg);
+            };
+            uttr.onend = () => finish(resolve);
+            uttr.onerror = (e) => finish(reject, e);
+            speechSynthesis.speak(uttr);
+            setTimeout(() => finish(resolve), 1200);
+        });
+    }
+
+    async function warmEngine() {
+        if (engineWarmed) return;
+        if (speechSynthesis.paused) speechSynthesis.resume();
+        const warm = new SpeechSynthesisUtterance('ready');
+        warm.volume = 0.01;
+        warm.rate = 1.2;
+        applyVoice(warm);
+        try {
+            await runUtterance(warm);
+        } catch (e) {}
+        engineWarmed = true;
+    }
+
+    function getLessonTitle(idx) {
+        const lesson = LESSON_DEFINITIONS[idx];
+        return lesson ? lesson.title : `レッスン ${idx + 1}`;
+    }
+
+    // 練習開始
+    async function startPractice() {
+        speakToken++;
+        if (nextSentenceTimer) {
+            clearTimeout(nextSentenceTimer);
+            nextSentenceTimer = null;
+        }
+        if (loadDelayTimer) {
+            clearTimeout(loadDelayTimer);
+            loadDelayTimer = null;
+        }
+        if (speechSynthesis.speaking || speechSynthesis.pending || speechSynthesis.paused) {
+            speechSynthesis.cancel();
+        }
+
+        const selectedValue = lessonSelect.value;
+        currentQueue = [];
+        lastLessonLogged = '';
+
+        if (selectedValue === 'all') {
+            isNumericalSession = false;
+            LESSON_DEFINITIONS.forEach((lesson, lIdx) => {
+                const title = lesson.title;
+                lesson.wordIds.forEach((wid, wIdx) => {
+                    const wItem = wordsMap[wid];
+                    if (wItem) {
+                        currentQueue.push({
+                            id: wid,
+                            word: wItem.word,
+                            meaning: wItem.meaning,
+                            ipa: wItem.ipa,
+                            katakana: wItem.katakana,
+                            lessonTitle: title,
+                            lessonIndex: lIdx,
+                            wordIndexInLesson: wIdx + 1,
+                            wordTotalInLesson: lesson.wordIds.length
+                        });
+                    }
+                });
+            });
+            logEvent('START', `★ 全語を通して実行を開始 (全${currentQueue.length}語)`);
+        } else {
+            isNumericalSession = true;
+            const startIndex = parseInt(selectedValue, 10);
+            const startTitle = getLessonTitle(startIndex);
+            // 選択したレッスンから最終レッスンまで継続実行
+            for (let i = startIndex; i < LESSON_DEFINITIONS.length; i++) {
+                const lesson = LESSON_DEFINITIONS[i];
+                if (lesson) {
+                    const title = lesson.title;
+                    lesson.wordIds.forEach((wid, wIdx) => {
+                        const wItem = wordsMap[wid];
+                        if (wItem) {
+                            currentQueue.push({
+                                id: wid,
+                                word: wItem.word,
+                                meaning: wItem.meaning,
+                                ipa: wItem.ipa,
+                                katakana: wItem.katakana,
+                                lessonTitle: title,
+                                lessonIndex: i,
+                                wordIndexInLesson: wIdx + 1,
+                                wordTotalInLesson: lesson.wordIds.length
+                            });
+                        }
+                    });
+                }
+            }
+            logEvent('START', `【継続実行】「${startTitle}」〜 最終レッスンまで開始 (全${currentQueue.length}語)`);
+        }
+
+        if (currentQueue.length === 0) {
+            logEvent('WARN', '単語データが0件のため開始できませんでした。');
+            return;
+        }
+
+        currentIndex = 0;
+        inputArea.disabled = false;
+        inputArea.value = '';
+        inputArea.focus();
+        startBtn.innerText = 'リスタート (Restart)';
+        updateProgress();
+        statusDisplay.innerText = 'Preparing audio...';
+        await warmEngine();
+        inputArea.focus();
+        loadWord();
+    }
+
+    // 単語の読み込み表示
+    function loadWord() {
+        wordHasLoggedMiss = false;
+
+        if (currentIndex >= currentQueue.length) {
+            meaningDisplay.innerText = '🎉 全単語達成！すべての練習が終了しました';
+            katakanaDisplay.innerText = '';
+            ipaDisplay.innerText = '';
+            wordDisplay.innerText = 'Congratulations! All Finished.';
+            if (lessonBadge) lessonBadge.innerText = '';
+            inputArea.disabled = true;
+            statusDisplay.innerText = 'レッスンを選択して再度スタートしてください。';
+            statusDisplay.className = '';
+            progressFill.style.width = '100%';
+            logEvent('COMPLETE', `🎉 全単語達成！すべての練習が終了しました (全${currentQueue.length}語 完了)`);
+            return;
+        }
+
+        const current = currentQueue[currentIndex];
+        if (lessonBadge && current.lessonTitle) {
+            lessonBadge.innerText = `${current.lessonTitle} （単語 ${current.wordIndexInLesson}/${current.wordTotalInLesson} · 全体 ${currentIndex + 1}/${currentQueue.length}）`;
+        }
+        if (current.lessonTitle && current.lessonTitle !== lastLessonLogged) {
+            lastLessonLogged = current.lessonTitle;
+            logEvent('INFO', `▶ 【レッスン進行】「${current.lessonTitle}」に入りました (レッスン内全${current.wordTotalInLesson}語)`);
+            if (isNumericalSession && current.lessonIndex !== undefined) {
+                lessonSelect.value = String(current.lessonIndex);
+            }
+        }
+
+        meaningDisplay.innerText = current.meaning;
+        katakanaDisplay.innerText = current.katakana;
+        ipaDisplay.innerText = current.ipa;
+
+        renderEnglishText('');
+
+        statusDisplay.innerText = 'Listening... (読み上げ中)';
+        statusDisplay.className = '';
+        inputArea.value = '';
+        updateProgress();
+        logEvent('INFO', `[${currentIndex + 1}/${currentQueue.length}] 出題: "${current.word}" (${current.meaning})`);
+
+        if (loadDelayTimer) {
+            clearTimeout(loadDelayTimer);
+            loadDelayTimer = null;
+        }
+        const tokenAtLoad = speakToken;
+        loadDelayTimer = setTimeout(() => {
+            loadDelayTimer = null;
+            if (tokenAtLoad !== speakToken) return;
+            speak(current.word);
+        }, 300);
+    }
+
+    // 単語（文字単位）の描画
+    function renderEnglishText(userInput) {
+        if (!currentQueue[currentIndex]) return;
+        const targetText = currentQueue[currentIndex].word;
+
+        let html = '';
+        for (let i = 0; i < targetText.length; i++) {
+            const char = targetText[i];
+            const isSpace = char === ' ';
+
+            if (i < userInput.length) {
+                if (userInput[i] === char) {
+                    if (isSpace) {
+                        html += `<span class="char-correct space-correct">&nbsp;</span>`;
+                    } else {
+                        html += `<span class="char-correct">${char}</span>`;
+                    }
+                } else {
+                    if (isSpace) {
+                        html += `<span class="char-wrong space-wrong">&nbsp;</span>`;
+                    } else {
+                        html += `<span class="char-wrong">${char}</span>`;
+                    }
+                }
+            } else {
+                if (isSpace) {
+                    html += `<span class="char-pending space-char">&nbsp;</span>`;
+                } else {
+                    html += `<span class="char-pending">${char}</span>`;
+                }
+            }
+        }
+        wordDisplay.innerHTML = html;
+    }
+
+    // 音声読み上げ
+    async function speak(text) {
+        const token = ++speakToken;
+
+        if (speechSynthesis.speaking || speechSynthesis.pending) {
+            speechSynthesis.cancel();
+            await waitMs(250);
+        } else if (speechSynthesis.paused) {
+            speechSynthesis.resume();
+        }
+        if (token !== speakToken) return;
+
+        await warmEngine();
+        if (token !== speakToken) return;
+
+        const rate = parseFloat(speedSelect.value) || 1.0;
+        const uttr = new SpeechSynthesisUtterance(text);
+        uttr.rate = rate;
+        uttr.pitch = 1.0;
+        applyVoice(uttr);
+
+        const timeoutMs = Math.max(6000, Math.ceil((text.length * 150) / rate));
+        logEvent('AUDIO', `音声読み上げ開始 (速度: ${rate}): "${text}"`);
+        statusDisplay.innerText = 'Listening... (読み上げ中)';
+        statusDisplay.className = '';
+
+        try {
+            await new Promise((resolve, reject) => {
+                let settled = false;
+                const timer = setTimeout(() => {
+                    if (settled) return;
+                    settled = true;
+                    logEvent('WARN', `音声タイムアウト保護発動 (${timeoutMs}ms) → 入力待機 (Type it!) に復帰`);
+                    speechSynthesis.cancel();
+                    resolve();
+                }, timeoutMs);
+
+                uttr.onend = () => {
+                    if (settled) return;
+                    settled = true;
+                    clearTimeout(timer);
+                    logEvent('AUDIO', '音声読み上げ完了 → 入力待機 (Type it!)');
+                    resolve();
+                };
+                uttr.onerror = (e) => {
+                    if (settled) return;
+                    settled = true;
+                    clearTimeout(timer);
+                    logEvent('ERROR', `音声合成エラー: ${e?.error || 'unknown'}`);
+                    reject(e);
+                };
+
+                speechSynthesis.speak(uttr);
+            });
+
+            if (token !== speakToken) return;
+            statusDisplay.innerText = 'Type it!';
+            statusDisplay.className = '';
+            inputArea.focus();
+        } catch (e) {
+            console.error('Speech synthesis error:', e);
+            if (token !== speakToken) return;
+            speechSynthesis.cancel();
+            statusDisplay.innerText = 'Type it! (Enter で再読み上げ)';
+            statusDisplay.className = '';
+            logEvent('WARN', '音声キャンセル → Enterキーで再読み上げ可能');
+            inputArea.focus();
+        }
+    }
+
+    function updateProgress() {
+        const percent = (currentIndex / currentQueue.length) * 100;
+        progressFill.style.width = percent + '%';
+    }
+
+    // 入力監視リスナー
+    inputArea.addEventListener('input', () => {
+        if (!currentQueue[currentIndex]) return;
+
+        const currentWord = currentQueue[currentIndex].word;
+        const userInput = inputArea.value;
+
+        renderEnglishText(userInput);
+
+        if (userInput === currentWord) {
+            const currentItem = currentQueue[currentIndex];
+            const isEndOfLesson = currentItem && (currentItem.wordIndexInLesson === currentItem.wordTotalInLesson) && (currentIndex + 1 < currentQueue.length);
+
+            inputArea.disabled = true;
+            if (nextSentenceTimer) {
+                clearTimeout(nextSentenceTimer);
+                nextSentenceTimer = null;
+            }
+
+            if (isEndOfLesson) {
+                const nextItem = currentQueue[currentIndex + 1];
+                const nextLessonName = nextItem ? nextItem.lessonTitle : '次のレッスン';
+                statusDisplay.innerText = `🎉 ${currentItem.lessonTitle} クリア！ → ${nextLessonName} へ進みます`;
+                statusDisplay.className = 'correct';
+                logEvent('SUCCESS', `🎉 【レッスンクリア】「${currentItem.lessonTitle}」完了！ 次のレッスンへ進みます (1200ms後)`);
+                nextSentenceTimer = setTimeout(() => {
+                    nextSentenceTimer = null;
+                    currentIndex++;
+                    inputArea.disabled = false;
+                    inputArea.focus();
+                    statusDisplay.className = '';
+                    loadWord();
+                }, 1200);
+            } else {
+                statusDisplay.innerText = 'Correct! Next...';
+                statusDisplay.className = 'correct';
+                logEvent('SUCCESS', `正解！ [${currentIndex + 1}/${currentQueue.length}] 次の単語へ進みます (600ms後)`);
+                nextSentenceTimer = setTimeout(() => {
+                    nextSentenceTimer = null;
+                    currentIndex++;
+                    inputArea.disabled = false;
+                    inputArea.focus();
+                    statusDisplay.className = '';
+                    loadWord();
+                }, 600);
+            }
+        } else if (currentWord.startsWith(userInput)) {
+            statusDisplay.innerText = 'Typing...';
+            statusDisplay.className = '';
+        } else {
+            statusDisplay.innerText = 'Miss!';
+            statusDisplay.className = 'incorrect';
+            if (!wordHasLoggedMiss) {
+                wordHasLoggedMiss = true;
+                const charExpected = currentWord[userInput.length - 1] || '';
+                const charTyped = userInput[userInput.length - 1] || '';
+                logEvent('WARN', `タイピング不一致: 入力='${charTyped}' (期待='${charExpected}')`);
+            }
+        }
+    });
+
+    inputArea.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && inputArea.value === '') {
+            speak(currentQueue[currentIndex].word);
+        }
+    });
+
+    // 初期化実行
+    window.addEventListener('DOMContentLoaded', async () => {
+        initLessonSelect();
+        await initData();
+        if ('speechSynthesis' in window) {
+            speechSynthesis.onvoiceschanged = () => {
+                preferredVoice = selectEnglishVoice();
+            };
+            preferredVoice = selectEnglishVoice();
+        }
+        logEvent('INFO', 'プログラム／AI英単語タイピングの初期化が完了しました。レッスンを選んでスタートしてください。');
+    });
+</script>
+
+</body>
+</html>
