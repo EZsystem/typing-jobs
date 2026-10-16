@@ -3191,6 +3191,7 @@
     let loadDelayTimer = null;
     let nextSentenceTimer = null;
     let candidateTimeoutTimer = null;
+    let isTransitioning = false;
     let wordHasLoggedMiss = false;
     let isNumericalSession = false;
     let lastLessonLogged = null;
@@ -3453,6 +3454,7 @@
 
     // 単語の読み込み表示
     function loadWord() {
+        isTransitioning = false;
         wordHasLoggedMiss = false;
         if (candidateTimeoutTimer) {
             clearTimeout(candidateTimeoutTimer);
@@ -3513,13 +3515,18 @@
     function getBestTarget(item, userInput) {
         const cands = item.typing_candidates && item.typing_candidates.length > 0 ? item.typing_candidates : [item.word];
         const display = item.toc_display || item.word;
+        const noCommaDisplay = display.replace(/,/g, '');
         if (!userInput) return display;
         
-        // 入力が display に一致していれば display
+        // カンマあり表示に一致
         if (display.toLowerCase().startsWith(userInput.toLowerCase())) {
             return display;
         }
-        // 入力がいずれかの候補の前方一致ならその候補
+        // カンマなし表示に一致
+        if (noCommaDisplay.toLowerCase().startsWith(userInput.toLowerCase())) {
+            return noCommaDisplay;
+        }
+        // 個別候補の前方一致
         for (const c of cands) {
             if (c.toLowerCase().startsWith(userInput.toLowerCase())) {
                 return c;
@@ -3655,7 +3662,10 @@
     }
 
     // 正解完了時の処理
-    function handleCorrectMatch(matchedWord) {
+    function handleCorrectMatch(matchedWord, matchType = 'full') {
+        if (isTransitioning) return;
+        isTransitioning = true;
+
         const currentItem = currentQueue[currentIndex];
         const isEndOfLesson = currentItem && (currentItem.wordIndexInLesson === currentItem.wordTotalInLesson) && (currentIndex + 1 < currentQueue.length);
 
@@ -3663,11 +3673,17 @@
             clearTimeout(candidateTimeoutTimer);
             candidateTimeoutTimer = null;
         }
+
+        // 次語へのキー漏洩防止のため即座にクリア・無効化
+        inputArea.value = '';
         inputArea.disabled = true;
+
         if (nextSentenceTimer) {
             clearTimeout(nextSentenceTimer);
             nextSentenceTimer = null;
         }
+
+        const matchKind = matchType === 'short_tab' ? ' (短縮形Tabスキップ)' : (matchType === 'full' ? ' (全文一致)' : ` (${matchType})`);
 
         if (isEndOfLesson) {
             const nextItem = currentQueue[currentIndex + 1];
@@ -3678,34 +3694,38 @@
             nextSentenceTimer = setTimeout(() => {
                 nextSentenceTimer = null;
                 currentIndex++;
-                inputArea.disabled = false;
-                inputArea.focus();
                 statusDisplay.className = '';
                 loadWord();
+                inputArea.disabled = false;
+                inputArea.focus();
             }, 1200);
         } else {
             statusDisplay.innerText = 'Correct! Next...';
             statusDisplay.className = 'correct';
-            logEvent('SUCCESS', `正解！ [${currentIndex + 1}/${currentQueue.length}] "${matchedWord}" → 次へ (600ms後)`);
+            logEvent('SUCCESS', `正解！ [${currentIndex + 1}/${currentQueue.length}] "${matchedWord}"${matchKind} → 次へ (600ms後)`);
             nextSentenceTimer = setTimeout(() => {
                 nextSentenceTimer = null;
                 currentIndex++;
-                inputArea.disabled = false;
-                inputArea.focus();
                 statusDisplay.className = '';
                 loadWord();
+                inputArea.disabled = false;
+                inputArea.focus();
             }, 600);
         }
     }
 
     // 入力監視リスナー
     inputArea.addEventListener('input', () => {
-        if (!currentQueue[currentIndex]) return;
+        if (isTransitioning || !currentQueue[currentIndex]) {
+            if (isTransitioning) inputArea.value = '';
+            return;
+        }
 
         const currentItem = currentQueue[currentIndex];
         const userInput = inputArea.value;
         const cands = currentItem.typing_candidates && currentItem.typing_candidates.length > 0 ? currentItem.typing_candidates : [currentItem.word];
         const displayWord = currentItem.toc_display || currentItem.word;
+        const isCompound = displayWord.includes(',') || cands.length > 1;
 
         renderEnglishText(userInput);
 
@@ -3714,31 +3734,30 @@
             candidateTimeoutTimer = null;
         }
 
-        // 判定候補一覧（原文表示、個別候補、カンマなし併記）
-        const acceptedTargets = [...cands, displayWord, displayWord.replace(/,/g, '')];
+        // 判定対象:
+        // 略語併記等の連なり出題（def, define 等）では、表示形（カンマあり "def, define" / カンマなし "def define"）の完全一致のみを主ゴールとする。
+        // 単一語（import 等）の場合は cands / displayWord。
+        const acceptedTargets = isCompound
+            ? [displayWord, displayWord.replace(/,/g, '')]
+            : [...cands, displayWord];
 
         // 1. 完全一致チェック
         const exactMatch = acceptedTargets.find(t => t.toLowerCase() === userInput.trim().toLowerCase());
         if (exactMatch) {
-            // より長い候補が存在するか確認（例: del に対する delete）
-            const longerCand = cands.find(c => c.length > exactMatch.length && c.toLowerCase().startsWith(userInput.toLowerCase()));
-            if (longerCand) {
-                // 長い候補もあるため、500ms待機またはEnterで確定
-                statusDisplay.innerText = `Matched "${exactMatch}"! (Space/Enter で即確定、または続けて入力)`;
-                statusDisplay.className = 'correct';
-                candidateTimeoutTimer = setTimeout(() => {
-                    handleCorrectMatch(exactMatch);
-                }, 500);
-                return;
-            }
-            handleCorrectMatch(exactMatch);
+            handleCorrectMatch(exactMatch, 'full');
             return;
         }
 
         // 2. 前方一致チェック
-        const hasPrefix = acceptedTargets.some(t => t.toLowerCase().startsWith(userInput.toLowerCase()));
+        // 連なり出題では acceptedTargets への前方一致を優先し、さらに短縮形Tabスキップを狙う入力も考慮
+        const prefixTargets = isCompound ? [...acceptedTargets, ...cands] : acceptedTargets;
+        const hasPrefix = prefixTargets.some(t => t.toLowerCase().startsWith(userInput.toLowerCase()));
         if (hasPrefix) {
-            statusDisplay.innerText = 'Typing...';
+            if (isCompound && cands.some(c => c.toLowerCase() === userInput.trim().toLowerCase())) {
+                statusDisplay.innerText = 'Typing... (最後まで入力、または Tab で短縮確定)';
+            } else {
+                statusDisplay.innerText = 'Typing...';
+            }
             statusDisplay.className = '';
         } else {
             statusDisplay.innerText = 'Oops! 綴りを確認してください';
@@ -3750,35 +3769,53 @@
         }
     });
 
-    // Enter / Space キー操作補助
+    // Enter / Space / Tab キー操作補助
     inputArea.addEventListener('keydown', (e) => {
-        if (!currentQueue[currentIndex]) return;
+        if (isTransitioning || !currentQueue[currentIndex]) {
+            if (isTransitioning) e.preventDefault();
+            return;
+        }
         const currentItem = currentQueue[currentIndex];
         const userInput = inputArea.value.trim();
         const cands = currentItem.typing_candidates && currentItem.typing_candidates.length > 0 ? currentItem.typing_candidates : [currentItem.word];
         const displayWord = currentItem.toc_display || currentItem.word;
-        const acceptedTargets = [...cands, displayWord, displayWord.replace(/,/g, '')];
+        const isCompound = displayWord.includes(',') || cands.length > 1;
 
-        if (e.key === 'Enter') {
+        if (e.key === 'Tab') {
+            // 方針B: 略語併記等の連なり出題で、短縮形入力後に明示的に Tab キーを押した場合は即確定スキップ
+            if (isCompound && userInput) {
+                const shortMatch = cands.find(c => c.toLowerCase() === userInput.toLowerCase());
+                if (shortMatch) {
+                    e.preventDefault();
+                    handleCorrectMatch(shortMatch, 'short_tab');
+                    return;
+                }
+            }
+        } else if (e.key === 'Enter') {
             if (!userInput) {
                 // 未入力Enter時は音声再再生
                 e.preventDefault();
                 replayCurrentVoice();
                 return;
             }
+            const acceptedTargets = isCompound
+                ? [displayWord, displayWord.replace(/,/g, '')]
+                : [...cands, displayWord];
             const match = acceptedTargets.find(t => t.toLowerCase() === userInput.toLowerCase());
             if (match) {
                 e.preventDefault();
-                handleCorrectMatch(match);
+                handleCorrectMatch(match, 'enter');
                 return;
             }
         } else if (e.key === ' ') {
-            // スペースキー押下時に完全一致していれば即確定
-            const match = acceptedTargets.find(t => t.toLowerCase() === userInput.toLowerCase());
-            if (match) {
-                e.preventDefault();
-                handleCorrectMatch(match);
-                return;
+            // 単一語出題のみ、末尾スペースでの完全一致確定を許可（連なり出題では単語間スペースを入力するため確定させない）
+            if (!isCompound && userInput) {
+                const match = cands.find(t => t.toLowerCase() === userInput.toLowerCase());
+                if (match) {
+                    e.preventDefault();
+                    handleCorrectMatch(match, 'space');
+                    return;
+                }
             }
         }
     });
