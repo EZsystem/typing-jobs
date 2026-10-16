@@ -1,0 +1,3796 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>プログラミングの英単語タイピング (Programming Vocabulary Typing - 150 Words)</title>
+<style>
+    body {
+        font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'BIZ UDPGothic', Meiryo, sans-serif;
+        text-align: center;
+        padding: 30px;
+        background-color: #f0f2f5;
+        color: #333;
+    }
+    h1 {
+        color: #2c3e50;
+        font-size: 1.6em;
+        margin-bottom: 6px;
+        letter-spacing: 0.5px;
+    }
+    .subtitle {
+        font-size: 0.88em;
+        color: #6c757d;
+        margin-bottom: 18px;
+    }
+    
+    #container {
+        background: white;
+        max-width: 840px;
+        margin: 0 auto;
+        padding: 32px 30px;
+        border-radius: 12px;
+        box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+    }
+    
+    .controls {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 20px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    select {
+        padding: 10px 12px;
+        font-size: 1em;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+        background: #fff;
+        color: #333;
+        outline: none;
+        transition: border-color 0.2s;
+    }
+    select:focus {
+        border-color: #007bff;
+    }
+    #lesson-select {
+        flex: 2;
+        min-width: 280px;
+    }
+    #speed-select {
+        flex: 1;
+        min-width: 130px;
+    }
+
+    /* --- 単語表示エリア --- */
+    #lesson-badge {
+        font-size: 0.92em;
+        font-weight: bold;
+        color: #007bff;
+        margin-bottom: 8px;
+        min-height: 1.4em;
+    }
+    /* 1. 意味 */
+    #meaning-display {
+        font-size: 1.25em;
+        color: #222;
+        margin-bottom: 6px;
+        min-height: 1.5em;
+        line-height: 1.5;
+        font-weight: bold;
+    }
+    
+    /* 2. カタカナ */
+    #katakana-display {
+        font-size: 0.95em;
+        color: #666;
+        margin-bottom: 4px;
+        min-height: 1.3em;
+        letter-spacing: 0.5px;
+    }
+
+    /* 3. 発音記号 (IPA) */
+    #ipa-display {
+        font-size: 1.0em;
+        color: #007bff;
+        margin-bottom: 18px;
+        font-family: "Lucida Sans Unicode", "Arial Unicode MS", "Segoe UI", sans-serif;
+        min-height: 1.3em;
+    }
+
+    /* 4. 打つ英単語 (判定用装飾) */
+    #word-display {
+        font-size: 1.85em;
+        font-weight: bold;
+        margin-bottom: 22px;
+        letter-spacing: 1px;
+        min-height: 1.5em;
+        color: #bbb;
+        word-wrap: break-word;
+        white-space: pre-wrap;
+    }
+
+    /* 文字単位の判定スタイル */
+    .char-correct { color: #222; }
+    .char-wrong { color: #dc3545; background-color: #f8d7da; border-radius: 3px; padding: 0 1px; }
+    .char-pending { color: #aaa; }
+    /* スペース文字の可視化補助（未入力時） */
+    .space-char { border-bottom: 1.5px dashed #bbb; display: inline-block; min-width: 0.5em; }
+    .space-correct { border-bottom: 1.5px solid #222; display: inline-block; min-width: 0.5em; }
+    .space-wrong { border-bottom: 1.5px solid #dc3545; background-color: #f8d7da; display: inline-block; min-width: 0.5em; }
+    
+    #input-area {
+        width: 88%;
+        max-width: 600px;
+        padding: 14px 18px;
+        font-size: 1.35em;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        outline: none;
+        transition: border-color 0.25s, box-shadow 0.25s;
+        text-align: center;
+        letter-spacing: 0.5px;
+    }
+    #input-area:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
+    }
+    
+    #status {
+        margin-top: 18px;
+        font-weight: bold;
+        color: #007bff;
+        min-height: 1.5em;
+        font-size: 1.05em;
+    }
+    #status.correct {
+        color: #28a745;
+    }
+    #status.incorrect {
+        color: #dc3545;
+    }
+    
+    .btn-group {
+        margin-top: 18px;
+    }
+    button.main-btn {
+        padding: 12px 30px;
+        font-size: 1.1em;
+        font-weight: bold;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background 0.2s, transform 0.1s;
+    }
+    button.main-btn:hover {
+        background-color: #0056b3;
+    }
+    button.main-btn:active {
+        transform: translateY(1px);
+    }
+    
+    .progress-bar {
+        height: 8px;
+        background: #eee;
+        width: 100%;
+        margin-top: 22px;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+    .progress-fill {
+        height: 100%;
+        background: #28a745;
+        width: 0%;
+        transition: width 0.3s;
+    }
+
+    /* 進行・診断ログパネル */
+    #log-wrapper {
+        margin-top: 25px;
+        text-align: left;
+        border-top: 1px solid #eee;
+        padding-top: 15px;
+    }
+    .log-btn {
+        padding: 4px 10px;
+        font-size: 0.8em;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: opacity 0.2s;
+    }
+    .log-btn:hover { opacity: 0.85; }
+    #log-box {
+        background: #1e1e1e;
+        color: #d4d4d4;
+        font-family: Consolas, 'Courier New', monospace;
+        font-size: 0.82em;
+        padding: 10px 12px;
+        border-radius: 6px;
+        height: 140px;
+        overflow-y: auto;
+        line-height: 1.45;
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+    }
+</style>
+</head>
+<body>
+
+<div id="container">
+    <h1>プログラミングの英単語 タイピング</h1>
+    <div class="subtitle">『コードの気持ちがわかる! プログラミングの英単語』初心者に必須の150語（13章構成 · 音声・発音記号・カタカナ付き）</div>
+    
+    <div class="controls">
+        <select id="lesson-select">
+            <option value="all">★ 全語を通して実行 (All 150 Words)</option>
+        </select>
+
+        <select id="speed-select">
+            <option value="0.5">速度: 0.5 (Slow)</option>
+            <option value="0.7" selected>速度: 0.7</option>
+            <option value="0.8">速度: 0.8</option>
+            <option value="1.0">速度: 1.0 (Normal)</option>
+            <option value="1.2">速度: 1.2</option>
+            <option value="1.5">速度: 1.5</option>
+        </select>
+    </div>
+
+    <hr style="border: 0; border-top: 1px solid #eee; margin: 18px 0;">
+
+    <div id="lesson-badge"></div>
+    <div id="meaning-display">レッスンを選択してスタートしてください</div>
+    <div id="katakana-display"></div>
+    <div id="ipa-display"></div>
+    <div id="word-display">Programming Vocabulary</div>
+    
+    <input type="text" id="input-area" placeholder="Type here..." disabled autocomplete="off">
+    
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+    <div id="status"></div>
+    
+    <div class="btn-group">
+        <button id="start-btn" class="main-btn" onclick="startPractice()">スタート (Start)</button>
+    </div>
+
+    <!-- 進行・診断ログ表示パネル -->
+    <div id="log-wrapper">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <span style="font-weight: bold; font-size: 0.9em; color: #555;">📋 進行・診断ログ (Realtime Log)</span>
+            <div style="display: flex; gap: 6px;">
+                <button class="log-btn" style="background-color: #6c757d;" onclick="replayCurrentVoice()">🔊 音声再読込</button>
+                <button class="log-btn" style="background-color: #17a2b8;" onclick="copyLogs()">📋 コピー</button>
+                <button class="log-btn" style="background-color: #dc3545;" onclick="clearLogs()">🗑 消去</button>
+                <button class="log-btn" style="background-color: #007bff;" onclick="toggleLogView()">表示/非表示</button>
+            </div>
+        </div>
+        <div id="log-box"></div>
+    </div>
+</div>
+
+<script>
+    /* =====================================================================
+       プログラミングの英単語タイピング - アプリケーション定義
+       - 正本: practice/data/words_programming_150.json
+       - 150語・13章構成（『コードの気持ちがわかる! プログラミングの英単語』）
+       - file:// 直開き環境と Web サーバー環境の双方で 100% 動作するよう、
+         内蔵フォールバックデータと fetch 自動更新を併用。
+       ===================================================================== */
+
+    // 1. レッスン定義 (13章・150語)
+    let LESSON_DEFINITIONS = [
+  {
+    "id": "lesson-1",
+    "chapterId": "ch01",
+    "title": "第1章 基本中の基本単語",
+    "nos": [
+      1,
+      17
+    ],
+    "wordCount": 17,
+    "wordIds": [
+      "create",
+      "get",
+      "find",
+      "listen",
+      "put",
+      "is",
+      "have_has",
+      "add",
+      "del_delete",
+      "success",
+      "error",
+      "push",
+      "pull",
+      "return",
+      "default",
+      "interface",
+      "commit"
+    ]
+  },
+  {
+    "id": "lesson-2",
+    "chapterId": "ch02",
+    "title": "第2章 モノの集まりに関わる単語",
+    "nos": [
+      18,
+      29
+    ],
+    "wordCount": 12,
+    "wordIds": [
+      "contain",
+      "include",
+      "length",
+      "size",
+      "range",
+      "join",
+      "union",
+      "merge",
+      "concat",
+      "append",
+      "rel_relation",
+      "association"
+    ]
+  },
+  {
+    "id": "lesson-3",
+    "chapterId": "ch03",
+    "title": "第3章 生産や前進を表わす単語",
+    "nos": [
+      30,
+      43
+    ],
+    "wordCount": 14,
+    "wordIds": [
+      "gen_generate",
+      "fetch",
+      "factory",
+      "construct",
+      "compose",
+      "skip",
+      "continue",
+      "next",
+      "dev_development",
+      "progress",
+      "complete",
+      "launch",
+      "implement",
+      "sanitise"
+    ]
+  },
+  {
+    "id": "lesson-4",
+    "chapterId": "ch04",
+    "title": "第4章 終了や停滞に関わる単語",
+    "nos": [
+      44,
+      50
+    ],
+    "wordCount": 7,
+    "wordIds": [
+      "blank",
+      "remove",
+      "quit",
+      "exit",
+      "conflict",
+      "fault",
+      "close"
+    ]
+  },
+  {
+    "id": "lesson-5",
+    "chapterId": "ch05",
+    "title": "第5章 データやファイルに関わる単語",
+    "nos": [
+      51,
+      67
+    ],
+    "wordCount": 17,
+    "wordIds": [
+      "stream",
+      "import",
+      "migrate",
+      "bin_binary",
+      "format",
+      "store",
+      "asset",
+      "dump",
+      "result",
+      "row",
+      "col_column",
+      "archive",
+      "attribute",
+      "analyze",
+      "alter",
+      "conv_convert",
+      "parse"
+    ]
+  },
+  {
+    "id": "lesson-6",
+    "chapterId": "ch06",
+    "title": "第6章 型に関わる単語",
+    "nos": [
+      68,
+      77
+    ],
+    "wordCount": 10,
+    "wordIds": [
+      "string",
+      "char",
+      "varchar",
+      "int_integer",
+      "float",
+      "decimal",
+      "set",
+      "array",
+      "hash",
+      "map"
+    ]
+  },
+  {
+    "id": "lesson-7",
+    "chapterId": "ch07",
+    "title": "第7章 定義に関わる単語",
+    "nos": [
+      78,
+      86
+    ],
+    "wordCount": 9,
+    "wordIds": [
+      "func_function",
+      "def_define",
+      "strict",
+      "local",
+      "global",
+      "scope",
+      "refer",
+      "annotate",
+      "schema"
+    ]
+  },
+  {
+    "id": "lesson-8",
+    "chapterId": "ch08",
+    "title": "第8章 状態や状況を表す単語",
+    "nos": [
+      87,
+      102
+    ],
+    "wordCount": 16,
+    "wordIds": [
+      "env_environment",
+      "status",
+      "init_initialize",
+      "layout",
+      "offset",
+      "locale",
+      "feature",
+      "trait",
+      "context",
+      "current",
+      "async",
+      "tmp_temporary",
+      "state",
+      "prop_property",
+      "finally",
+      "entry"
+    ]
+  },
+  {
+    "id": "lesson-9",
+    "chapterId": "ch09",
+    "title": "第9章 権限や要求に関わる単語",
+    "nos": [
+      103,
+      112
+    ],
+    "wordCount": 10,
+    "wordIds": [
+      "allow",
+      "permit",
+      "auth_authorization",
+      "private",
+      "public",
+      "meta",
+      "require",
+      "depend",
+      "request",
+      "invalid"
+    ]
+  },
+  {
+    "id": "lesson-10",
+    "chapterId": "ch10",
+    "title": "第10章 データの受け渡しや伝達に関わる単語",
+    "nos": [
+      113,
+      124
+    ],
+    "wordCount": 12,
+    "wordIds": [
+      "flush",
+      "dispatch",
+      "render",
+      "submit",
+      "yield",
+      "assign",
+      "alert",
+      "exception",
+      "assert",
+      "send",
+      "path",
+      "node"
+    ]
+  },
+  {
+    "id": "lesson-11",
+    "chapterId": "ch11",
+    "title": "第11章 抽出や限定を表わす単語",
+    "nos": [
+      125,
+      132
+    ],
+    "wordCount": 8,
+    "wordIds": [
+      "ignore",
+      "except",
+      "uniq_unique",
+      "filter",
+      "trim",
+      "select",
+      "limit",
+      "match"
+    ]
+  },
+  {
+    "id": "lesson-12",
+    "chapterId": "ch12",
+    "title": "第12章 裏で動いてる雰囲気の単語",
+    "nos": [
+      133,
+      138
+    ],
+    "wordCount": 6,
+    "wordIds": [
+      "proc_process",
+      "task",
+      "service",
+      "exe_execute",
+      "kill",
+      "shell"
+    ]
+  },
+  {
+    "id": "lesson-13",
+    "chapterId": "ch13",
+    "title": "第13章 ログによく表われる単語",
+    "nos": [
+      139,
+      150
+    ],
+    "wordCount": 12,
+    "wordIds": [
+      "warning",
+      "abort",
+      "failure",
+      "var_variable",
+      "load",
+      "invoke",
+      "interrupt",
+      "exist",
+      "compress",
+      "identify",
+      "deprecated",
+      "halt"
+    ]
+  }
+];
+
+    // 2. 内蔵フォールバック単語データ (150語・完全内蔵)
+    const DEFAULT_WORDS_DATA = {
+  "version": 1,
+  "updated": "2026-10-16",
+  "author": "antigravity",
+  "status": "official",
+  "title": "プログラミングの英単語",
+  "description": "『コードの気持ちがわかる! プログラミングの英単語』150語・13章。初心者に必須の150語。",
+  "source_book": "コードの気持ちがわかる! プログラミングの英単語（初心者に必須の150語）",
+  "total": 150,
+  "lessons": [
+    {
+      "id": "lesson-1",
+      "chapterId": "ch01",
+      "title": "第1章 基本中の基本単語",
+      "nos": [
+        1,
+        17
+      ],
+      "wordCount": 17,
+      "wordIds": [
+        "create",
+        "get",
+        "find",
+        "listen",
+        "put",
+        "is",
+        "have_has",
+        "add",
+        "del_delete",
+        "success",
+        "error",
+        "push",
+        "pull",
+        "return",
+        "default",
+        "interface",
+        "commit"
+      ]
+    },
+    {
+      "id": "lesson-2",
+      "chapterId": "ch02",
+      "title": "第2章 モノの集まりに関わる単語",
+      "nos": [
+        18,
+        29
+      ],
+      "wordCount": 12,
+      "wordIds": [
+        "contain",
+        "include",
+        "length",
+        "size",
+        "range",
+        "join",
+        "union",
+        "merge",
+        "concat",
+        "append",
+        "rel_relation",
+        "association"
+      ]
+    },
+    {
+      "id": "lesson-3",
+      "chapterId": "ch03",
+      "title": "第3章 生産や前進を表わす単語",
+      "nos": [
+        30,
+        43
+      ],
+      "wordCount": 14,
+      "wordIds": [
+        "gen_generate",
+        "fetch",
+        "factory",
+        "construct",
+        "compose",
+        "skip",
+        "continue",
+        "next",
+        "dev_development",
+        "progress",
+        "complete",
+        "launch",
+        "implement",
+        "sanitise"
+      ]
+    },
+    {
+      "id": "lesson-4",
+      "chapterId": "ch04",
+      "title": "第4章 終了や停滞に関わる単語",
+      "nos": [
+        44,
+        50
+      ],
+      "wordCount": 7,
+      "wordIds": [
+        "blank",
+        "remove",
+        "quit",
+        "exit",
+        "conflict",
+        "fault",
+        "close"
+      ]
+    },
+    {
+      "id": "lesson-5",
+      "chapterId": "ch05",
+      "title": "第5章 データやファイルに関わる単語",
+      "nos": [
+        51,
+        67
+      ],
+      "wordCount": 17,
+      "wordIds": [
+        "stream",
+        "import",
+        "migrate",
+        "bin_binary",
+        "format",
+        "store",
+        "asset",
+        "dump",
+        "result",
+        "row",
+        "col_column",
+        "archive",
+        "attribute",
+        "analyze",
+        "alter",
+        "conv_convert",
+        "parse"
+      ]
+    },
+    {
+      "id": "lesson-6",
+      "chapterId": "ch06",
+      "title": "第6章 型に関わる単語",
+      "nos": [
+        68,
+        77
+      ],
+      "wordCount": 10,
+      "wordIds": [
+        "string",
+        "char",
+        "varchar",
+        "int_integer",
+        "float",
+        "decimal",
+        "set",
+        "array",
+        "hash",
+        "map"
+      ]
+    },
+    {
+      "id": "lesson-7",
+      "chapterId": "ch07",
+      "title": "第7章 定義に関わる単語",
+      "nos": [
+        78,
+        86
+      ],
+      "wordCount": 9,
+      "wordIds": [
+        "func_function",
+        "def_define",
+        "strict",
+        "local",
+        "global",
+        "scope",
+        "refer",
+        "annotate",
+        "schema"
+      ]
+    },
+    {
+      "id": "lesson-8",
+      "chapterId": "ch08",
+      "title": "第8章 状態や状況を表す単語",
+      "nos": [
+        87,
+        102
+      ],
+      "wordCount": 16,
+      "wordIds": [
+        "env_environment",
+        "status",
+        "init_initialize",
+        "layout",
+        "offset",
+        "locale",
+        "feature",
+        "trait",
+        "context",
+        "current",
+        "async",
+        "tmp_temporary",
+        "state",
+        "prop_property",
+        "finally",
+        "entry"
+      ]
+    },
+    {
+      "id": "lesson-9",
+      "chapterId": "ch09",
+      "title": "第9章 権限や要求に関わる単語",
+      "nos": [
+        103,
+        112
+      ],
+      "wordCount": 10,
+      "wordIds": [
+        "allow",
+        "permit",
+        "auth_authorization",
+        "private",
+        "public",
+        "meta",
+        "require",
+        "depend",
+        "request",
+        "invalid"
+      ]
+    },
+    {
+      "id": "lesson-10",
+      "chapterId": "ch10",
+      "title": "第10章 データの受け渡しや伝達に関わる単語",
+      "nos": [
+        113,
+        124
+      ],
+      "wordCount": 12,
+      "wordIds": [
+        "flush",
+        "dispatch",
+        "render",
+        "submit",
+        "yield",
+        "assign",
+        "alert",
+        "exception",
+        "assert",
+        "send",
+        "path",
+        "node"
+      ]
+    },
+    {
+      "id": "lesson-11",
+      "chapterId": "ch11",
+      "title": "第11章 抽出や限定を表わす単語",
+      "nos": [
+        125,
+        132
+      ],
+      "wordCount": 8,
+      "wordIds": [
+        "ignore",
+        "except",
+        "uniq_unique",
+        "filter",
+        "trim",
+        "select",
+        "limit",
+        "match"
+      ]
+    },
+    {
+      "id": "lesson-12",
+      "chapterId": "ch12",
+      "title": "第12章 裏で動いてる雰囲気の単語",
+      "nos": [
+        133,
+        138
+      ],
+      "wordCount": 6,
+      "wordIds": [
+        "proc_process",
+        "task",
+        "service",
+        "exe_execute",
+        "kill",
+        "shell"
+      ]
+    },
+    {
+      "id": "lesson-13",
+      "chapterId": "ch13",
+      "title": "第13章 ログによく表われる単語",
+      "nos": [
+        139,
+        150
+      ],
+      "wordCount": 12,
+      "wordIds": [
+        "warning",
+        "abort",
+        "failure",
+        "var_variable",
+        "load",
+        "invoke",
+        "interrupt",
+        "exist",
+        "compress",
+        "identify",
+        "deprecated",
+        "halt"
+      ]
+    }
+  ],
+  "words": [
+    {
+      "no": 1,
+      "id": "create",
+      "word": "create",
+      "toc_display": "create",
+      "typing_candidates": [
+        "create"
+      ],
+      "meaning": "作成する",
+      "katakana": "クリエイト",
+      "ipa": "/kriˈeɪt/",
+      "chapter": "ch01",
+      "category": "基本中の基本単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 2,
+      "id": "get",
+      "word": "get",
+      "toc_display": "get",
+      "typing_candidates": [
+        "get"
+      ],
+      "meaning": "取得する",
+      "katakana": "ゲット",
+      "ipa": "/ɡɛt/",
+      "chapter": "ch01",
+      "category": "基本中の基本単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 3,
+      "id": "find",
+      "word": "find",
+      "toc_display": "find",
+      "typing_candidates": [
+        "find"
+      ],
+      "meaning": "検索する・見つける",
+      "katakana": "ファインド",
+      "ipa": "/faɪnd/",
+      "chapter": "ch01",
+      "category": "基本中の基本単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 4,
+      "id": "listen",
+      "word": "listen",
+      "toc_display": "listen",
+      "typing_candidates": [
+        "listen"
+      ],
+      "meaning": "待機・監視する",
+      "katakana": "リッスン",
+      "ipa": "/ˈlɪs.ən/",
+      "chapter": "ch01",
+      "category": "基本中の基本単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 5,
+      "id": "put",
+      "word": "put",
+      "toc_display": "put",
+      "typing_candidates": [
+        "put"
+      ],
+      "meaning": "格納・配置する",
+      "katakana": "プット",
+      "ipa": "/pʊt/",
+      "chapter": "ch01",
+      "category": "基本中の基本単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 6,
+      "id": "is",
+      "word": "is",
+      "toc_display": "is",
+      "typing_candidates": [
+        "is"
+      ],
+      "meaning": "〜である（真偽判定）",
+      "katakana": "イズ",
+      "ipa": "/ɪz/",
+      "chapter": "ch01",
+      "category": "基本中の基本単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 7,
+      "id": "have_has",
+      "word": "have, has",
+      "toc_display": "have, has",
+      "typing_candidates": [
+        "have",
+        "has"
+      ],
+      "meaning": "保持している（真偽判定）",
+      "katakana": "ハヴ / ハズ",
+      "ipa": "/hæv/ , /hæz/",
+      "chapter": "ch01",
+      "category": "基本中の基本単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 8,
+      "id": "add",
+      "word": "add",
+      "toc_display": "add",
+      "typing_candidates": [
+        "add"
+      ],
+      "meaning": "追加する",
+      "katakana": "アド",
+      "ipa": "/æd/",
+      "chapter": "ch01",
+      "category": "基本中の基本単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 9,
+      "id": "del_delete",
+      "word": "del, delete",
+      "toc_display": "del, delete",
+      "typing_candidates": [
+        "del",
+        "delete"
+      ],
+      "meaning": "削除する",
+      "katakana": "デル / デリート",
+      "ipa": "/dɛl/ , /dɪˈliːt/",
+      "chapter": "ch01",
+      "category": "基本中の基本単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 10,
+      "id": "success",
+      "word": "success",
+      "toc_display": "success",
+      "typing_candidates": [
+        "success"
+      ],
+      "meaning": "成功",
+      "katakana": "サクセス",
+      "ipa": "/səkˈsɛs/",
+      "chapter": "ch01",
+      "category": "基本中の基本単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 11,
+      "id": "error",
+      "word": "error",
+      "toc_display": "error",
+      "typing_candidates": [
+        "error"
+      ],
+      "meaning": "エラー・障害",
+      "katakana": "エラー",
+      "ipa": "/ˈɛr.ər/",
+      "chapter": "ch01",
+      "category": "基本中の基本単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 12,
+      "id": "push",
+      "word": "push",
+      "toc_display": "push",
+      "typing_candidates": [
+        "push"
+      ],
+      "meaning": "送信・追加する",
+      "katakana": "プッシュ",
+      "ipa": "/pʊʃ/",
+      "chapter": "ch01",
+      "category": "基本中の基本単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 13,
+      "id": "pull",
+      "word": "pull",
+      "toc_display": "pull",
+      "typing_candidates": [
+        "pull"
+      ],
+      "meaning": "受信・取得する",
+      "katakana": "プル",
+      "ipa": "/pʊl/",
+      "chapter": "ch01",
+      "category": "基本中の基本単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 14,
+      "id": "return",
+      "word": "return",
+      "toc_display": "return",
+      "typing_candidates": [
+        "return"
+      ],
+      "meaning": "返す・戻り値",
+      "katakana": "リターン",
+      "ipa": "/rɪˈtɜːrn/",
+      "chapter": "ch01",
+      "category": "基本中の基本単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 15,
+      "id": "default",
+      "word": "default",
+      "toc_display": "default",
+      "typing_candidates": [
+        "default"
+      ],
+      "meaning": "既定値・デフォルト",
+      "katakana": "デフォルト",
+      "ipa": "/dɪˈfɔːlt/",
+      "chapter": "ch01",
+      "category": "基本中の基本単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 16,
+      "id": "interface",
+      "word": "interface",
+      "toc_display": "interface",
+      "typing_candidates": [
+        "interface"
+      ],
+      "meaning": "境界面・インターフェース",
+      "katakana": "インターフェース",
+      "ipa": "/ˈɪn.tər.feɪs/",
+      "chapter": "ch01",
+      "category": "基本中の基本単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 17,
+      "id": "commit",
+      "word": "commit",
+      "toc_display": "commit",
+      "typing_candidates": [
+        "commit"
+      ],
+      "meaning": "確定・記録する",
+      "katakana": "コミット",
+      "ipa": "/kəˈmɪt/",
+      "chapter": "ch01",
+      "category": "基本中の基本単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 18,
+      "id": "contain",
+      "word": "contain",
+      "toc_display": "contain",
+      "typing_candidates": [
+        "contain"
+      ],
+      "meaning": "含む",
+      "katakana": "コンテイン",
+      "ipa": "/kənˈteɪn/",
+      "chapter": "ch02",
+      "category": "モノの集まりに関わる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 19,
+      "id": "include",
+      "word": "include",
+      "toc_display": "include",
+      "typing_candidates": [
+        "include"
+      ],
+      "meaning": "包含する",
+      "katakana": "インクルード",
+      "ipa": "/ɪnˈkluːd/",
+      "chapter": "ch02",
+      "category": "モノの集まりに関わる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 20,
+      "id": "length",
+      "word": "length",
+      "toc_display": "length",
+      "typing_candidates": [
+        "length"
+      ],
+      "meaning": "長さ・要素数",
+      "katakana": "レングス",
+      "ipa": "/lɛŋkθ/",
+      "chapter": "ch02",
+      "category": "モノの集まりに関わる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 21,
+      "id": "size",
+      "word": "size",
+      "toc_display": "size",
+      "typing_candidates": [
+        "size"
+      ],
+      "meaning": "サイズ・大きさ",
+      "katakana": "サイズ",
+      "ipa": "/saɪz/",
+      "chapter": "ch02",
+      "category": "モノの集まりに関わる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 22,
+      "id": "range",
+      "word": "range",
+      "toc_display": "range",
+      "typing_candidates": [
+        "range"
+      ],
+      "meaning": "範囲",
+      "katakana": "レンジ",
+      "ipa": "/reɪndʒ/",
+      "chapter": "ch02",
+      "category": "モノの集まりに関わる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 23,
+      "id": "join",
+      "word": "join",
+      "toc_display": "join",
+      "typing_candidates": [
+        "join"
+      ],
+      "meaning": "結合する",
+      "katakana": "ジョイン",
+      "ipa": "/dʒɔɪn/",
+      "chapter": "ch02",
+      "category": "モノの集まりに関わる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 24,
+      "id": "union",
+      "word": "union",
+      "toc_display": "union",
+      "typing_candidates": [
+        "union"
+      ],
+      "meaning": "和集合・統合",
+      "katakana": "ユニオン",
+      "ipa": "/ˈjuː.njən/",
+      "chapter": "ch02",
+      "category": "モノの集まりに関わる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 25,
+      "id": "merge",
+      "word": "merge",
+      "toc_display": "merge",
+      "typing_candidates": [
+        "merge"
+      ],
+      "meaning": "併合・マージする",
+      "katakana": "マージ",
+      "ipa": "/mɜːrdʒ/",
+      "chapter": "ch02",
+      "category": "モノの集まりに関わる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 26,
+      "id": "concat",
+      "word": "concat",
+      "toc_display": "concat",
+      "typing_candidates": [
+        "concat"
+      ],
+      "meaning": "連結する",
+      "katakana": "コンカット",
+      "ipa": "/kənˈkæt/",
+      "chapter": "ch02",
+      "category": "モノの集まりに関わる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 27,
+      "id": "append",
+      "word": "append",
+      "toc_display": "append",
+      "typing_candidates": [
+        "append"
+      ],
+      "meaning": "末尾に追加する",
+      "katakana": "アペンド",
+      "ipa": "/əˈpɛnd/",
+      "chapter": "ch02",
+      "category": "モノの集まりに関わる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 28,
+      "id": "rel_relation",
+      "word": "rel, relation",
+      "toc_display": "rel, relation",
+      "typing_candidates": [
+        "rel",
+        "relation"
+      ],
+      "meaning": "関係・関連",
+      "katakana": "レル / リレーション",
+      "ipa": "/rɛl/ , /rɪˈleɪ.ʃən/",
+      "chapter": "ch02",
+      "category": "モノの集まりに関わる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 29,
+      "id": "association",
+      "word": "association",
+      "toc_display": "association",
+      "typing_candidates": [
+        "association"
+      ],
+      "meaning": "関連付け・結合",
+      "katakana": "アソシエーション",
+      "ipa": "/əˌsoʊ.siˈeɪ.ʃən/",
+      "chapter": "ch02",
+      "category": "モノの集まりに関わる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 30,
+      "id": "gen_generate",
+      "word": "gen, generate",
+      "toc_display": "gen, generate",
+      "typing_candidates": [
+        "gen",
+        "generate"
+      ],
+      "meaning": "生成する",
+      "katakana": "ジェン / ジェネレート",
+      "ipa": "/dʒɛn/ , /ˈdʒɛn.ə.reɪt/",
+      "chapter": "ch03",
+      "category": "生産や前進を表わす単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 31,
+      "id": "fetch",
+      "word": "fetch",
+      "toc_display": "fetch",
+      "typing_candidates": [
+        "fetch"
+      ],
+      "meaning": "取得・取ってくる",
+      "katakana": "フェッチ",
+      "ipa": "/fɛtʃ/",
+      "chapter": "ch03",
+      "category": "生産や前進を表わす単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 32,
+      "id": "factory",
+      "word": "factory",
+      "toc_display": "factory",
+      "typing_candidates": [
+        "factory"
+      ],
+      "meaning": "生成クラス・ファクトリ",
+      "katakana": "ファクトリ",
+      "ipa": "/ˈfæk.tər.i/",
+      "chapter": "ch03",
+      "category": "生産や前進を表わす単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 33,
+      "id": "construct",
+      "word": "construct",
+      "toc_display": "construct",
+      "typing_candidates": [
+        "construct"
+      ],
+      "meaning": "構築・生成する",
+      "katakana": "コンストラクト",
+      "ipa": "/kənˈstrʌkt/",
+      "chapter": "ch03",
+      "category": "生産や前進を表わす単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 34,
+      "id": "compose",
+      "word": "compose",
+      "toc_display": "compose",
+      "typing_candidates": [
+        "compose"
+      ],
+      "meaning": "組み立てる・合成する",
+      "katakana": "コンポーズ",
+      "ipa": "/kəmˈpoʊz/",
+      "chapter": "ch03",
+      "category": "生産や前進を表わす単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 35,
+      "id": "skip",
+      "word": "skip",
+      "toc_display": "skip",
+      "typing_candidates": [
+        "skip"
+      ],
+      "meaning": "スキップ・飛ばす",
+      "katakana": "スキップ",
+      "ipa": "/skɪp/",
+      "chapter": "ch03",
+      "category": "生産や前進を表わす単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 36,
+      "id": "continue",
+      "word": "continue",
+      "toc_display": "continue",
+      "typing_candidates": [
+        "continue"
+      ],
+      "meaning": "続行する",
+      "katakana": "コンティニュー",
+      "ipa": "/kənˈtɪn.juː/",
+      "chapter": "ch03",
+      "category": "生産や前進を表わす単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 37,
+      "id": "next",
+      "word": "next",
+      "toc_display": "next",
+      "typing_candidates": [
+        "next"
+      ],
+      "meaning": "次へ",
+      "katakana": "ネクスト",
+      "ipa": "/nɛkst/",
+      "chapter": "ch03",
+      "category": "生産や前進を表わす単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 38,
+      "id": "dev_development",
+      "word": "dev, development",
+      "toc_display": "dev, development",
+      "typing_candidates": [
+        "dev",
+        "development"
+      ],
+      "meaning": "開発",
+      "katakana": "デブ / デベロップメント",
+      "ipa": "/dɛv/ , /dɪˈvɛl.əp.mənt/",
+      "chapter": "ch03",
+      "category": "生産や前進を表わす単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 39,
+      "id": "progress",
+      "word": "progress",
+      "toc_display": "progress",
+      "typing_candidates": [
+        "progress"
+      ],
+      "meaning": "進捗・進行",
+      "katakana": "プログレス",
+      "ipa": "/ˈprɑː.ɡrɛs/",
+      "chapter": "ch03",
+      "category": "生産や前進を表わす単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 40,
+      "id": "complete",
+      "word": "complete",
+      "toc_display": "complete",
+      "typing_candidates": [
+        "complete"
+      ],
+      "meaning": "完了・完了する",
+      "katakana": "コンプリート",
+      "ipa": "/kəmˈpliːt/",
+      "chapter": "ch03",
+      "category": "生産や前進を表わす単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 41,
+      "id": "launch",
+      "word": "launch",
+      "toc_display": "launch",
+      "typing_candidates": [
+        "launch"
+      ],
+      "meaning": "起動・立ち上げる",
+      "katakana": "ローンチ",
+      "ipa": "/lɔːntʃ/",
+      "chapter": "ch03",
+      "category": "生産や前進を表わす単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 42,
+      "id": "implement",
+      "word": "implement",
+      "toc_display": "implement",
+      "typing_candidates": [
+        "implement"
+      ],
+      "meaning": "実装する",
+      "katakana": "インプリメント",
+      "ipa": "/ˈɪm.plə.mɛnt/",
+      "chapter": "ch03",
+      "category": "生産や前進を表わす単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 43,
+      "id": "sanitise",
+      "word": "sanitise",
+      "toc_display": "sanitise",
+      "typing_candidates": [
+        "sanitise"
+      ],
+      "meaning": "無害化・サニタイズする",
+      "katakana": "サニタイズ",
+      "ipa": "/ˈsæn.ɪ.taɪz/",
+      "chapter": "ch03",
+      "category": "生産や前進を表わす単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 44,
+      "id": "blank",
+      "word": "blank",
+      "toc_display": "blank",
+      "typing_candidates": [
+        "blank"
+      ],
+      "meaning": "空白・空文字",
+      "katakana": "ブランク",
+      "ipa": "/blæŋk/",
+      "chapter": "ch04",
+      "category": "終了や停滞に関わる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 45,
+      "id": "remove",
+      "word": "remove",
+      "toc_display": "remove",
+      "typing_candidates": [
+        "remove"
+      ],
+      "meaning": "除去・取り除く",
+      "katakana": "リムーブ",
+      "ipa": "/rɪˈmuːv/",
+      "chapter": "ch04",
+      "category": "終了や停滞に関わる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 46,
+      "id": "quit",
+      "word": "quit",
+      "toc_display": "quit",
+      "typing_candidates": [
+        "quit"
+      ],
+      "meaning": "中止・終了する",
+      "katakana": "クイット",
+      "ipa": "/kwɪt/",
+      "chapter": "ch04",
+      "category": "終了や停滞に関わる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 47,
+      "id": "exit",
+      "word": "exit",
+      "toc_display": "exit",
+      "typing_candidates": [
+        "exit"
+      ],
+      "meaning": "脱出・終了する",
+      "katakana": "エグジット",
+      "ipa": "/ˈɛɡ.zɪt/",
+      "chapter": "ch04",
+      "category": "終了や停滞に関わる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 48,
+      "id": "conflict",
+      "word": "conflict",
+      "toc_display": "conflict",
+      "typing_candidates": [
+        "conflict"
+      ],
+      "meaning": "衝突・競合",
+      "katakana": "コンフリクト",
+      "ipa": "/ˈkɑːn.flɪkt/",
+      "chapter": "ch04",
+      "category": "終了や停滞に関わる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 49,
+      "id": "fault",
+      "word": "fault",
+      "toc_display": "fault",
+      "typing_candidates": [
+        "fault"
+      ],
+      "meaning": "障害・過失",
+      "katakana": "フォールト",
+      "ipa": "/fɔːlt/",
+      "chapter": "ch04",
+      "category": "終了や停滞に関わる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 50,
+      "id": "close",
+      "word": "close",
+      "toc_display": "close",
+      "typing_candidates": [
+        "close"
+      ],
+      "meaning": "閉じる",
+      "katakana": "クローズ",
+      "ipa": "/kloʊz/",
+      "chapter": "ch04",
+      "category": "終了や停滞に関わる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 51,
+      "id": "stream",
+      "word": "stream",
+      "toc_display": "stream",
+      "typing_candidates": [
+        "stream"
+      ],
+      "meaning": "順次処理・ストリーム",
+      "katakana": "ストリーム",
+      "ipa": "/striːm/",
+      "chapter": "ch05",
+      "category": "データやファイルに関わる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 52,
+      "id": "import",
+      "word": "import",
+      "toc_display": "import",
+      "typing_candidates": [
+        "import"
+      ],
+      "meaning": "取り込み・インポート",
+      "katakana": "インポート",
+      "ipa": "/ˈɪm.pɔːrt/",
+      "chapter": "ch05",
+      "category": "データやファイルに関わる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 53,
+      "id": "migrate",
+      "word": "migrate",
+      "toc_display": "migrate",
+      "typing_candidates": [
+        "migrate"
+      ],
+      "meaning": "移行・マイグレートする",
+      "katakana": "マイグレート",
+      "ipa": "/ˈmaɪ.ɡreɪt/",
+      "chapter": "ch05",
+      "category": "データやファイルに関わる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 54,
+      "id": "bin_binary",
+      "word": "bin, binary",
+      "toc_display": "bin, binary",
+      "typing_candidates": [
+        "bin",
+        "binary"
+      ],
+      "meaning": "2進・バイナリ",
+      "katakana": "ビン / バイナリ",
+      "ipa": "/bɪn/ , /ˈbaɪ.nər.i/",
+      "chapter": "ch05",
+      "category": "データやファイルに関わる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 55,
+      "id": "format",
+      "word": "format",
+      "toc_display": "format",
+      "typing_candidates": [
+        "format"
+      ],
+      "meaning": "形式・フォーマット",
+      "katakana": "フォーマット",
+      "ipa": "/ˈfɔːr.mæt/",
+      "chapter": "ch05",
+      "category": "データやファイルに関わる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 56,
+      "id": "store",
+      "word": "store",
+      "toc_display": "store",
+      "typing_candidates": [
+        "store"
+      ],
+      "meaning": "格納・保存する",
+      "katakana": "ストア",
+      "ipa": "/stɔːr/",
+      "chapter": "ch05",
+      "category": "データやファイルに関わる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 57,
+      "id": "asset",
+      "word": "asset",
+      "toc_display": "asset",
+      "typing_candidates": [
+        "asset"
+      ],
+      "meaning": "静的資産・アセット",
+      "katakana": "アセット",
+      "ipa": "/ˈæs.ɛt/",
+      "chapter": "ch05",
+      "category": "データやファイルに関わる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 58,
+      "id": "dump",
+      "word": "dump",
+      "toc_display": "dump",
+      "typing_candidates": [
+        "dump"
+      ],
+      "meaning": "一括出力・ダンプ",
+      "katakana": "ダンプ",
+      "ipa": "/dʌmp/",
+      "chapter": "ch05",
+      "category": "データやファイルに関わる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 59,
+      "id": "result",
+      "word": "result",
+      "toc_display": "result",
+      "typing_candidates": [
+        "result"
+      ],
+      "meaning": "結果",
+      "katakana": "リザルト",
+      "ipa": "/rɪˈzʌlt/",
+      "chapter": "ch05",
+      "category": "データやファイルに関わる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 60,
+      "id": "row",
+      "word": "row",
+      "toc_display": "row",
+      "typing_candidates": [
+        "row"
+      ],
+      "meaning": "行",
+      "katakana": "ロウ",
+      "ipa": "/roʊ/",
+      "chapter": "ch05",
+      "category": "データやファイルに関わる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 61,
+      "id": "col_column",
+      "word": "col, column",
+      "toc_display": "col, column",
+      "typing_candidates": [
+        "col",
+        "column"
+      ],
+      "meaning": "列・カラム",
+      "katakana": "コル / カラム",
+      "ipa": "/kɑːl/ , /ˈkɑː.ləm/ ",
+      "chapter": "ch05",
+      "category": "データやファイルに関わる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 62,
+      "id": "archive",
+      "word": "archive",
+      "toc_display": "archive",
+      "typing_candidates": [
+        "archive"
+      ],
+      "meaning": "保管・アーカイブ",
+      "katakana": "アーカイブ",
+      "ipa": "/ˈɑːr.kaɪv/",
+      "chapter": "ch05",
+      "category": "データやファイルに関わる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 63,
+      "id": "attribute",
+      "word": "attribute",
+      "toc_display": "attribute",
+      "typing_candidates": [
+        "attribute"
+      ],
+      "meaning": "属性",
+      "katakana": "アトリビュート",
+      "ipa": "/ˈæt.rɪ.bjuːt/",
+      "chapter": "ch05",
+      "category": "データやファイルに関わる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 64,
+      "id": "analyze",
+      "word": "analyze",
+      "toc_display": "analyze",
+      "typing_candidates": [
+        "analyze"
+      ],
+      "meaning": "分析・解析する",
+      "katakana": "アナライズ",
+      "ipa": "/ˈæn.ə.laɪz/",
+      "chapter": "ch05",
+      "category": "データやファイルに関わる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 65,
+      "id": "alter",
+      "word": "alter",
+      "toc_display": "alter",
+      "typing_candidates": [
+        "alter"
+      ],
+      "meaning": "変更・改造する",
+      "katakana": "オルター",
+      "ipa": "/ˈɔːl.tər/",
+      "chapter": "ch05",
+      "category": "データやファイルに関わる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 66,
+      "id": "conv_convert",
+      "word": "conv, convert",
+      "toc_display": "conv, convert",
+      "typing_candidates": [
+        "conv",
+        "convert"
+      ],
+      "meaning": "変換する",
+      "katakana": "コンヴ / コンバート",
+      "ipa": "/kɑːnv/ , /kənˈvɜːrt/",
+      "chapter": "ch05",
+      "category": "データやファイルに関わる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 67,
+      "id": "parse",
+      "word": "parse",
+      "toc_display": "parse",
+      "typing_candidates": [
+        "parse"
+      ],
+      "meaning": "構文解析する",
+      "katakana": "パース",
+      "ipa": "/pɑːrs/",
+      "chapter": "ch05",
+      "category": "データやファイルに関わる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 68,
+      "id": "string",
+      "word": "string",
+      "toc_display": "string",
+      "typing_candidates": [
+        "string"
+      ],
+      "meaning": "文字列",
+      "katakana": "ストリング",
+      "ipa": "/strɪŋ/",
+      "chapter": "ch06",
+      "category": "型に関わる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 69,
+      "id": "char",
+      "word": "char",
+      "toc_display": "char",
+      "typing_candidates": [
+        "char"
+      ],
+      "meaning": "1文字",
+      "katakana": "チャー",
+      "ipa": "/tʃɑːr/",
+      "chapter": "ch06",
+      "category": "型に関わる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 70,
+      "id": "varchar",
+      "word": "varchar",
+      "toc_display": "varchar",
+      "typing_candidates": [
+        "varchar"
+      ],
+      "meaning": "可変長文字列",
+      "katakana": "バーチャー",
+      "ipa": "/ˈvɑːr.tʃɑːr/",
+      "chapter": "ch06",
+      "category": "型に関わる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 71,
+      "id": "int_integer",
+      "word": "int, integer",
+      "toc_display": "int, integer",
+      "typing_candidates": [
+        "int",
+        "integer"
+      ],
+      "meaning": "整数",
+      "katakana": "イント / インテジャー",
+      "ipa": "/ɪnt/ , /ˈɪn.tə.dʒər/",
+      "chapter": "ch06",
+      "category": "型に関わる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 72,
+      "id": "float",
+      "word": "float",
+      "toc_display": "float",
+      "typing_candidates": [
+        "float"
+      ],
+      "meaning": "浮動小数点数",
+      "katakana": "フロート",
+      "ipa": "/floʊt/",
+      "chapter": "ch06",
+      "category": "型に関わる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 73,
+      "id": "decimal",
+      "word": "decimal",
+      "toc_display": "decimal",
+      "typing_candidates": [
+        "decimal"
+      ],
+      "meaning": "固定小数点数・10進数",
+      "katakana": "デシマル",
+      "ipa": "/ˈdɛs.ə.məl/",
+      "chapter": "ch06",
+      "category": "型に関わる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 74,
+      "id": "set",
+      "word": "set",
+      "toc_display": "set",
+      "typing_candidates": [
+        "set"
+      ],
+      "meaning": "集合・セット",
+      "katakana": "セット",
+      "ipa": "/sɛt/",
+      "chapter": "ch06",
+      "category": "型に関わる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 75,
+      "id": "array",
+      "word": "array",
+      "toc_display": "array",
+      "typing_candidates": [
+        "array"
+      ],
+      "meaning": "配列",
+      "katakana": "アレイ",
+      "ipa": "/əˈreɪ/",
+      "chapter": "ch06",
+      "category": "型に関わる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 76,
+      "id": "hash",
+      "word": "hash",
+      "toc_display": "hash",
+      "typing_candidates": [
+        "hash"
+      ],
+      "meaning": "連想配列・ハッシュ",
+      "katakana": "ハッシュ",
+      "ipa": "/hæʃ/",
+      "chapter": "ch06",
+      "category": "型に関わる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 77,
+      "id": "map",
+      "word": "map",
+      "toc_display": "map",
+      "typing_candidates": [
+        "map"
+      ],
+      "meaning": "マップ・対応付け",
+      "katakana": "マップ",
+      "ipa": "/mæp/",
+      "chapter": "ch06",
+      "category": "型に関わる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 78,
+      "id": "func_function",
+      "word": "func, function",
+      "toc_display": "func, function",
+      "typing_candidates": [
+        "func",
+        "function"
+      ],
+      "meaning": "関数",
+      "katakana": "ファンク / ファンクション",
+      "ipa": "/fʌŋk/ , /ˈfʌŋk.ʃən/",
+      "chapter": "ch07",
+      "category": "定義に関わる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 79,
+      "id": "def_define",
+      "word": "def, define",
+      "toc_display": "def, define",
+      "typing_candidates": [
+        "def",
+        "define"
+      ],
+      "meaning": "定義・定義する",
+      "katakana": "デフ / ディファイン",
+      "ipa": "/dɛf/ , /dɪˈfaɪn/",
+      "chapter": "ch07",
+      "category": "定義に関わる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 80,
+      "id": "strict",
+      "word": "strict",
+      "toc_display": "strict",
+      "typing_candidates": [
+        "strict"
+      ],
+      "meaning": "厳格な",
+      "katakana": "ストリクト",
+      "ipa": "/strɪkt/",
+      "chapter": "ch07",
+      "category": "定義に関わる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 81,
+      "id": "local",
+      "word": "local",
+      "toc_display": "local",
+      "typing_candidates": [
+        "local"
+      ],
+      "meaning": "ローカル・局所",
+      "katakana": "ローカル",
+      "ipa": "/ˈloʊ.kəl/",
+      "chapter": "ch07",
+      "category": "定義に関わる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 82,
+      "id": "global",
+      "word": "global",
+      "toc_display": "global",
+      "typing_candidates": [
+        "global"
+      ],
+      "meaning": "グローバル・広域",
+      "katakana": "グローバル",
+      "ipa": "/ˈɡloʊ.bəl/",
+      "chapter": "ch07",
+      "category": "定義に関わる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 83,
+      "id": "scope",
+      "word": "scope",
+      "toc_display": "scope",
+      "typing_candidates": [
+        "scope"
+      ],
+      "meaning": "有効範囲・スコープ",
+      "katakana": "スコープ",
+      "ipa": "/skoʊp/",
+      "chapter": "ch07",
+      "category": "定義に関わる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 84,
+      "id": "refer",
+      "word": "refer",
+      "toc_display": "refer",
+      "typing_candidates": [
+        "refer"
+      ],
+      "meaning": "参照する",
+      "katakana": "リファー",
+      "ipa": "/rɪˈfɜːr/",
+      "chapter": "ch07",
+      "category": "定義に関わる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 85,
+      "id": "annotate",
+      "word": "annotate",
+      "toc_display": "annotate",
+      "typing_candidates": [
+        "annotate"
+      ],
+      "meaning": "注釈を付ける",
+      "katakana": "アノテート",
+      "ipa": "/ˈæn.ə.teɪt/",
+      "chapter": "ch07",
+      "category": "定義に関わる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 86,
+      "id": "schema",
+      "word": "schema",
+      "toc_display": "schema",
+      "typing_candidates": [
+        "schema"
+      ],
+      "meaning": "構造定義・スキーマ",
+      "katakana": "スキーマ",
+      "ipa": "/ˈskiː.mə/",
+      "chapter": "ch07",
+      "category": "定義に関わる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 87,
+      "id": "env_environment",
+      "word": "env, environment",
+      "toc_display": "env, environment",
+      "typing_candidates": [
+        "env",
+        "environment"
+      ],
+      "meaning": "環境",
+      "katakana": "エンヴ / エンバイロメント",
+      "ipa": "/ɛnv/ , /ɪnˈvaɪ.rən.mənt/",
+      "chapter": "ch08",
+      "category": "状態や状況を表す単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 88,
+      "id": "status",
+      "word": "status",
+      "toc_display": "status",
+      "typing_candidates": [
+        "status"
+      ],
+      "meaning": "状態・ステータス",
+      "katakana": "ステータス",
+      "ipa": "/ˈsteɪ.təs/",
+      "chapter": "ch08",
+      "category": "状態や状況を表す単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 89,
+      "id": "init_initialize",
+      "word": "init, initialize",
+      "toc_display": "init, initialize",
+      "typing_candidates": [
+        "init",
+        "initialize"
+      ],
+      "meaning": "初期化する",
+      "katakana": "イニット / イニシャライズ",
+      "ipa": "/ɪˈnɪt/ , /ɪˈnɪʃ.əl.aɪz/",
+      "chapter": "ch08",
+      "category": "状態や状況を表す単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 90,
+      "id": "layout",
+      "word": "layout",
+      "toc_display": "layout",
+      "typing_candidates": [
+        "layout"
+      ],
+      "meaning": "配置・レイアウト",
+      "katakana": "レイアウト",
+      "ipa": "/ˈleɪ.aʊt/",
+      "chapter": "ch08",
+      "category": "状態や状況を表す単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 91,
+      "id": "offset",
+      "word": "offset",
+      "toc_display": "offset",
+      "typing_candidates": [
+        "offset"
+      ],
+      "meaning": "ずれ・オフセット",
+      "katakana": "オフセット",
+      "ipa": "/ˈɔːf.sɛt/",
+      "chapter": "ch08",
+      "category": "状態や状況を表す単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 92,
+      "id": "locale",
+      "word": "locale",
+      "toc_display": "locale",
+      "typing_candidates": [
+        "locale"
+      ],
+      "meaning": "地域・言語設定",
+      "katakana": "ロケール",
+      "ipa": "/loʊˈkæl/",
+      "chapter": "ch08",
+      "category": "状態や状況を表す単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 93,
+      "id": "feature",
+      "word": "feature",
+      "toc_display": "feature",
+      "typing_candidates": [
+        "feature"
+      ],
+      "meaning": "機能・特徴",
+      "katakana": "フィーチャー",
+      "ipa": "/ˈfiː.tʃər/",
+      "chapter": "ch08",
+      "category": "状態や状況を表す単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 94,
+      "id": "trait",
+      "word": "trait",
+      "toc_display": "trait",
+      "typing_candidates": [
+        "trait"
+      ],
+      "meaning": "特性・トレイト",
+      "katakana": "トレイト",
+      "ipa": "/treɪt/",
+      "chapter": "ch08",
+      "category": "状態や状況を表す単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 95,
+      "id": "context",
+      "word": "context",
+      "toc_display": "context",
+      "typing_candidates": [
+        "context"
+      ],
+      "meaning": "文脈・コンテキスト",
+      "katakana": "コンテキスト",
+      "ipa": "/ˈkɑːn.tɛkst/",
+      "chapter": "ch08",
+      "category": "状態や状況を表す単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 96,
+      "id": "current",
+      "word": "current",
+      "toc_display": "current",
+      "typing_candidates": [
+        "current"
+      ],
+      "meaning": "現在の",
+      "katakana": "カレント",
+      "ipa": "/ˈkɜːr.ənt/",
+      "chapter": "ch08",
+      "category": "状態や状況を表す単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 97,
+      "id": "async",
+      "word": "async",
+      "toc_display": "async",
+      "typing_candidates": [
+        "async"
+      ],
+      "meaning": "非同期",
+      "katakana": "エイシンク",
+      "ipa": "/eɪˈsɪŋk/",
+      "chapter": "ch08",
+      "category": "状態や状況を表す単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 98,
+      "id": "tmp_temporary",
+      "word": "tmp, temporary",
+      "toc_display": "tmp, temporary",
+      "typing_candidates": [
+        "tmp",
+        "temporary"
+      ],
+      "meaning": "一時的な",
+      "katakana": "テンプ / テンポラリ",
+      "ipa": "/tɛmp/ , /ˈtɛm.pə.rɛr.i/",
+      "chapter": "ch08",
+      "category": "状態や状況を表す単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 99,
+      "id": "state",
+      "word": "state",
+      "toc_display": "state",
+      "typing_candidates": [
+        "state"
+      ],
+      "meaning": "状態・ステート",
+      "katakana": "ステート",
+      "ipa": "/steɪt/",
+      "chapter": "ch08",
+      "category": "状態や状況を表す単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 100,
+      "id": "prop_property",
+      "word": "prop, property",
+      "toc_display": "prop, property",
+      "typing_candidates": [
+        "prop",
+        "property"
+      ],
+      "meaning": "属性・プロパティ",
+      "katakana": "プロップ / プロパティ",
+      "ipa": "/prɑːp/ , /ˈprɑː.pər.ti/",
+      "chapter": "ch08",
+      "category": "状態や状況を表す単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 101,
+      "id": "finally",
+      "word": "finally",
+      "toc_display": "finally",
+      "typing_candidates": [
+        "finally"
+      ],
+      "meaning": "最終処理・ついに",
+      "katakana": "ファイナリー",
+      "ipa": "/ˈfaɪ.nəl.i/",
+      "chapter": "ch08",
+      "category": "状態や状況を表す単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 102,
+      "id": "entry",
+      "word": "entry",
+      "toc_display": "entry",
+      "typing_candidates": [
+        "entry"
+      ],
+      "meaning": "入口・項目",
+      "katakana": "エントリ",
+      "ipa": "/ˈɛn.tri/",
+      "chapter": "ch08",
+      "category": "状態や状況を表す単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 103,
+      "id": "allow",
+      "word": "allow",
+      "toc_display": "allow",
+      "typing_candidates": [
+        "allow"
+      ],
+      "meaning": "許可する",
+      "katakana": "アラウ",
+      "ipa": "/əˈlaʊ/",
+      "chapter": "ch09",
+      "category": "権限や要求に関わる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 104,
+      "id": "permit",
+      "word": "permit",
+      "toc_display": "permit",
+      "typing_candidates": [
+        "permit"
+      ],
+      "meaning": "認可する",
+      "katakana": "パーミット",
+      "ipa": "/pərˈmɪt/",
+      "chapter": "ch09",
+      "category": "権限や要求に関わる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 105,
+      "id": "auth_authorization",
+      "word": "auth, authorization",
+      "toc_display": "auth, authorization",
+      "typing_candidates": [
+        "auth",
+        "authorization"
+      ],
+      "meaning": "認証・認可",
+      "katakana": "オース / オーソリゼーション",
+      "ipa": "/ɔːθ/ , /ˌɔː.θər.əˈzeɪ.ʃən/",
+      "chapter": "ch09",
+      "category": "権限や要求に関わる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 106,
+      "id": "private",
+      "word": "private",
+      "toc_display": "private",
+      "typing_candidates": [
+        "private"
+      ],
+      "meaning": "非公開・プライベート",
+      "katakana": "プライベート",
+      "ipa": "/ˈpraɪ.vət/",
+      "chapter": "ch09",
+      "category": "権限や要求に関わる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 107,
+      "id": "public",
+      "word": "public",
+      "toc_display": "public",
+      "typing_candidates": [
+        "public"
+      ],
+      "meaning": "公開・パブリック",
+      "katakana": "パブリック",
+      "ipa": "/ˈpʌb.lɪk/",
+      "chapter": "ch09",
+      "category": "権限や要求に関わる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 108,
+      "id": "meta",
+      "word": "meta",
+      "toc_display": "meta",
+      "typing_candidates": [
+        "meta"
+      ],
+      "meaning": "高次の・メタ情報",
+      "katakana": "メタ",
+      "ipa": "/ˈmɛt.ə/",
+      "chapter": "ch09",
+      "category": "権限や要求に関わる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 109,
+      "id": "require",
+      "word": "require",
+      "toc_display": "require",
+      "typing_candidates": [
+        "require"
+      ],
+      "meaning": "必須とする",
+      "katakana": "リクワイア",
+      "ipa": "/rɪˈkwaɪər/",
+      "chapter": "ch09",
+      "category": "権限や要求に関わる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 110,
+      "id": "depend",
+      "word": "depend",
+      "toc_display": "depend",
+      "typing_candidates": [
+        "depend"
+      ],
+      "meaning": "依存する",
+      "katakana": "ディペンド",
+      "ipa": "/dɪˈpɛnd/",
+      "chapter": "ch09",
+      "category": "権限や要求に関わる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 111,
+      "id": "request",
+      "word": "request",
+      "toc_display": "request",
+      "typing_candidates": [
+        "request"
+      ],
+      "meaning": "要求・リクエスト",
+      "katakana": "リクエスト",
+      "ipa": "/rɪˈkwɛst/",
+      "chapter": "ch09",
+      "category": "権限や要求に関わる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 112,
+      "id": "invalid",
+      "word": "invalid",
+      "toc_display": "invalid",
+      "typing_candidates": [
+        "invalid"
+      ],
+      "meaning": "無効な",
+      "katakana": "インバリッド",
+      "ipa": "/ɪnˈvæl.ɪd/",
+      "chapter": "ch09",
+      "category": "権限や要求に関わる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 113,
+      "id": "flush",
+      "word": "flush",
+      "toc_display": "flush",
+      "typing_candidates": [
+        "flush"
+      ],
+      "meaning": "強制掃出・フラッシュ",
+      "katakana": "フラッシュ",
+      "ipa": "/flʌʃ/",
+      "chapter": "ch10",
+      "category": "データの受け渡しや伝達に関わる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 114,
+      "id": "dispatch",
+      "word": "dispatch",
+      "toc_display": "dispatch",
+      "typing_candidates": [
+        "dispatch"
+      ],
+      "meaning": "配送・ディスパッチ",
+      "katakana": "ディスパッチ",
+      "ipa": "/dɪˈspætʃ/",
+      "chapter": "ch10",
+      "category": "データの受け渡しや伝達に関わる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 115,
+      "id": "render",
+      "word": "render",
+      "toc_display": "render",
+      "typing_candidates": [
+        "render"
+      ],
+      "meaning": "描画・レンダリングする",
+      "katakana": "レンダー",
+      "ipa": "/ˈrɛn.dər/",
+      "chapter": "ch10",
+      "category": "データの受け渡しや伝達に関わる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 116,
+      "id": "submit",
+      "word": "submit",
+      "toc_display": "submit",
+      "typing_candidates": [
+        "submit"
+      ],
+      "meaning": "送信・提出する",
+      "katakana": "サブミット",
+      "ipa": "/səbˈmɪt/",
+      "chapter": "ch10",
+      "category": "データの受け渡しや伝達に関わる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 117,
+      "id": "yield",
+      "word": "yield",
+      "toc_display": "yield",
+      "typing_candidates": [
+        "yield"
+      ],
+      "meaning": "譲渡・一時停止する",
+      "katakana": "イールド",
+      "ipa": "/jiːld/",
+      "chapter": "ch10",
+      "category": "データの受け渡しや伝達に関わる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 118,
+      "id": "assign",
+      "word": "assign",
+      "toc_display": "assign",
+      "typing_candidates": [
+        "assign"
+      ],
+      "meaning": "割り当てる・代入する",
+      "katakana": "アサイン",
+      "ipa": "/əˈsaɪn/",
+      "chapter": "ch10",
+      "category": "データの受け渡しや伝達に関わる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 119,
+      "id": "alert",
+      "word": "alert",
+      "toc_display": "alert",
+      "typing_candidates": [
+        "alert"
+      ],
+      "meaning": "警告・アラート",
+      "katakana": "アラート",
+      "ipa": "/əˈlɜːrt/",
+      "chapter": "ch10",
+      "category": "データの受け渡しや伝達に関わる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 120,
+      "id": "exception",
+      "word": "exception",
+      "toc_display": "exception",
+      "typing_candidates": [
+        "exception"
+      ],
+      "meaning": "例外",
+      "katakana": "エクセプション",
+      "ipa": "/ɪkˈsɛp.ʃən/",
+      "chapter": "ch10",
+      "category": "データの受け渡しや伝達に関わる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 121,
+      "id": "assert",
+      "word": "assert",
+      "toc_display": "assert",
+      "typing_candidates": [
+        "assert"
+      ],
+      "meaning": "主張・表明する",
+      "katakana": "アサート",
+      "ipa": "/əˈsɜːrt/",
+      "chapter": "ch10",
+      "category": "データの受け渡しや伝達に関わる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 122,
+      "id": "send",
+      "word": "send",
+      "toc_display": "send",
+      "typing_candidates": [
+        "send"
+      ],
+      "meaning": "送信する",
+      "katakana": "センド",
+      "ipa": "/sɛnd/",
+      "chapter": "ch10",
+      "category": "データの受け渡しや伝達に関わる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 123,
+      "id": "path",
+      "word": "path",
+      "toc_display": "path",
+      "typing_candidates": [
+        "path"
+      ],
+      "meaning": "経路・パス",
+      "katakana": "パス",
+      "ipa": "/pæθ/",
+      "chapter": "ch10",
+      "category": "データの受け渡しや伝達に関わる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 124,
+      "id": "node",
+      "word": "node",
+      "toc_display": "node",
+      "typing_candidates": [
+        "node"
+      ],
+      "meaning": "節点・ノード",
+      "katakana": "ノード",
+      "ipa": "/noʊd/",
+      "chapter": "ch10",
+      "category": "データの受け渡しや伝達に関わる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 125,
+      "id": "ignore",
+      "word": "ignore",
+      "toc_display": "ignore",
+      "typing_candidates": [
+        "ignore"
+      ],
+      "meaning": "無視・除外する",
+      "katakana": "イグノア",
+      "ipa": "/ɪɡˈnɔːr/",
+      "chapter": "ch11",
+      "category": "抽出や限定を表わす単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 126,
+      "id": "except",
+      "word": "except",
+      "toc_display": "except",
+      "typing_candidates": [
+        "except"
+      ],
+      "meaning": "〜を除いて",
+      "katakana": "エクセプト",
+      "ipa": "/ɪkˈsɛpt/",
+      "chapter": "ch11",
+      "category": "抽出や限定を表わす単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 127,
+      "id": "uniq_unique",
+      "word": "uniq, unique",
+      "toc_display": "uniq, unique",
+      "typing_candidates": [
+        "uniq",
+        "unique"
+      ],
+      "meaning": "一意な・重複なし",
+      "katakana": "ユニーク",
+      "ipa": "/ˈjuː.nɪk/ , /juːˈniːk/",
+      "chapter": "ch11",
+      "category": "抽出や限定を表わす単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 128,
+      "id": "filter",
+      "word": "filter",
+      "toc_display": "filter",
+      "typing_candidates": [
+        "filter"
+      ],
+      "meaning": "絞り込み・フィルター",
+      "katakana": "フィルター",
+      "ipa": "/ˈfɪl.tər/",
+      "chapter": "ch11",
+      "category": "抽出や限定を表わす単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 129,
+      "id": "trim",
+      "word": "trim",
+      "toc_display": "trim",
+      "typing_candidates": [
+        "trim"
+      ],
+      "meaning": "前後の空白除去",
+      "katakana": "トリム",
+      "ipa": "/trɪm/",
+      "chapter": "ch11",
+      "category": "抽出や限定を表わす単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 130,
+      "id": "select",
+      "word": "select",
+      "toc_display": "select",
+      "typing_candidates": [
+        "select"
+      ],
+      "meaning": "選択・抽出する",
+      "katakana": "セレクト",
+      "ipa": "/səˈlɛkt/",
+      "chapter": "ch11",
+      "category": "抽出や限定を表わす単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 131,
+      "id": "limit",
+      "word": "limit",
+      "toc_display": "limit",
+      "typing_candidates": [
+        "limit"
+      ],
+      "meaning": "上限・制限する",
+      "katakana": "リミット",
+      "ipa": "/ˈlɪm.ɪt/",
+      "chapter": "ch11",
+      "category": "抽出や限定を表わす単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 132,
+      "id": "match",
+      "word": "match",
+      "toc_display": "match",
+      "typing_candidates": [
+        "match"
+      ],
+      "meaning": "一致・適合する",
+      "katakana": "マッチ",
+      "ipa": "/mætʃ/",
+      "chapter": "ch11",
+      "category": "抽出や限定を表わす単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 133,
+      "id": "proc_process",
+      "word": "proc, process",
+      "toc_display": "proc, process",
+      "typing_candidates": [
+        "proc",
+        "process"
+      ],
+      "meaning": "処理・プロセス",
+      "katakana": "プロック / プロセス",
+      "ipa": "/prɑːs/ , /ˈprɑː.sɛs/",
+      "chapter": "ch12",
+      "category": "裏で動いてる雰囲気の単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 134,
+      "id": "task",
+      "word": "task",
+      "toc_display": "task",
+      "typing_candidates": [
+        "task"
+      ],
+      "meaning": "作業単位・タスク",
+      "katakana": "タスク",
+      "ipa": "/tæsk/",
+      "chapter": "ch12",
+      "category": "裏で動いてる雰囲気の単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 135,
+      "id": "service",
+      "word": "service",
+      "toc_display": "service",
+      "typing_candidates": [
+        "service"
+      ],
+      "meaning": "常駐機能・サービス",
+      "katakana": "サービス",
+      "ipa": "/ˈsɜːr.vɪs/",
+      "chapter": "ch12",
+      "category": "裏で動いてる雰囲気の単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 136,
+      "id": "exe_execute",
+      "word": "exe, execute",
+      "toc_display": "exe, execute",
+      "typing_candidates": [
+        "exe",
+        "execute"
+      ],
+      "meaning": "実行ファイル・実行する",
+      "katakana": "エグゼ / エグゼキュート",
+      "ipa": "/ˈɛks.i/ , /ˈɛk.sə.kjuːt/",
+      "chapter": "ch12",
+      "category": "裏で動いてる雰囲気の単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 137,
+      "id": "kill",
+      "word": "kill",
+      "toc_display": "kill",
+      "typing_candidates": [
+        "kill"
+      ],
+      "meaning": "強制終了する",
+      "katakana": "キル",
+      "ipa": "/kɪl/",
+      "chapter": "ch12",
+      "category": "裏で動いてる雰囲気の単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 138,
+      "id": "shell",
+      "word": "shell",
+      "toc_display": "shell",
+      "typing_candidates": [
+        "shell"
+      ],
+      "meaning": "対話環境・シェル",
+      "katakana": "シェル",
+      "ipa": "/ʃɛl/",
+      "chapter": "ch12",
+      "category": "裏で動いてる雰囲気の単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 139,
+      "id": "warning",
+      "word": "warning",
+      "toc_display": "warning",
+      "typing_candidates": [
+        "warning"
+      ],
+      "meaning": "警告",
+      "katakana": "ウォーニング",
+      "ipa": "/ˈwɔːr.nɪŋ/",
+      "chapter": "ch13",
+      "category": "ログによく表われる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 140,
+      "id": "abort",
+      "word": "abort",
+      "toc_display": "abort",
+      "typing_candidates": [
+        "abort"
+      ],
+      "meaning": "中断・強制中止",
+      "katakana": "アボート",
+      "ipa": "/əˈbɔːrt/",
+      "chapter": "ch13",
+      "category": "ログによく表われる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 141,
+      "id": "failure",
+      "word": "failure",
+      "toc_display": "failure",
+      "typing_candidates": [
+        "failure"
+      ],
+      "meaning": "失敗",
+      "katakana": "フェイリャー",
+      "ipa": "/ˈfeɪl.jər/",
+      "chapter": "ch13",
+      "category": "ログによく表われる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 142,
+      "id": "var_variable",
+      "word": "var, variable",
+      "toc_display": "var, variable",
+      "typing_candidates": [
+        "var",
+        "variable"
+      ],
+      "meaning": "変数",
+      "katakana": "バー / バリアブル",
+      "ipa": "/vɑːr/ , /ˈvɛr.i.ə.bəl/",
+      "chapter": "ch13",
+      "category": "ログによく表われる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 143,
+      "id": "load",
+      "word": "load",
+      "toc_display": "load",
+      "typing_candidates": [
+        "load"
+      ],
+      "meaning": "読み込み・ロード",
+      "katakana": "ロード",
+      "ipa": "/loʊd/",
+      "chapter": "ch13",
+      "category": "ログによく表われる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 144,
+      "id": "invoke",
+      "word": "invoke",
+      "toc_display": "invoke",
+      "typing_candidates": [
+        "invoke"
+      ],
+      "meaning": "呼び出す・発動する",
+      "katakana": "インボーク",
+      "ipa": "/ɪnˈvoʊk/",
+      "chapter": "ch13",
+      "category": "ログによく表われる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 145,
+      "id": "interrupt",
+      "word": "interrupt",
+      "toc_display": "interrupt",
+      "typing_candidates": [
+        "interrupt"
+      ],
+      "meaning": "割り込み",
+      "katakana": "インタラプト",
+      "ipa": "/ˌɪn.təˈrʌpt/",
+      "chapter": "ch13",
+      "category": "ログによく表われる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 146,
+      "id": "exist",
+      "word": "exist",
+      "toc_display": "exist",
+      "typing_candidates": [
+        "exist"
+      ],
+      "meaning": "存在する",
+      "katakana": "イグジスト",
+      "ipa": "/ɪɡˈzɪst/",
+      "chapter": "ch13",
+      "category": "ログによく表われる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 147,
+      "id": "compress",
+      "word": "compress",
+      "toc_display": "compress",
+      "typing_candidates": [
+        "compress"
+      ],
+      "meaning": "圧縮する",
+      "katakana": "コンプレス",
+      "ipa": "/kəmˈprɛs/",
+      "chapter": "ch13",
+      "category": "ログによく表われる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 148,
+      "id": "identify",
+      "word": "identify",
+      "toc_display": "identify",
+      "typing_candidates": [
+        "identify"
+      ],
+      "meaning": "特定・識別する",
+      "katakana": "アイデンティファイ",
+      "ipa": "/aɪˈdɛn.tə.faɪ/",
+      "chapter": "ch13",
+      "category": "ログによく表われる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 149,
+      "id": "deprecated",
+      "word": "deprecated",
+      "toc_display": "deprecated",
+      "typing_candidates": [
+        "deprecated"
+      ],
+      "meaning": "非推奨の",
+      "katakana": "デプリケーテッド",
+      "ipa": "/ˈdɛp.rə.keɪ.tɪd/",
+      "chapter": "ch13",
+      "category": "ログによく表われる単語",
+      "source": "programming_book_toc_150"
+    },
+    {
+      "no": 150,
+      "id": "halt",
+      "word": "halt",
+      "toc_display": "halt",
+      "typing_candidates": [
+        "halt"
+      ],
+      "meaning": "停止・休止する",
+      "katakana": "ホールト",
+      "ipa": "/hɔːlt/",
+      "chapter": "ch13",
+      "category": "ログによく表われる単語",
+      "source": "programming_book_toc_150"
+    }
+  ]
+};
+
+    // --- 実行状態管理 ---
+    let wordsMap = {};
+    let currentQueue = [];
+    let currentIndex = 0;
+    let preferredVoice = null;
+    let engineWarmed = false;
+    let speakToken = 0;
+    let loadDelayTimer = null;
+    let nextSentenceTimer = null;
+    let candidateTimeoutTimer = null;
+    let wordHasLoggedMiss = false;
+    let isNumericalSession = false;
+    let lastLessonLogged = null;
+
+    // DOM要素
+    const lessonSelect = document.getElementById('lesson-select');
+    const speedSelect = document.getElementById('speed-select');
+    const lessonBadge = document.getElementById('lesson-badge');
+    const meaningDisplay = document.getElementById('meaning-display');
+    const katakanaDisplay = document.getElementById('katakana-display');
+    const ipaDisplay = document.getElementById('ipa-display');
+    const wordDisplay = document.getElementById('word-display');
+    const inputArea = document.getElementById('input-area');
+    const statusDisplay = document.getElementById('status');
+    const progressFill = document.getElementById('progress-fill');
+    const startBtn = document.getElementById('start-btn');
+    const logBox = document.getElementById('log-box');
+
+    // ログ出力関数
+    function logEvent(type, message) {
+        const now = new Date();
+        const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}.${String(now.getMilliseconds()).padStart(3, '0')}`;
+        const line = document.createElement('div');
+        
+        let color = '#d4d4d4';
+        if (type === 'SUCCESS') color = '#4ec9b0';
+        else if (type === 'AUDIO') color = '#ce9178';
+        else if (type === 'WARN') color = '#dcdcaa';
+        else if (type === 'ERROR') color = '#f44747';
+        else if (type === 'COMPLETE') color = '#9cdcfe';
+        
+        line.innerHTML = `<span style="color:#888;">[${timeStr}]</span> <span style="color:${color};font-weight:bold;">[${type}]</span> ${escapeHtml(message)}`;
+        logBox.appendChild(line);
+        logBox.scrollTop = logBox.scrollHeight;
+    }
+
+    function escapeHtml(text) {
+        return text.replace(/[&<>"']/g, m => ({
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#039;'
+        }[m]));
+    }
+
+    function clearLogs() {
+        logBox.innerHTML = '';
+        logEvent('INFO', 'ログをクリアしました。');
+    }
+
+    function copyLogs() {
+        const text = logBox.innerText;
+        navigator.clipboard.writeText(text).then(() => {
+            alert('ログをクリップボードにコピーしました。');
+        }).catch(err => {
+            console.error('Copy failed:', err);
+        });
+    }
+
+    function toggleLogView() {
+        logBox.style.display = (logBox.style.display === 'none') ? 'block' : 'none';
+    }
+
+    // レッスンセレクトの初期化
+    function initLessonSelect() {
+        const currentVal = lessonSelect.value;
+        lessonSelect.innerHTML = '<option value="all">★ 全語を通して実行 (All 150 Words)</option>';
+        LESSON_DEFINITIONS.forEach((lesson, index) => {
+            const opt = document.createElement('option');
+            opt.value = String(index);
+            opt.textContent = `${lesson.title} (${lesson.wordCount || lesson.wordIds.length}語)`;
+            lessonSelect.appendChild(opt);
+        });
+        if (currentVal) lessonSelect.value = currentVal;
+    }
+
+    // 単語データのマッピング
+    function loadWordsData(data) {
+        wordsMap = {};
+        if (data.words && Array.isArray(data.words)) {
+            data.words.forEach(w => {
+                wordsMap[w.id] = w;
+            });
+        }
+        if (data.lessons && Array.isArray(data.lessons)) {
+            LESSON_DEFINITIONS = data.lessons;
+        }
+    }
+
+    // 外部 JSON 読み込み (HTTP 環境) + 内蔵フォールバック
+    async function initData() {
+        loadWordsData(DEFAULT_WORDS_DATA);
+        initLessonSelect();
+        logEvent('INFO', `内蔵フォールバックデータを読み込みました (全${Object.keys(wordsMap).length}語)`);
+
+        try {
+            const res = await fetch('data/words_programming_150.json', { cache: 'no-cache' });
+            if (res.ok) {
+                const extData = await res.json();
+                let updated = false;
+                if (extData.words && Array.isArray(extData.words)) {
+                    extData.words.forEach(w => {
+                        wordsMap[w.id] = w;
+                    });
+                    updated = true;
+                }
+                if (extData.lessons && Array.isArray(extData.lessons)) {
+                    LESSON_DEFINITIONS = extData.lessons;
+                    initLessonSelect();
+                }
+                if (updated) {
+                    logEvent('SUCCESS', `外部 data/words_programming_150.json を読み込みました (全${Object.keys(wordsMap).length}語, version:${extData.version || 1})`);
+                }
+            } else {
+                logEvent('INFO', `data/words_programming_150.json 応答ステータス: ${res.status} (内蔵データで継続)`);
+            }
+        } catch (e) {
+            logEvent('INFO', 'file:// プロトコルまたはローカル制限を検知。内蔵データで正常に動作します。');
+        }
+    }
+
+    // 音声初期化
+    function selectEnglishVoice() {
+        if (!('speechSynthesis' in window)) return null;
+        const voices = speechSynthesis.getVoices();
+        if (!voices || voices.length === 0) return null;
+
+        return (
+            voices.find(v => v.lang === 'en-US' && /natural|premium|enhanced/i.test(v.name)) ||
+            voices.find(v => v.lang === 'en-US' && /google|samantha|zira|david/i.test(v.name)) ||
+            voices.find(v => v.lang === 'en-US') ||
+            voices.find(v => v.lang && v.lang.startsWith('en')) ||
+            null
+        );
+    }
+
+    function applyVoice(uttr) {
+        if (!preferredVoice) preferredVoice = selectEnglishVoice();
+        if (preferredVoice) {
+            uttr.voice = preferredVoice;
+            uttr.lang = preferredVoice.lang;
+        }
+    }
+
+    function runUtterance(uttr) {
+        return new Promise((resolve, reject) => {
+            let settled = false;
+            const finish = (fn, arg) => {
+                if (settled) return;
+                settled = true;
+                fn(arg);
+            };
+            uttr.onend = () => finish(resolve);
+            uttr.onerror = (e) => finish(reject, e);
+            speechSynthesis.speak(uttr);
+            setTimeout(() => finish(resolve), 1200);
+        });
+    }
+
+    async function warmEngine() {
+        if (engineWarmed) return;
+        if (speechSynthesis.paused) speechSynthesis.resume();
+        const warm = new SpeechSynthesisUtterance('ready');
+        warm.volume = 0.01;
+        warm.rate = 1.2;
+        applyVoice(warm);
+        try {
+            await runUtterance(warm);
+            engineWarmed = true;
+            logEvent('INFO', '音声エンジン初期化完了 (Speech Engine Warmed)');
+        } catch (e) {
+            engineWarmed = true;
+            logEvent('WARN', '音声エンジン初期化タイムアウト（タイピング練習は継続可能）');
+        }
+    }
+
+    if ('speechSynthesis' in window) {
+        speechSynthesis.onvoiceschanged = () => {
+            preferredVoice = selectEnglishVoice();
+            if (preferredVoice) {
+                logEvent('INFO', `英語音声を検出: ${preferredVoice.name} (${preferredVoice.lang})`);
+            }
+        };
+    }
+
+    // 単語キューの構築
+    function buildQueue() {
+        const mode = lessonSelect.value;
+        const queue = [];
+
+        if (mode === 'all') {
+            isNumericalSession = false;
+            let totalWords = 0;
+            LESSON_DEFINITIONS.forEach(l => totalWords += l.wordIds.length);
+            
+            LESSON_DEFINITIONS.forEach((lesson) => {
+                lesson.wordIds.forEach((wid, wIdx) => {
+                    const wData = wordsMap[wid];
+                    if (wData) {
+                        queue.push({
+                            ...wData,
+                            lessonTitle: lesson.title,
+                            wordIndexInLesson: wIdx + 1,
+                            wordTotalInLesson: lesson.wordIds.length
+                        });
+                    }
+                });
+            });
+        } else {
+            isNumericalSession = true;
+            const startIndex = parseInt(mode, 10);
+            for (let i = startIndex; i < LESSON_DEFINITIONS.length; i++) {
+                const lesson = LESSON_DEFINITIONS[i];
+                lesson.wordIds.forEach((wid, wIdx) => {
+                    const wData = wordsMap[wid];
+                    if (wData) {
+                        queue.push({
+                            ...wData,
+                            lessonTitle: lesson.title,
+                            lessonIndex: i,
+                            wordIndexInLesson: wIdx + 1,
+                            wordTotalInLesson: lesson.wordIds.length
+                        });
+                    }
+                });
+            }
+        }
+        return queue;
+    }
+
+    // 練習開始
+    async function startPractice() {
+        if (candidateTimeoutTimer) {
+            clearTimeout(candidateTimeoutTimer);
+            candidateTimeoutTimer = null;
+        }
+        if (nextSentenceTimer) {
+            clearTimeout(nextSentenceTimer);
+            nextSentenceTimer = null;
+        }
+        currentQueue = buildQueue();
+        currentIndex = 0;
+        lastLessonLogged = null;
+
+        if (currentQueue.length === 0) {
+            alert('単語データが見つかりませんでした。');
+            return;
+        }
+
+        logEvent('INFO', `練習セッション開始: 全${currentQueue.length}語のキューを生成`);
+        inputArea.disabled = false;
+        startBtn.innerText = 'リスタート (Restart)';
+        updateProgress();
+        statusDisplay.innerText = 'Preparing audio...';
+        await warmEngine();
+        inputArea.focus();
+        loadWord();
+    }
+
+    // 単語の読み込み表示
+    function loadWord() {
+        wordHasLoggedMiss = false;
+        if (candidateTimeoutTimer) {
+            clearTimeout(candidateTimeoutTimer);
+            candidateTimeoutTimer = null;
+        }
+
+        if (currentIndex >= currentQueue.length) {
+            meaningDisplay.innerText = '🎉 全150語達成！すべての練習が終了しました';
+            katakanaDisplay.innerText = '';
+            ipaDisplay.innerText = '';
+            wordDisplay.innerText = 'Congratulations! All 150 Words Finished.';
+            if (lessonBadge) lessonBadge.innerText = '';
+            inputArea.disabled = true;
+            statusDisplay.innerText = 'レッスンを選択して再度スタートしてください。';
+            statusDisplay.className = '';
+            progressFill.style.width = '100%';
+            logEvent('COMPLETE', `🎉 全単語達成！すべての練習が終了しました (全${currentQueue.length}語 完了)`);
+            return;
+        }
+
+        const current = currentQueue[currentIndex];
+        if (lessonBadge && current.lessonTitle) {
+            lessonBadge.innerText = `${current.lessonTitle} （単語 ${current.wordIndexInLesson}/${current.wordTotalInLesson} · 全体 ${currentIndex + 1}/${currentQueue.length}）`;
+        }
+        if (current.lessonTitle && current.lessonTitle !== lastLessonLogged) {
+            lastLessonLogged = current.lessonTitle;
+            logEvent('INFO', `▶ 【章進行】「${current.lessonTitle}」に入りました (章内全${current.wordTotalInLesson}語)`);
+            if (isNumericalSession && current.lessonIndex !== undefined) {
+                lessonSelect.value = String(current.lessonIndex);
+            }
+        }
+
+        meaningDisplay.innerText = current.meaning;
+        katakanaDisplay.innerText = current.katakana;
+        ipaDisplay.innerText = current.ipa;
+
+        renderEnglishText('');
+
+        statusDisplay.innerText = 'Listening... (読み上げ中)';
+        statusDisplay.className = '';
+        inputArea.value = '';
+        updateProgress();
+        logEvent('INFO', `[${currentIndex + 1}/${currentQueue.length}] 出題: "${current.toc_display || current.word}" (${current.meaning})`);
+
+        if (loadDelayTimer) {
+            clearTimeout(loadDelayTimer);
+            loadDelayTimer = null;
+        }
+        const tokenAtLoad = speakToken;
+        loadDelayTimer = setTimeout(() => {
+            loadDelayTimer = null;
+            if (tokenAtLoad !== speakToken) return;
+            speak(current.toc_display || current.word);
+        }, 300);
+    }
+
+    // 単語の最良一致候補判定
+    function getBestTarget(item, userInput) {
+        const cands = item.typing_candidates && item.typing_candidates.length > 0 ? item.typing_candidates : [item.word];
+        const display = item.toc_display || item.word;
+        if (!userInput) return display;
+        
+        // 入力が display に一致していれば display
+        if (display.toLowerCase().startsWith(userInput.toLowerCase())) {
+            return display;
+        }
+        // 入力がいずれかの候補の前方一致ならその候補
+        for (const c of cands) {
+            if (c.toLowerCase().startsWith(userInput.toLowerCase())) {
+                return c;
+            }
+        }
+        // 入力が候補で始まっている場合
+        for (const c of cands) {
+            if (userInput.toLowerCase().startsWith(c.toLowerCase())) {
+                return c;
+            }
+        }
+        return display;
+    }
+
+    // 単語（文字単位）の描画
+    function renderEnglishText(userInput) {
+        if (!currentQueue[currentIndex]) return;
+        const currentItem = currentQueue[currentIndex];
+        const targetText = getBestTarget(currentItem, userInput);
+
+        let html = '';
+        for (let i = 0; i < targetText.length; i++) {
+            const char = targetText[i];
+            const isSpace = char === ' ';
+
+            if (i < userInput.length) {
+                if (userInput[i].toLowerCase() === char.toLowerCase()) {
+                    if (isSpace) {
+                        html += `<span class="char-correct space-correct">&nbsp;</span>`;
+                    } else {
+                        html += `<span class="char-correct">${escapeHtml(char)}</span>`;
+                    }
+                } else {
+                    if (isSpace) {
+                        html += `<span class="char-wrong space-wrong">&nbsp;</span>`;
+                    } else {
+                        html += `<span class="char-wrong">${escapeHtml(char)}</span>`;
+                    }
+                }
+            } else {
+                if (isSpace) {
+                    html += `<span class="char-pending space-char">&nbsp;</span>`;
+                } else {
+                    html += `<span class="char-pending">${escapeHtml(char)}</span>`;
+                }
+            }
+        }
+        wordDisplay.innerHTML = html;
+    }
+
+    // 音声読み上げ
+    async function speak(text) {
+        const token = ++speakToken;
+
+        if (speechSynthesis.speaking || speechSynthesis.pending) {
+            speechSynthesis.cancel();
+            await waitMs(250);
+        } else if (speechSynthesis.paused) {
+            speechSynthesis.resume();
+        }
+        if (token !== speakToken) return;
+
+        await warmEngine();
+        if (token !== speakToken) return;
+
+        const rate = parseFloat(speedSelect.value) || 0.7;
+        const uttr = new SpeechSynthesisUtterance(text);
+        uttr.rate = rate;
+        uttr.pitch = 1.0;
+        applyVoice(uttr);
+
+        const timeoutMs = Math.max(6000, Math.ceil((text.length * 150) / rate));
+        logEvent('AUDIO', `音声読み上げ開始 (速度: ${rate}): "${text}"`);
+        statusDisplay.innerText = 'Listening... (読み上げ中)';
+        statusDisplay.className = '';
+
+        try {
+            await new Promise((resolve, reject) => {
+                let settled = false;
+                const timer = setTimeout(() => {
+                    if (settled) return;
+                    settled = true;
+                    logEvent('WARN', `音声タイムアウト保護発動 (${timeoutMs}ms) → 入力待機 (Type it!) に復帰`);
+                    speechSynthesis.cancel();
+                    resolve();
+                }, timeoutMs);
+
+                uttr.onend = () => {
+                    if (settled) return;
+                    settled = true;
+                    clearTimeout(timer);
+                    resolve();
+                };
+                uttr.onerror = (e) => {
+                    if (settled) return;
+                    settled = true;
+                    clearTimeout(timer);
+                    logEvent('WARN', `音声合成エラーイベント: ${e.error || 'unknown'}`);
+                    resolve();
+                };
+
+                speechSynthesis.speak(uttr);
+            });
+
+            if (token !== speakToken) return;
+            statusDisplay.innerText = 'Type it!';
+            statusDisplay.className = '';
+            inputArea.focus();
+        } catch (e) {
+            console.error('Speech synthesis error:', e);
+            if (token !== speakToken) return;
+            speechSynthesis.cancel();
+            statusDisplay.innerText = 'Type it! (Enter で再読み上げ)';
+            statusDisplay.className = '';
+            logEvent('WARN', '音声キャンセル → Enterキーで再読み上げ可能');
+            inputArea.focus();
+        }
+    }
+
+    function replayCurrentVoice() {
+        if (!currentQueue[currentIndex]) return;
+        const current = currentQueue[currentIndex];
+        speak(current.toc_display || current.word);
+    }
+
+    function waitMs(ms) {
+        return new Promise(r => setTimeout(r, ms));
+    }
+
+    function updateProgress() {
+        const percent = (currentIndex / currentQueue.length) * 100;
+        progressFill.style.width = percent + '%';
+    }
+
+    // 正解完了時の処理
+    function handleCorrectMatch(matchedWord) {
+        const currentItem = currentQueue[currentIndex];
+        const isEndOfLesson = currentItem && (currentItem.wordIndexInLesson === currentItem.wordTotalInLesson) && (currentIndex + 1 < currentQueue.length);
+
+        if (candidateTimeoutTimer) {
+            clearTimeout(candidateTimeoutTimer);
+            candidateTimeoutTimer = null;
+        }
+        inputArea.disabled = true;
+        if (nextSentenceTimer) {
+            clearTimeout(nextSentenceTimer);
+            nextSentenceTimer = null;
+        }
+
+        if (isEndOfLesson) {
+            const nextItem = currentQueue[currentIndex + 1];
+            const nextLessonName = nextItem ? nextItem.lessonTitle : '次の章';
+            statusDisplay.innerText = `🎉 ${currentItem.lessonTitle} クリア！ → ${nextLessonName} へ進みます`;
+            statusDisplay.className = 'correct';
+            logEvent('SUCCESS', `🎉 【章クリア】「${currentItem.lessonTitle}」完了！ 次の章へ進みます (1200ms後)`);
+            nextSentenceTimer = setTimeout(() => {
+                nextSentenceTimer = null;
+                currentIndex++;
+                inputArea.disabled = false;
+                inputArea.focus();
+                statusDisplay.className = '';
+                loadWord();
+            }, 1200);
+        } else {
+            statusDisplay.innerText = 'Correct! Next...';
+            statusDisplay.className = 'correct';
+            logEvent('SUCCESS', `正解！ [${currentIndex + 1}/${currentQueue.length}] "${matchedWord}" → 次へ (600ms後)`);
+            nextSentenceTimer = setTimeout(() => {
+                nextSentenceTimer = null;
+                currentIndex++;
+                inputArea.disabled = false;
+                inputArea.focus();
+                statusDisplay.className = '';
+                loadWord();
+            }, 600);
+        }
+    }
+
+    // 入力監視リスナー
+    inputArea.addEventListener('input', () => {
+        if (!currentQueue[currentIndex]) return;
+
+        const currentItem = currentQueue[currentIndex];
+        const userInput = inputArea.value;
+        const cands = currentItem.typing_candidates && currentItem.typing_candidates.length > 0 ? currentItem.typing_candidates : [currentItem.word];
+        const displayWord = currentItem.toc_display || currentItem.word;
+
+        renderEnglishText(userInput);
+
+        if (candidateTimeoutTimer) {
+            clearTimeout(candidateTimeoutTimer);
+            candidateTimeoutTimer = null;
+        }
+
+        // 判定候補一覧（原文表示、個別候補、カンマなし併記）
+        const acceptedTargets = [...cands, displayWord, displayWord.replace(/,/g, '')];
+
+        // 1. 完全一致チェック
+        const exactMatch = acceptedTargets.find(t => t.toLowerCase() === userInput.trim().toLowerCase());
+        if (exactMatch) {
+            // より長い候補が存在するか確認（例: del に対する delete）
+            const longerCand = cands.find(c => c.length > exactMatch.length && c.toLowerCase().startsWith(userInput.toLowerCase()));
+            if (longerCand) {
+                // 長い候補もあるため、500ms待機またはEnterで確定
+                statusDisplay.innerText = `Matched "${exactMatch}"! (Space/Enter で即確定、または続けて入力)`;
+                statusDisplay.className = 'correct';
+                candidateTimeoutTimer = setTimeout(() => {
+                    handleCorrectMatch(exactMatch);
+                }, 500);
+                return;
+            }
+            handleCorrectMatch(exactMatch);
+            return;
+        }
+
+        // 2. 前方一致チェック
+        const hasPrefix = acceptedTargets.some(t => t.toLowerCase().startsWith(userInput.toLowerCase()));
+        if (hasPrefix) {
+            statusDisplay.innerText = 'Typing...';
+            statusDisplay.className = '';
+        } else {
+            statusDisplay.innerText = 'Oops! 綴りを確認してください';
+            statusDisplay.className = 'incorrect';
+            if (!wordHasLoggedMiss) {
+                wordHasLoggedMiss = true;
+                logEvent('WARN', `ミスタイプ検知: 入力="${userInput}" 目標="${displayWord}"`);
+            }
+        }
+    });
+
+    // Enter / Space キー操作補助
+    inputArea.addEventListener('keydown', (e) => {
+        if (!currentQueue[currentIndex]) return;
+        const currentItem = currentQueue[currentIndex];
+        const userInput = inputArea.value.trim();
+        const cands = currentItem.typing_candidates && currentItem.typing_candidates.length > 0 ? currentItem.typing_candidates : [currentItem.word];
+        const displayWord = currentItem.toc_display || currentItem.word;
+        const acceptedTargets = [...cands, displayWord, displayWord.replace(/,/g, '')];
+
+        if (e.key === 'Enter') {
+            if (!userInput) {
+                // 未入力Enter時は音声再再生
+                e.preventDefault();
+                replayCurrentVoice();
+                return;
+            }
+            const match = acceptedTargets.find(t => t.toLowerCase() === userInput.toLowerCase());
+            if (match) {
+                e.preventDefault();
+                handleCorrectMatch(match);
+                return;
+            }
+        } else if (e.key === ' ') {
+            // スペースキー押下時に完全一致していれば即確定
+            const match = acceptedTargets.find(t => t.toLowerCase() === userInput.toLowerCase());
+            if (match) {
+                e.preventDefault();
+                handleCorrectMatch(match);
+                return;
+            }
+        }
+    });
+
+    // 速度変更監視
+    speedSelect.addEventListener('change', () => {
+        logEvent('INFO', `読み上げ速度を ${speedSelect.value} に変更しました`);
+    });
+
+    // アプリケーション起動
+    initData();
+</script>
+
+</body>
+</html>
