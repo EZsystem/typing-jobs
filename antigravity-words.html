@@ -23,7 +23,7 @@
         color: #6c757d;
         margin-bottom: 18px;
     }
-    
+
     #container {
         background: white;
         max-width: 820px;
@@ -32,7 +32,7 @@
         border-radius: 12px;
         box-shadow: 0 6px 16px rgba(0,0,0,0.08);
     }
-    
+
     .controls {
         display: flex;
         gap: 12px;
@@ -79,7 +79,7 @@
         line-height: 1.5;
         font-weight: bold;
     }
-    
+
     /* 2. カタカナ */
     #katakana-display {
         font-size: 0.95em;
@@ -118,7 +118,7 @@
     .space-char { border-bottom: 1.5px dashed #bbb; display: inline-block; min-width: 0.5em; }
     .space-correct { border-bottom: 1.5px solid #222; display: inline-block; min-width: 0.5em; }
     .space-wrong { border-bottom: 1.5px solid #dc3545; background-color: #f8d7da; display: inline-block; min-width: 0.5em; }
-    
+
     #input-area {
         width: 88%;
         max-width: 600px;
@@ -135,7 +135,7 @@
         border-color: #007bff;
         box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
     }
-    
+
     #status {
         margin-top: 18px;
         font-weight: bold;
@@ -149,7 +149,7 @@
     #status.incorrect {
         color: #dc3545;
     }
-    
+
     .btn-group {
         margin-top: 18px;
     }
@@ -170,7 +170,7 @@
     button.main-btn:active {
         transform: translateY(1px);
     }
-    
+
     .progress-bar {
         height: 8px;
         background: #eee;
@@ -222,7 +222,7 @@
 <div id="container">
     <h1>Antigravity英単語タイピング</h1>
     <div class="subtitle">Antigravity Vocabulary Typing</div>
-    
+
     <div class="controls">
         <select id="lesson-select">
             <option value="all">★ 全語を通して実行 (All 153 Words)</option>
@@ -243,12 +243,12 @@
     <div id="katakana-display"></div>
     <div id="ipa-display"></div>
     <div id="word-display">Antigravity Vocabulary Typing</div>
-    
+
     <input type="text" id="input-area" placeholder="Type here..." disabled autocomplete="off">
-    
+
     <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
     <div id="status"></div>
-    
+
     <div class="btn-group">
         <button id="start-btn" class="main-btn" onclick="startPractice()">スタート (Start)</button>
     </div>
