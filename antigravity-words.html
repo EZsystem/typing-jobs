@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Antigravity英単語タイピング (Antigravity Vocabulary Typing)</title>
+<style>
+    body {
+        font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'BIZ UDPGothic', Meiryo, sans-serif;
+        text-align: center;
+        padding: 30px;
+        background-color: #f0f2f5;
+        color: #333;
+    }
+    h1 {
+        color: #2c3e50;
+        font-size: 1.6em;
+        margin-bottom: 6px;
+        letter-spacing: 0.5px;
+    }
+    .subtitle {
+        font-size: 0.88em;
+        color: #6c757d;
+        margin-bottom: 18px;
+    }
+
+    #container {
+        background: white;
+        max-width: 820px;
+        margin: 0 auto;
+        padding: 32px 30px;
+        border-radius: 12px;
+        box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+    }
+
+    .controls {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 20px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    select {
+        padding: 10px 12px;
+        font-size: 1em;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+        background: #fff;
+        color: #333;
+        outline: none;
+        transition: border-color 0.2s;
+    }
+    select:focus {
+        border-color: #007bff;
+    }
+    #lesson-select {
+        flex: 2;
+        min-width: 260px;
+    }
+    #speed-select {
+        flex: 1;
+        min-width: 130px;
+    }
+
+    /* --- 単語表示エリア --- */
+    #lesson-badge {
+        font-size: 0.92em;
+        font-weight: bold;
+        color: #007bff;
+        margin-bottom: 8px;
+        min-height: 1.4em;
+    }
+    /* 1. 意味 (Jobs の和訳位置) */
+    #meaning-display {
+        font-size: 1.25em;
+        color: #222;
+        margin-bottom: 6px;
+        min-height: 1.5em;
+        line-height: 1.5;
+        font-weight: bold;
+    }
+
+    /* 2. カタカナ */
+    #katakana-display {
+        font-size: 0.95em;
+        color: #666;
+        margin-bottom: 4px;
+        min-height: 1.3em;
+        letter-spacing: 0.5px;
+    }
+
+    /* 3. 発音記号 (IPA) */
+    #ipa-display {
+        font-size: 1.0em;
+        color: #007bff;
+        margin-bottom: 18px;
+        font-family: "Lucida Sans Unicode", "Arial Unicode MS", "Segoe UI", sans-serif;
+        min-height: 1.3em;
+    }
+
+    /* 4. 打つ英単語 (判定用装飾) */
+    #word-display {
+        font-size: 1.85em;
+        font-weight: bold;
+        margin-bottom: 22px;
+        letter-spacing: 1px;
+        min-height: 1.5em;
+        color: #bbb;
+        word-wrap: break-word;
+        white-space: pre-wrap;
+    }
+
+    /* 文字単位の判定スタイル */
+    .char-correct { color: #222; }
+    .char-wrong { color: #dc3545; background-color: #f8d7da; border-radius: 3px; padding: 0 1px; }
+    .char-pending { color: #aaa; }
+    /* スペース文字の可視化補助（未入力時） */
+    .space-char { border-bottom: 1.5px dashed #bbb; display: inline-block; min-width: 0.5em; }
+    .space-correct { border-bottom: 1.5px solid #222; display: inline-block; min-width: 0.5em; }
+    .space-wrong { border-bottom: 1.5px solid #dc3545; background-color: #f8d7da; display: inline-block; min-width: 0.5em; }
+
+    #input-area {
+        width: 88%;
+        max-width: 600px;
+        padding: 14px 18px;
+        font-size: 1.35em;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        outline: none;
+        transition: border-color 0.25s, box-shadow 0.25s;
+        text-align: center;
+        letter-spacing: 0.5px;
+    }
+    #input-area:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
+    }
+
+    #status {
+        margin-top: 18px;
+        font-weight: bold;
+        color: #007bff;
+        min-height: 1.5em;
+        font-size: 1.05em;
+    }
+    #status.correct {
+        color: #28a745;
+    }
+    #status.incorrect {
+        color: #dc3545;
+    }
+
+    .btn-group {
+        margin-top: 18px;
+    }
+    button.main-btn {
+        padding: 12px 30px;
+        font-size: 1.1em;
+        font-weight: bold;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background 0.2s, transform 0.1s;
+    }
+    button.main-btn:hover {
+        background-color: #0056b3;
+    }
+    button.main-btn:active {
+        transform: translateY(1px);
+    }
+
+    .progress-bar {
+        height: 8px;
+        background: #eee;
+        width: 100%;
+        margin-top: 22px;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+    .progress-fill {
+        height: 100%;
+        background: #28a745;
+        width: 0%;
+        transition: width 0.3s;
+    }
+
+    /* 進行・診断ログパネル */
+    #log-wrapper {
+        margin-top: 25px;
+        text-align: left;
+        border-top: 1px solid #eee;
+        padding-top: 15px;
+    }
+    .log-btn {
+        padding: 4px 10px;
+        font-size: 0.8em;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: opacity 0.2s;
+    }
+    .log-btn:hover { opacity: 0.85; }
+    #log-box {
+        background: #1e1e1e;
+        color: #d4d4d4;
+        font-family: Consolas, 'Courier New', monospace;
+        font-size: 0.82em;
+        padding: 10px 12px;
+        border-radius: 6px;
+        height: 140px;
+        overflow-y: auto;
+        line-height: 1.45;
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+    }
+</style>
+</head>
+<body>
+
+<div id="container">
+    <h1>Antigravity英単語タイピング</h1>
+    <div class="subtitle">Antigravity Vocabulary Typing</div>
+
+    <div class="controls">
+        <select id="lesson-select">
+            <option value="all">★ 全語を通して実行 (All 153 Words)</option>
+        </select>
+
+        <select id="speed-select">
+            <option value="0.5">速度: 0.5 (Slow)</option>
+            <option value="0.7" selected>速度: 0.7</option>
+            <option value="0.8">速度: 0.8</option>
+            <option value="1.0">速度: 1.0 (Normal)</option>
+        </select>
+    </div>
+
+    <hr style="border: 0; border-top: 1px solid #eee; margin: 18px 0;">
+
+    <div id="lesson-badge"></div>
+    <div id="meaning-display">レッスンを選択してスタートしてください</div>
+    <div id="katakana-display"></div>
+    <div id="ipa-display"></div>
+    <div id="word-display">Antigravity Vocabulary Typing</div>
+
+    <input type="text" id="input-area" placeholder="Type here..." disabled autocomplete="off">
+
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+    <div id="status"></div>
+
+    <div class="btn-group">
+        <button id="start-btn" class="main-btn" onclick="startPractice()">スタート (Start)</button>
+    </div>
+
+    <!-- 進行・診断ログ表示パネル -->
+    <div id="log-wrapper">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <span style="font-weight: bold; font-size: 0.9em; color: #555;">📋 進行・診断ログ (Realtime Log)</span>
+            <div style="display: flex; gap: 6px;">
+                <button id="copy-log-btn" class="log-btn" type="button" onclick="copyLogPanel()" style="background: #007bff;">コピー</button>
+                <button id="toggle-log-btn" class="log-btn" type="button" onclick="toggleLogPanel()" style="background: #6c757d;">ログを隠す</button>
+                <button id="clear-log-btn" class="log-btn" type="button" onclick="clearLogPanel()" style="background: #dc3545;">消去</button>
+            </div>
+        </div>
+        <div id="log-box"></div>
+    </div>
+</div>
+
+<script>
+    // レッスン別の内蔵単語: 単語、意味、発音、カタカナ
+    const VOCABULARY_LESSONS = [
+        {
+            title: '1. 開発環境とツール',
+            entries: [
+                ['plugin', 'プラグイン', '/ˈplʌɡɪn/', 'プラグイン'],
+                ['command', 'コマンド', '/kəˈmænd/', 'コマンド'],
+                ['mcp', 'MCP（外部ツール連携規格）', '/ˌem siː ˈpiː/', 'エムシーピー'],
+                ['server', 'サーバー', '/ˈsɜːrvər/', 'サーバー'],
+                ['project', 'プロジェクト', '/ˈprɑːdʒekt/', 'プロジェクト'],
+                ['cli', 'コマンドライン（CLI）', '/ˌsiː el ˈaɪ/', 'シーエルアイ'],
+                ['ide', '統合開発環境（IDE）', '/ˌaɪ diː ˈiː/', 'アイディーイー'],
+                ['sdk', '開発キット（SDK）', '/ˌes diː ˈkeɪ/', 'エスディーケー'],
+                ['terminal', 'ターミナル', '/ˈtɜːrmɪnəl/', 'ターミナル'],
+                ['system', 'システム', '/ˈsɪstəm/', 'システム'],
+                ['script', 'スクリプト', '/skrɪpt/', 'スクリプト'],
+                ['handler', 'ハンドラ（処理役）', '/ˈhændlər/', 'ハンドラー'],
+                ['execution', '実行', '/ˌeksɪˈkjuːʃən/', 'エクスキューション']
+            ]
+        },
+        {
+            title: '2. 設定とカスタマイズ',
+            entries: [
+                ['optional', '任意（省略可）', '/ˈɑːpʃənəl/', 'オプショナル'],
+                ['customizations', 'カスタマイズ（複数）', '/ˌkʌstəmaɪˈzeɪʃənz/', 'カスタマイゼーションズ'],
+                ['configuration', '構成・設定', '/kənˌfɪɡjəˈreɪʃən/', 'コンフィギュレーション'],
+                ['customization', 'カスタマイズ', '/ˌkʌstəmaɪˈzeɪʃən/', 'カスタマイゼーション'],
+                ['field', '項目・フィールド', '/fiːld/', 'フィールド'],
+                ['specific', '特定の', '/spəˈsɪfɪk/', 'スペシフィック'],
+                ['setting', '設定', '/ˈsetɪŋ/', 'セッティング'],
+                ['custom', 'カスタム（独自）', '/ˈkʌstəm/', 'カスタム'],
+                ['configured', '設定済みの', '/kənˈfɪɡjərd/', 'コンフィギュアード'],
+                ['configure', '設定・構成する', '/kənˈfɪɡjər/', 'コンフィギュア'],
+                ['override', '上書きする', '/ˌoʊvərˈraɪd/', 'オーバーライド'],
+                ['capabilitiesconfig', '機能設定（設定キー）', '/ˌkeɪpəˈbɪlətiz ˈkɑːnfɪɡ/', 'ケイパビリティーズコンフィグ'],
+                ['localagentconfig', 'ローカルエージェント設定', '/ˈloʊkəl ˈeɪdʒənt ˈkɑːnfɪɡ/', 'ローカルエージェントコンフィグ']
+            ]
+        },
+        {
+            title: '3. ファイルと構造',
+            entries: [
+                ['reference', '参照・参考資料', '/ˈrefərəns/', 'レファレンス'],
+                ['root', 'ルート（最上位）', '/ruːt/', 'ルート'],
+                ['relative', '相対（パス等）', '/ˈrelətɪv/', 'レラティブ'],
+                ['inline', 'インライン（行内）', '/ˈɪnlaɪn/', 'インライン'],
+                ['inside', '内部に', '/ɪnˈsaɪd/', 'インサイド'],
+                ['within', '〜の範囲内で', '/wɪˈðɪn/', 'ウィズイン'],
+                ['folder', 'フォルダ', '/ˈfoʊldər/', 'フォルダー'],
+                ['location', '場所・配置先', '/loʊˈkeɪʃən/', 'ロケーション'],
+                ['containing', '〜を含む', '/kənˈteɪnɪŋ/', 'コンテイニング'],
+                ['sitemap', 'サイトマップ（目次）', '/ˈsaɪtmæp/', 'サイトマップ'],
+                ['structure', '構造', '/ˈstrʌktʃər/', 'ストラクチャー'],
+                ['flat', 'フラット（平ら・1階層）', '/flæt/', 'フラット'],
+                ['metadata', 'メタデータ（付随情報）', '/ˈmetədeɪtə/', 'メタデータ']
+            ]
+        },
+        {
+            title: '4. 入出力とメッセージ',
+            entries: [
+                ['message', 'メッセージ', '/ˈmesɪdʒ/', 'メッセージ'],
+                ['output', '出力', '/ˈaʊtpʊt/', 'アウトプット'],
+                ['input', '入力', '/ˈɪnpʊt/', 'インプット'],
+                ['slash', 'スラッシュ（`/`）', '/slæʃ/', 'スラッシュ'],
+                ['stdout', '標準出力', '/ˌstændərd ˈaʊt/', 'スタンダードアウト'],
+                ['systemmessage', 'システムメッセージ', '/ˈsɪstəm ˈmesɪdʒ/', 'システムメッセージ'],
+                ['description', '説明文', '/dɪˈskrɪpʃən/', 'ディスクリプション'],
+                ['stdin', '標準入力', '/ˌstændərd ˈɪn/', 'スタンダードイン'],
+                ['conversation', '会話', '/ˌkɑːnvərˈseɪʃən/', 'カンバセーション'],
+                ['instruction', '指示書', '/ɪnˈstrʌkʃən/', 'インストラクション'],
+                ['asks', '尋ねる・確認する', '/æsks/', 'アスクス'],
+                ['strings', '文字列（複数）', '/strɪŋz/', 'ストリングズ']
+            ]
+        },
+        {
+            title: '5. 実行とフック',
+            entries: [
+                ['automatically', '自動的に', '/ˌɔːtəˈmætɪkli/', 'オートマティカリー'],
+                ['loop', 'ループ（繰り返し）', '/luːp/', 'ループ'],
+                ['directly', '直接', '/dəˈrektli/', 'ダイレクトリー'],
+                ['matcher', 'マッチャー（条件照合）', '/ˈmætʃər/', 'マッチャー'],
+                ['workflow', 'ワークフロー', '/ˈwɜːrkfloʊ/', 'ワークフロー'],
+                ['lifecycle', 'ライフサイクル', '/ˈlaɪfsaɪkəl/', 'ライフサイクル'],
+                ['event', 'イベント', '/ɪˈvent/', 'イベント'],
+                ['preinvocation', '実行前フック', '/ˌpriː ˌɪnvəˈkeɪʃən/', 'プリーインボケーション'],
+                ['pretooluse', 'ツール実行前フック', '/ˌpriː tuːl ˈjuːs/', 'プリーツールユース'],
+                ['trigger', 'トリガー（起動条件）', '/ˈtrɪɡər/', 'トリガー'],
+                ['posttooluse', 'ツール実行後フック', '/ˌpoʊst tuːl ˈjuːs/', 'ポストツールユース'],
+                ['executes', '実行する', '/ˈeksɪkjuːts/', 'エクスキューツ'],
+                ['postinvocation', '実行後フック', '/ˌpoʊst ˌɪnvəˈkeɪʃən/', 'ポストインボケーション']
+            ]
+        },
+        {
+            title: '6. 権限と制御',
+            entries: [
+                ['permission', '権限・許可', '/pərˈmɪʃən/', 'パーミッション'],
+                ['block', 'ブロック（阻止/塊）', '/blɑːk/', 'ブロック'],
+                ['required', '必須', '/rɪˈkwaɪərd/', 'リクワイアード'],
+                ['policy', 'ポリシー（方針）', '/ˈpɑːləsi/', 'ポリシー'],
+                ['enabled', '有効化された', '/ɪˈneɪbəld/', 'イネイブルド'],
+                ['control', '制御する', '/kənˈtroʊl/', 'コントロール'],
+                ['access', 'アクセス', '/ˈækses/', 'アクセス'],
+                ['enable', '有効化する', '/ɪˈneɪbəl/', 'イネイブル'],
+                ['deny', '拒否する', '/dɪˈnaɪ/', 'ディナイ'],
+                ['grant', '付与する', '/ɡrænt/', 'グラント'],
+                ['disable', '無効化する', '/dɪsˈeɪbəl/', 'ディセイブル'],
+                ['allows', '許可・可能にする', '/əˈlaʊz/', 'アラウズ'],
+                ['exclude', '除外する', '/ɪkˈskluːd/', 'エクスクルード']
+            ]
+        },
+        {
+            title: '7. 状態と変更',
+            entries: [
+                ['discovery', '自動検出', '/dɪˈskʌvəri/', 'ディスカバリー'],
+                ['loaded', '読み込まれた', '/ˈloʊdɪd/', 'ローディッド'],
+                ['supported', '対応済みの', '/səˈpɔːrtɪd/', 'サポーティッド'],
+                ['discovered', '検出された', '/dɪˈskʌvərd/', 'ディスカバード'],
+                ['injected', '差し込まれた', '/ɪnˈdʒektɪd/', 'インジェクティッド'],
+                ['shared', '共有された', '/ʃerd/', 'シェアード'],
+                ['built', '組み込まれた', '/bɪlt/', 'ビルト'],
+                ['merged', '統合・マージされた', '/mɜːrdʒd/', 'マージド'],
+                ['defined', '定義された', '/dɪˈfaɪnd/', 'ディファインド'],
+                ['started', '開始した', '/ˈstɑːrtɪd/', 'スターティッド'],
+                ['applied', '適用された', '/əˈplaɪd/', 'アプライド'],
+                ['listed', '一覧にある', '/ˈlɪstɪd/', 'リスティッド'],
+                ['resolved', '解決・確定された', '/rɪˈzɑːlvd/', 'リゾルブド']
+            ]
+        },
+        {
+            title: '8. チームとドキュメント',
+            entries: [
+                ['guide', 'ガイド', '/ɡaɪd/', 'ガイド'],
+                ['team', 'チーム', '/tiːm/', 'チーム'],
+                ['working', '作業中の', '/ˈwɜːrkɪŋ/', 'ワーキング'],
+                ['contract', '契約・仕様', '/ˈkɑːntrækt/', 'コントラクト'],
+                ['common', '共通の', '/ˈkɑːmən/', 'コモン'],
+                ['share', '共有する', '/ʃer/', 'シェア'],
+                ['documentation', 'ドキュメント', '/ˌdɑːkjəmenˈteɪʃən/', 'ドキュメンテーション'],
+                ['based', '〜に基づく', '/beɪst/', 'ベイスト'],
+                ['decision', '判断・決定', '/dɪˈsɪʒən/', 'ディシジョン'],
+                ['example', '例', '/ɪɡˈzæmpəl/', 'イグザンプル'],
+                ['reason', '理由', '/ˈriːzən/', 'リーズン'],
+                ['practice', '実践・ベストプラクティス', '/ˈpræktɪs/', 'プラクティス'],
+                ['details', '詳細', '/ˈdiːteɪlz/', 'ディーテイルズ']
+            ]
+        },
+        {
+            title: '9. 操作と画面',
+            entries: [
+                ['sidebar', 'サイドバー', '/ˈsaɪdbɑːr/', 'サイドバー'],
+                ['mode', 'モード', '/moʊd/', 'モード'],
+                ['auto', '自動', '/ˈɔːtoʊ/', 'オート'],
+                ['edit', '編集する', '/ˈedɪt/', 'エディット'],
+                ['interactive', '対話型の', '/ˌɪntərˈæktɪv/', 'インタラクティブ'],
+                ['application', 'アプリケーション', '/ˌæplɪˈkeɪʃən/', 'アプリケーション'],
+                ['background', 'バックグラウンド（裏方）', '/ˈbækɡraʊnd/', 'バックグラウンド'],
+                ['live', 'ライブ・リアルタイム', '/laɪv/', 'ライブ'],
+                ['browser', 'ブラウザ', '/ˈbraʊzər/', 'ブラウザー'],
+                ['apply', '適用する', '/əˈplaɪ/', 'アプライ'],
+                ['canvas', 'キャンバス（画面）', '/ˈkænvəs/', 'キャンバス'],
+                ['coding', 'コーディング', '/ˈkoʊdɪŋ/', 'コーディング'],
+                ['change', '変更', '/tʃeɪndʒ/', 'チェンジ']
+            ]
+        },
+        {
+            title: '10. エージェントと機能',
+            entries: [
+                ['level', 'レベル・階層', '/ˈlevəl/', 'レベル'],
+                ['budget', '予算・上限枠', '/ˈbʌdʒɪt/', 'バジェット'],
+                ['inject', '注入・差し込む', '/ɪnˈdʒekt/', 'インジェクト'],
+                ['injectsteps', 'ステップ注入（内部キー）', '/ɪnˈdʒekt steps/', 'インジェクトステップス'],
+                ['remote', 'リモート（遠隔）', '/rɪˈmoʊt/', 'リモート'],
+                ['capability', '機能・権限', '/ˌkeɪpəˈbɪləti/', 'ケイパビリティー'],
+                ['terminationbehavior', '終了時の挙動（設定キー）', '/ˌtɜːrmɪˈneɪʃən bɪˈheɪvjər/', 'ターミネーションビヘイビア'],
+                ['transport', '通信方式', '/ˈtrænspɔːrt/', 'トランスポート'],
+                ['provides', '提供する', '/prəˈvaɪdz/', 'プロバイズ'],
+                ['subagent', 'サブエージェント', '/ˈsʌbˌeɪdʒənt/', 'サブエージェント'],
+                ['specialized', '特化した', '/ˈspeʃəlaɪzd/', 'スペシャライズド'],
+                ['external', '外部の', '/ɪkˈstɜːrnəl/', 'エクスターナル'],
+                ['progressive', '段階的な', '/prəˈɡresɪv/', 'プログレッシブ']
+            ]
+        },
+        {
+            title: '11. 導入と適用',
+            entries: [
+                ['available', '利用可能な', '/əˈveɪləbəl/', 'アベイラブル'],
+                ['necessary', '必要な', '/ˈnesəseri/', 'ネセサリー'],
+                ['pair', 'ペア（組）', '/per/', 'ペア'],
+                ['install', 'インストール', '/ɪnˈstɔːl/', 'インストール'],
+                ['binary', 'バイナリ（実行ファイル）', '/ˈbaɪnəri/', 'バイナリー'],
+                ['points', '箇所・ポイント', '/pɔɪnts/', 'ポインツ'],
+                ['applies', '適用される', '/əˈplaɪz/', 'アプライズ'],
+                ['inherit', '継承・引き継ぐ', '/ɪnˈherɪt/', 'インヘリット'],
+                ['placed', '配置された', '/pleɪst/', 'プレイスト'],
+                ['supports', '対応している', '/səˈpɔːrts/', 'サポーツ'],
+                ['ignored', '無視される', '/ɪɡˈnɔːrd/', 'イグノード'],
+                ['starting', '開始する', '/ˈstɑːrtɪŋ/', 'スターティング'],
+                ['npm', 'npm（パッケージ管理）', '/ˌen piː ˈem/', 'エヌピーエム'],
+                ['inherits', '引き継ぐ', '/ɪnˈherɪts/', 'インヘリッツ']
+            ]
+        },
+        {
+            title: '12. 条件と範囲',
+            entries: [
+                ['always', '常に', '/ˈɔːlweɪz/', 'オールウェイズ'],
+                ['explicitly', '明示的に', '/ɪkˈsplɪsɪtli/', 'イクスプリシットリー'],
+                ['complex', '複雑な', '/ˈkɑːmpleks/', 'コンプレックス'],
+                ['single', '単一の', '/ˈsɪŋɡəl/', 'シングル'],
+                ['every', 'すべての', '/ˈevri/', 'エブリー'],
+                ['whether', '〜かどうか', '/ˈweðər/', 'ウェザー'],
+                ['across', '〜を横断して', '/əˈkrɔːs/', 'アクロス'],
+                ['multiple', '複数の', '/ˈmʌltɪpəl/', 'マルティプル'],
+                ['never', '決して〜ない', '/ˈnevər/', 'ネバー'],
+                ['max', '最大', '/mæks/', 'マックス']
+            ]
+        }
+    ];
+
+    const LESSON_DEFINITIONS = VOCABULARY_LESSONS.map((lesson, index) => ({
+        id: `lesson-${index + 1}`,
+        title: lesson.title,
+        wordIds: lesson.entries.map(entry => entry[0])
+    }));
+
+    const DEFAULT_WORDS_DATA = {
+        words: VOCABULARY_LESSONS.flatMap(lesson => lesson.entries.map(([word, meaning, ipa, katakana]) => ({
+            id: word, word, meaning, ipa, katakana,
+            tags: ['Antigravity', lesson.title],
+            source: 'Antigravity'
+        })))
+    };
+
+    // アプリ内状態
+    let wordsMap = {};
+    let currentQueue = [];
+    let currentIndex = 0;
+    let preferredVoice = null;
+    let engineWarmed = false;
+    let speakToken = 0;
+    let nextSentenceTimer = null;
+    let loadDelayTimer = null;
+    let isNumericalSession = false;
+    let lastLessonLogged = '';
+    let wordHasLoggedMiss = false;
+
+    // DOM要素
+    const lessonSelect = document.getElementById('lesson-select');
+    const speedSelect = document.getElementById('speed-select');
+    const lessonBadge = document.getElementById('lesson-badge');
+    const meaningDisplay = document.getElementById('meaning-display');
+    const katakanaDisplay = document.getElementById('katakana-display');
+    const ipaDisplay = document.getElementById('ipa-display');
+    const wordDisplay = document.getElementById('word-display');
+    const inputArea = document.getElementById('input-area');
+    const progressFill = document.getElementById('progress-fill');
+    const statusDisplay = document.getElementById('status');
+    const startBtn = document.getElementById('start-btn');
+    const logBox = document.getElementById('log-box');
+
+    // ログ出力関数
+    function logEvent(type, message) {
+        const time = new Date().toLocaleTimeString('ja-JP', { hour12: false });
+        const line = document.createElement('div');
+        let color = '#d4d4d4';
+        if (type === 'SUCCESS') color = '#4ec9b0';
+        else if (type === 'WARN') color = '#ce9178';
+        else if (type === 'ERROR') color = '#f14c4c';
+        else if (type === 'INFO') color = '#9cdcfe';
+        else if (type === 'AUDIO') color = '#dcdcaa';
+        else if (type === 'START' || type === 'COMPLETE') color = '#c586c0';
+        line.innerHTML = `<span style="color:#858585;">[${time}]</span> <span style="color:${color}; font-weight:bold;">[${type}]</span> ${message}`;
+        logBox.appendChild(line);
+        logBox.scrollTop = logBox.scrollHeight;
+    }
+
+    function copyLogPanel() {
+        const text = logBox.innerText;
+        navigator.clipboard.writeText(text).then(() => {
+            alert('ログをクリップボードにコピーしました');
+        }).catch(() => {
+            alert('コピーに失敗しました');
+        });
+    }
+
+    function toggleLogPanel() {
+        const isHidden = logBox.style.display === 'none';
+        logBox.style.display = isHidden ? 'block' : 'none';
+        document.getElementById('toggle-log-btn').innerText = isHidden ? 'ログを隠す' : 'ログを表示';
+    }
+
+    function clearLogPanel() {
+        logBox.innerHTML = '';
+        logEvent('INFO', 'ログを消去しました');
+    }
+
+    function waitMs(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    // 単語マップの構築
+    function buildWordsMap(wordsList) {
+        const map = {};
+        wordsList.forEach(w => {
+            if (w && w.id) {
+                map[w.id] = w;
+            }
+        });
+        return map;
+    }
+
+    // レッスンセレクトの初期化
+    function initLessonSelect() {
+        // option[0]「★ 全語を通して実行」以外を一旦クリア
+        while (lessonSelect.options.length > 1) {
+            lessonSelect.remove(1);
+        }
+        LESSON_DEFINITIONS.forEach((lesson, idx) => {
+            const opt = document.createElement('option');
+            opt.value = String(idx);
+            opt.text = `${lesson.title} (${lesson.wordIds.length}語)`;
+            lessonSelect.appendChild(opt);
+        });
+    }
+
+    // 内蔵データの初期化
+    async function initData() {
+        wordsMap = buildWordsMap(DEFAULT_WORDS_DATA.words);
+        logEvent('INFO', `内蔵データを読み込みました (${Object.keys(wordsMap).length}語)`);
+    }
+
+    // 音声初期化 (Jobs 実績コードを踏襲)
+    function selectEnglishVoice() {
+        if (!('speechSynthesis' in window)) return null;
+        const voices = speechSynthesis.getVoices();
+        if (!voices || voices.length === 0) return null;
+
+        return (
+            voices.find(v => v.lang === 'en-US' && /natural|premium|enhanced/i.test(v.name)) ||
+            voices.find(v => v.lang === 'en-US' && /google|samantha|zira|david/i.test(v.name)) ||
+            voices.find(v => v.lang === 'en-US') ||
+            voices.find(v => v.lang && v.lang.startsWith('en')) ||
+            null
+        );
+    }
+
+    function applyVoice(uttr) {
+        if (!preferredVoice) preferredVoice = selectEnglishVoice();
+        if (preferredVoice) {
+            uttr.voice = preferredVoice;
+            uttr.lang = preferredVoice.lang;
+        }
+    }
+
+    function runUtterance(uttr) {
+        return new Promise((resolve, reject) => {
+            let settled = false;
+            const finish = (fn, arg) => {
+                if (settled) return;
+                settled = true;
+                fn(arg);
+            };
+            uttr.onend = () => finish(resolve);
+            uttr.onerror = (e) => finish(reject, e);
+            speechSynthesis.speak(uttr);
+            setTimeout(() => finish(resolve), 1200);
+        });
+    }
+
+    async function warmEngine() {
+        if (engineWarmed) return;
+        if (speechSynthesis.paused) speechSynthesis.resume();
+        const warm = new SpeechSynthesisUtterance('ready');
+        warm.volume = 0.01;
+        warm.rate = 1.2;
+        applyVoice(warm);
+        try {
+            await runUtterance(warm);
+        } catch (e) {}
+        engineWarmed = true;
+    }
+
+    function getLessonTitle(idx) {
+        const lesson = LESSON_DEFINITIONS[idx];
+        return lesson ? lesson.title : `レッスン ${idx + 1}`;
+    }
+
+    // 練習開始
+    async function startPractice() {
+        speakToken++;
+        if (nextSentenceTimer) {
+            clearTimeout(nextSentenceTimer);
+            nextSentenceTimer = null;
+        }
+        if (loadDelayTimer) {
+            clearTimeout(loadDelayTimer);
+            loadDelayTimer = null;
+        }
+        if (speechSynthesis.speaking || speechSynthesis.pending || speechSynthesis.paused) {
+            speechSynthesis.cancel();
+        }
+
+        const selectedValue = lessonSelect.value;
+        currentQueue = [];
+        lastLessonLogged = '';
+
+        if (selectedValue === 'all') {
+            isNumericalSession = false;
+            LESSON_DEFINITIONS.forEach((lesson, lIdx) => {
+                const title = lesson.title;
+                lesson.wordIds.forEach((wid, wIdx) => {
+                    const wItem = wordsMap[wid];
+                    if (wItem) {
+                        currentQueue.push({
+                            id: wid,
+                            word: wItem.word,
+                            meaning: wItem.meaning,
+                            ipa: wItem.ipa,
+                            katakana: wItem.katakana,
+                            lessonTitle: title,
+                            lessonIndex: lIdx,
+                            wordIndexInLesson: wIdx + 1,
+                            wordTotalInLesson: lesson.wordIds.length
+                        });
+                    }
+                });
+            });
+            logEvent('START', `★ 全語を通して実行を開始 (全${currentQueue.length}語)`);
+        } else {
+            isNumericalSession = true;
+            const startIndex = parseInt(selectedValue, 10);
+            const startTitle = getLessonTitle(startIndex);
+            // 選択したレッスンから最終レッスンまで継続実行
+            for (let i = startIndex; i < LESSON_DEFINITIONS.length; i++) {
+                const lesson = LESSON_DEFINITIONS[i];
+                if (lesson) {
+                    const title = lesson.title;
+                    lesson.wordIds.forEach((wid, wIdx) => {
+                        const wItem = wordsMap[wid];
+                        if (wItem) {
+                            currentQueue.push({
+                                id: wid,
+                                word: wItem.word,
+                                meaning: wItem.meaning,
+                                ipa: wItem.ipa,
+                                katakana: wItem.katakana,
+                                lessonTitle: title,
+                                lessonIndex: i,
+                                wordIndexInLesson: wIdx + 1,
+                                wordTotalInLesson: lesson.wordIds.length
+                            });
+                        }
+                    });
+                }
+            }
+            logEvent('START', `【継続実行】「${startTitle}」〜 最終レッスンまで開始 (全${currentQueue.length}語)`);
+        }
+
+        if (currentQueue.length === 0) {
+            logEvent('WARN', '単語データが0件のため開始できませんでした。');
+            return;
+        }
+
+        currentIndex = 0;
+        inputArea.disabled = false;
+        inputArea.value = '';
+        inputArea.focus();
+        startBtn.innerText = 'リスタート (Restart)';
+        updateProgress();
+        statusDisplay.innerText = 'Preparing audio...';
+        await warmEngine();
+        inputArea.focus();
+        loadWord();
+    }
+
+    // 単語の読み込み表示
+    function loadWord() {
+        wordHasLoggedMiss = false;
+
+        if (currentIndex >= currentQueue.length) {
+            meaningDisplay.innerText = '🎉 全単語達成！すべての練習が終了しました';
+            katakanaDisplay.innerText = '';
+            ipaDisplay.innerText = '';
+            wordDisplay.innerText = 'Congratulations! All Finished.';
+            if (lessonBadge) lessonBadge.innerText = '';
+            inputArea.disabled = true;
+            statusDisplay.innerText = 'レッスンを選択して再度スタートしてください。';
+            statusDisplay.className = '';
+            progressFill.style.width = '100%';
+            logEvent('COMPLETE', `🎉 全単語達成！すべての練習が終了しました (全${currentQueue.length}語 完了)`);
+            return;
+        }
+
+        const current = currentQueue[currentIndex];
+        if (lessonBadge && current.lessonTitle) {
+            lessonBadge.innerText = `${current.lessonTitle} （単語 ${current.wordIndexInLesson}/${current.wordTotalInLesson} · 全体 ${currentIndex + 1}/${currentQueue.length}）`;
+        }
+        if (current.lessonTitle && current.lessonTitle !== lastLessonLogged) {
+            lastLessonLogged = current.lessonTitle;
+            logEvent('INFO', `▶ 【レッスン進行】「${current.lessonTitle}」に入りました (レッスン内全${current.wordTotalInLesson}語)`);
+            if (isNumericalSession && current.lessonIndex !== undefined) {
+                lessonSelect.value = String(current.lessonIndex);
+            }
+        }
+
+        meaningDisplay.innerText = current.meaning;
+        katakanaDisplay.innerText = current.katakana;
+        ipaDisplay.innerText = current.ipa;
+
+        renderEnglishText('');
+
+        statusDisplay.innerText = 'Listening... (読み上げ中)';
+        statusDisplay.className = '';
+        inputArea.value = '';
+        updateProgress();
+        logEvent('INFO', `[${currentIndex + 1}/${currentQueue.length}] 出題: "${current.word}" (${current.meaning})`);
+
+        if (loadDelayTimer) {
+            clearTimeout(loadDelayTimer);
+            loadDelayTimer = null;
+        }
+        const tokenAtLoad = speakToken;
+        loadDelayTimer = setTimeout(() => {
+            loadDelayTimer = null;
+            if (tokenAtLoad !== speakToken) return;
+            speak(current.word);
+        }, 300);
+    }
+
+    // 単語（文字単位）の描画
+    function renderEnglishText(userInput) {
+        if (!currentQueue[currentIndex]) return;
+        const targetText = currentQueue[currentIndex].word;
+
+        let html = '';
+        for (let i = 0; i < targetText.length; i++) {
+            const char = targetText[i];
+            const isSpace = char === ' ';
+
+            if (i < userInput.length) {
+                if (userInput[i] === char) {
+                    if (isSpace) {
+                        html += `<span class="char-correct space-correct">&nbsp;</span>`;
+                    } else {
+                        html += `<span class="char-correct">${char}</span>`;
+                    }
+                } else {
+                    if (isSpace) {
+                        html += `<span class="char-wrong space-wrong">&nbsp;</span>`;
+                    } else {
+                        html += `<span class="char-wrong">${char}</span>`;
+                    }
+                }
+            } else {
+                if (isSpace) {
+                    html += `<span class="char-pending space-char">&nbsp;</span>`;
+                } else {
+                    html += `<span class="char-pending">${char}</span>`;
+                }
+            }
+        }
+        wordDisplay.innerHTML = html;
+    }
+
+    // 音声読み上げ
+    async function speak(text) {
+        const token = ++speakToken;
+
+        if (speechSynthesis.speaking || speechSynthesis.pending) {
+            speechSynthesis.cancel();
+            await waitMs(250);
+        } else if (speechSynthesis.paused) {
+            speechSynthesis.resume();
+        }
+        if (token !== speakToken) return;
+
+        await warmEngine();
+        if (token !== speakToken) return;
+
+        const rate = parseFloat(speedSelect.value) || 1.0;
+        const uttr = new SpeechSynthesisUtterance(text);
+        uttr.rate = rate;
+        uttr.pitch = 1.0;
+        applyVoice(uttr);
+
+        const timeoutMs = Math.max(6000, Math.ceil((text.length * 150) / rate));
+        logEvent('AUDIO', `音声読み上げ開始 (速度: ${rate}): "${text}"`);
+        statusDisplay.innerText = 'Listening... (読み上げ中)';
+        statusDisplay.className = '';
+
+        try {
+            await new Promise((resolve, reject) => {
+                let settled = false;
+                const timer = setTimeout(() => {
+                    if (settled) return;
+                    settled = true;
+                    logEvent('WARN', `音声タイムアウト保護発動 (${timeoutMs}ms) → 入力待機 (Type it!) に復帰`);
+                    speechSynthesis.cancel();
+                    resolve();
+                }, timeoutMs);
+
+                uttr.onend = () => {
+                    if (settled) return;
+                    settled = true;
+                    clearTimeout(timer);
+                    logEvent('AUDIO', '音声読み上げ完了 → 入力待機 (Type it!)');
+                    resolve();
+                };
+                uttr.onerror = (e) => {
+                    if (settled) return;
+                    settled = true;
+                    clearTimeout(timer);
+                    logEvent('ERROR', `音声合成エラー: ${e?.error || 'unknown'}`);
+                    reject(e);
+                };
+
+                speechSynthesis.speak(uttr);
+            });
+
+            if (token !== speakToken) return;
+            statusDisplay.innerText = 'Type it!';
+            statusDisplay.className = '';
+            inputArea.focus();
+        } catch (e) {
+            console.error('Speech synthesis error:', e);
+            if (token !== speakToken) return;
+            speechSynthesis.cancel();
+            statusDisplay.innerText = 'Type it! (Enter で再読み上げ)';
+            statusDisplay.className = '';
+            logEvent('WARN', '音声キャンセル → Enterキーで再読み上げ可能');
+            inputArea.focus();
+        }
+    }
+
+    function updateProgress() {
+        const percent = (currentIndex / currentQueue.length) * 100;
+        progressFill.style.width = percent + '%';
+    }
+
+    // 入力監視リスナー
+    inputArea.addEventListener('input', () => {
+        if (!currentQueue[currentIndex]) return;
+
+        const currentWord = currentQueue[currentIndex].word;
+        const userInput = inputArea.value;
+
+        renderEnglishText(userInput);
+
+        if (userInput === currentWord) {
+            const currentItem = currentQueue[currentIndex];
+            const isEndOfLesson = currentItem && (currentItem.wordIndexInLesson === currentItem.wordTotalInLesson) && (currentIndex + 1 < currentQueue.length);
+
+            inputArea.disabled = true;
+            if (nextSentenceTimer) {
+                clearTimeout(nextSentenceTimer);
+                nextSentenceTimer = null;
+            }
+
+            if (isEndOfLesson) {
+                const nextItem = currentQueue[currentIndex + 1];
+                const nextLessonName = nextItem ? nextItem.lessonTitle : '次のレッスン';
+                statusDisplay.innerText = `🎉 ${currentItem.lessonTitle} クリア！ → ${nextLessonName} へ進みます`;
+                statusDisplay.className = 'correct';
+                logEvent('SUCCESS', `🎉 【レッスンクリア】「${currentItem.lessonTitle}」完了！ 次のレッスンへ進みます (1200ms後)`);
+                nextSentenceTimer = setTimeout(() => {
+                    nextSentenceTimer = null;
+                    currentIndex++;
+                    inputArea.disabled = false;
+                    inputArea.focus();
+                    statusDisplay.className = '';
+                    loadWord();
+                }, 1200);
+            } else {
+                statusDisplay.innerText = 'Correct! Next...';
+                statusDisplay.className = 'correct';
+                logEvent('SUCCESS', `正解！ [${currentIndex + 1}/${currentQueue.length}] 次の単語へ進みます (600ms後)`);
+                nextSentenceTimer = setTimeout(() => {
+                    nextSentenceTimer = null;
+                    currentIndex++;
+                    inputArea.disabled = false;
+                    inputArea.focus();
+                    statusDisplay.className = '';
+                    loadWord();
+                }, 600);
+            }
+        } else if (currentWord.startsWith(userInput)) {
+            statusDisplay.innerText = 'Typing...';
+            statusDisplay.className = '';
+        } else {
+            statusDisplay.innerText = 'Miss!';
+            statusDisplay.className = 'incorrect';
+            if (!wordHasLoggedMiss) {
+                wordHasLoggedMiss = true;
+                const charExpected = currentWord[userInput.length - 1] || '';
+                const charTyped = userInput[userInput.length - 1] || '';
+                logEvent('WARN', `タイピング不一致: 入力='${charTyped}' (期待='${charExpected}')`);
+            }
+        }
+    });
+
+    inputArea.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && inputArea.value === '') {
+            speak(currentQueue[currentIndex].word);
+        }
+    });
+
+    // 初期化実行
+    window.addEventListener('DOMContentLoaded', async () => {
+        initLessonSelect();
+        await initData();
+        if ('speechSynthesis' in window) {
+            speechSynthesis.onvoiceschanged = () => {
+                preferredVoice = selectEnglishVoice();
+            };
+            preferredVoice = selectEnglishVoice();
+        }
+        logEvent('INFO', 'Antigravity英単語タイピングの初期化が完了しました。レッスンを選んでスタートしてください。');
+    });
+</script>
+
+</body>
+</html>
